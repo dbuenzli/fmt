@@ -1,0 +1,5 @@
+<**/*.{ml,mli}> : bin_annot, safe_string
+
+<src> : include
+<src/fmt_top*> : package(compiler-libs.toplevel)
+<test> : include

@@ -1,0 +1,8 @@
+description = "OCaml Format pretty-printer combinators"
+version = "%%VERSION%%"
+
+archive(byte) = "fmt.cma"
+archive(byte, plugin) = "fmt.cma"
+archive(native) = "fmt.cmxa"
+archive(native, plugin) = "fmt.cmxs"
+exists_if = "fmt.cma"
