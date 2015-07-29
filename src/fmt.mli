@@ -4,7 +4,9 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** {!Format} pretty-printer combinators. *)
+(** {!Format} pretty-printer combinators.
+
+    {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
 (** {1 Formatters} *)
 
