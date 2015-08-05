@@ -161,7 +161,7 @@ let ansi_style_code = function
 | `Red -> "\027[31m"
 | `Green -> "\027[32m"
 | `Yellow -> "\027[33m"
-| `Blue -> "\027[1;34m"
+| `Blue -> "\027[34m"
 | `Magenta -> "\027[35m"
 | `Cyan -> "\027[36m"
 | `White -> "\027[37m"
