@@ -65,6 +65,10 @@ let rec list ?(pp_sep = cut) pp_v ppf = function
 | v :: vs ->
     pp_v ppf v; if vs <> [] then (pp_sep ppf (); list ~pp_sep pp_v ppf vs)
 
+let hashtbl ?(pp_sep = cut) ~pp_k ~pp_v ppf tbl =
+  let f ppf k v = pf ppf "@[<1>%a:@.%a@]%a" pp_k k pp_v v pp_sep () in
+  Hashtbl.iter (f ppf) tbl
+
 (* Brackets *)
 
 let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
