@@ -178,6 +178,11 @@ let styled style pp_v ppf = match style_tags () with
 
 let styled_string style = styled style string
 
+(* Formatters *)
+
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
+
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.
    All rights reserved.
