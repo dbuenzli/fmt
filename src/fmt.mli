@@ -114,6 +114,17 @@ val list : ?pp_sep:unit t -> 'a t -> 'a list t
      printed with [pp_v], and values are separated by [pp_sep]
      (defaults to {!cut}). {!nop} on empty lists. *)
 
+val hashtbl :
+  ?pp_sep:unit t -> pp_k:'a t -> pp_v:'b t -> ('a, 'b) Hashtbl.t t
+(** [hashtbl ~pp_sep ~pp_k ~pp_v] formats hash tables.
+    Keys are printed with [pp_k] and values are printed with [pp_v].
+    Each binding (key,value) is separated by [pp_sep]
+    (defaults to {!cut}).
+
+    If the hash table contains multiple bindings for a key, all of
+    them are printed.
+*)
+
 (** {1:bracks Brackets} *)
 
 val parens : 'a t -> 'a t
