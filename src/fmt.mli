@@ -203,14 +203,13 @@ val set_style_tags : style_tags -> unit
 (** [set_style_tags s] sets the current tag style used by
       {!Fmt.pp_styled}. *)
 
-
 (** {1:fmt Standard output formatters} *)
 
 val stdout : Format.formatter
-(** Standard output formatter. *)
+(** [stdout] is the standard output formatter. *)
 
 val stderr : Format.formatter
-(** Standard error formatter. *)
+(** [stderr] is the standard error formatter. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.
