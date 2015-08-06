@@ -195,6 +195,16 @@ let styled_string style = styled style string
 let stdout = Format.std_formatter
 let stderr = Format.err_formatter
 
+let with_strf f =
+  let buf = Buffer.create 17 in
+  let ppf = Format.formatter_of_buffer buf in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  Buffer.contents buf
+
+let to_to_string pp_v v = strf "%a" pp_v v
+
+
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.
    All rights reserved.

@@ -233,6 +233,21 @@ val stdout : Format.formatter
 val stderr : Format.formatter
 (** [stderr] is the standard error formatter. *)
 
+val with_strf: (Format.formatter -> unit) -> string
+(** [with_strf (fun ppf -> ...)] bundles a set of formatting operations
+    together and output the resulting string.
+
+    This function can be used concurrently.
+*)
+
+val to_to_string : 'a t -> 'a -> string
+(** [to_to_string pp_v v] returns the string resulting from [pp_v] applies
+    to [v].
+
+    Using this function for composition is not advisable, since the layout
+    engine is reset between uses.
+*)
+
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.
    All rights reserved.
