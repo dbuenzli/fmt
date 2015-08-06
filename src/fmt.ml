@@ -204,6 +204,13 @@ let with_strf f =
 
 let to_to_string pp_v v = strf "%a" pp_v v
 
+let with_file filename f =
+  let oc = open_out filename in
+  let ppf = Format.formatter_of_out_channel oc in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  close_out oc
+
 
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.

@@ -248,6 +248,11 @@ val to_to_string : 'a t -> 'a -> string
     engine is reset between uses.
 *)
 
+val with_file : string -> (Format.formatter -> unit) -> unit
+(** [with_file filename (fun ppf -> ...)] bundles a set of formatting
+    operations together and emit them on [filename].
+*)
+
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.
    All rights reserved.
