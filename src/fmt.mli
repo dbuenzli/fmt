@@ -27,6 +27,10 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [strf] is {!Format.asprintf}. *)
 
+val kstrf : (string -> 'a) ->
+  ('b, Format.formatter, unit, 'a) format4 -> 'b
+(** [kstrf] is a version for {!Format.ksprintf} which handle "%a". *)
+
 (** {1 Formatters} *)
 
 type 'a t = Format.formatter -> 'a -> unit

@@ -11,6 +11,10 @@ let kpf = Format.kfprintf
 let pr = Format.printf
 let epr = Format.eprintf
 let strf = Format.asprintf
+let kstrf f fmt =
+  let buf = Buffer.create 17 in
+  let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
+  Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
 (* Formatters *)
 
