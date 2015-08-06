@@ -36,6 +36,7 @@ let uint64 ppf v = pf ppf "%Lu" v
 let uint ppf v = pf ppf "%u" v
 
 let string = Format.pp_print_string
+let char = Format.pp_print_char
 let const_string s ppf () = pf ppf "%s" s
 
 (* Floats *)

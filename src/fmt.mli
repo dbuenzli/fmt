@@ -98,6 +98,9 @@ val float_dsig : int -> float t
 val string : string t
 (** [string] is {!Format.pp_print_string}. *)
 
+val char : char t
+(** [char] is {!Format.pp_print_char}. *)
+
 val const_string : string -> unit t
 (** [const_string s] is [const string s]. *)
 
