@@ -8,31 +8,31 @@
 
 type 'a t = Format.formatter -> 'a -> unit
 
-let pp ppf fmt = Format.fprintf ppf fmt
-let kpp ppf fmt = Format.kfprintf ppf fmt
-let rpp fmt ppf = Format.fprintf ppf fmt
+let pf ppf fmt = Format.fprintf ppf fmt
+let kpf ppf fmt = Format.kfprintf ppf fmt
+let pr fmt = Format.printf fmt
 
 let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
-let const pp_v v ppf () = pp ppf "%a" pp_v v
+let const pp_v v ppf () = pf ppf "%a" pp_v v
 
 (* OCaml base type formatters *)
 
 let bool = Format.pp_print_bool
 let int = Format.pp_print_int
-let int32 ppf v = pp ppf "%ld" v
-let int64 ppf v = pp ppf "%Ld" v
-let uint32 ppf v = pp ppf "%lu" v
-let uint64 ppf v = pp ppf "%Lu" v
-let uint ppf v = pp ppf "%u" v
+let int32 ppf v = pf ppf "%ld" v
+let int64 ppf v = pf ppf "%Ld" v
+let uint32 ppf v = pf ppf "%lu" v
+let uint64 ppf v = pf ppf "%Lu" v
+let uint ppf v = pf ppf "%u" v
 
 let string = Format.pp_print_string
-let const_string s ppf () = pp ppf "%s" s
+let const_string s ppf () = pf ppf "%s" s
 
 (* Floats *)
 
-let float ppf v = pp ppf "%g" v
+let float ppf v = pf ppf "%g" v
 
 let round x = floor (x +. 0.5)
 let round_dfrac d x =
@@ -45,13 +45,13 @@ let round_dsig d x =
   let m = 10. ** (floor (log10 (abs_float x))) in       (* to normalize x. *)
   (round_dfrac d (x /. m)) *. m
 
-let float_dfrac d ppf f = pp ppf "%g" (round_dfrac d f)
-let float_dsig d ppf f = pp ppf "%g" (round_dsig d f)
+let float_dfrac d ppf f = pf ppf "%g" (round_dfrac d f)
+let float_dsig d ppf f = pf ppf "%g" (round_dsig d f)
 
 (* OCaml container formatters *)
 
-let none ppf () = pp ppf "None"
-let some pp_v ppf v = pp ppf "@[<1>Some@ %a@]" pp_v v
+let none ppf () = pf ppf "None"
+let some pp_v ppf v = pf ppf "@[<1>Some@ %a@]" pp_v v
 let option ?(pp_none = fun ppf () -> ()) pp_v ppf = function
 | None -> pp_none ppf ()
 | Some v -> pp_v ppf v
@@ -63,9 +63,9 @@ let rec list ?(pp_sep = cut) pp_v ppf = function
 
 (* Brackets *)
 
-let parens pp_v ppf v = pp ppf "@[<1>(%a)@]" pp_v v
-let brackets pp_v ppf v = pp ppf "@[<1>[%a]@]" pp_v v
-let braces pp_v ppf v = pp ppf "@[<1>{%a}@]" pp_v v
+let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
+let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
+let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
 
 (* Text and lines *)
 
@@ -84,10 +84,10 @@ let white_str ~spaces ppf s =
 
 let text = white_str ~spaces:true
 let lines = white_str ~spaces:false
-let text_range ppf ((l0, c0), (l1, c1)) = pp ppf "%d.%d-%d.%d" l0 c0 l1 c1
+let text_range ppf ((l0, c0), (l1, c1)) = pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 
 let doomed ppf reason =
-  pp ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
+  pf ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
     text reason
 
 (* Byte sizes *)
@@ -96,40 +96,40 @@ let _pp_byte_size k i ppf s =
   let pp_frac = float_dfrac 1 in
   let div_round_up m n = (m + n - 1) / n in
   let float = float_of_int in
-  if s < k then pp ppf "%dB" s else
+  if s < k then pf ppf "%dB" s else
   let m = k * k in
   if s < m then begin
     let kstr = if i = "" then "k" (* SI *) else "K" (* IEC *) in
     let sk = s / k in
     if sk < 10
-    then pp ppf "%a%s%sB" pp_frac (float s /. float k) kstr i
-    else pp ppf "%d%s%sB" (div_round_up s k) kstr i
+    then pf ppf "%a%s%sB" pp_frac (float s /. float k) kstr i
+    else pf ppf "%d%s%sB" (div_round_up s k) kstr i
   end else
   let g = k * m in
   if s < g then begin
     let sm = s / m in
     if sm < 10
-    then pp ppf "%aM%sB" pp_frac (float s /. float m) i
-    else pp ppf "%dM%sB" (div_round_up s m) i
+    then pf ppf "%aM%sB" pp_frac (float s /. float m) i
+    else pf ppf "%dM%sB" (div_round_up s m) i
   end else
   let t = k * g in
   if s < t then begin
     let sg = s / g in
     if sg < 10
-    then pp ppf "%aG%sB" pp_frac (float s /. float g) i
-    else pp ppf "%dG%sB" (div_round_up s g) i
+    then pf ppf "%aG%sB" pp_frac (float s /. float g) i
+    else pf ppf "%dG%sB" (div_round_up s g) i
   end else
   let p = k * t in
   if s < p then begin
     let st = s / t in
     if st < 10
-    then pp ppf "%aT%sB" pp_frac (float s /. float t) i
-    else pp ppf "%dT%sB" (div_round_up s t) i
+    then pf ppf "%aT%sB" pp_frac (float s /. float t) i
+    else pf ppf "%dT%sB" (div_round_up s t) i
   end else begin
     let sp = s / p in
     if sp < 10
-    then pp ppf "%aP%sB" pp_frac (float s /. float p) i
-    else pp ppf "%dP%sB" (div_round_up s p) i
+    then pf ppf "%aP%sB" pp_frac (float s /. float p) i
+    else pf ppf "%dP%sB" (div_round_up s p) i
   end
 
 let byte_size ppf s = _pp_byte_size 1000 "" ppf s
@@ -173,7 +173,7 @@ let styled style pp_v ppf = match style_tags () with
 | `None -> pp_v ppf
 | `Ansi ->
     Format.kfprintf
-      (fun ppf -> pp ppf "@<0>%s" ansi_style_reset) ppf "@<0>%s%a"
+      (fun ppf -> pf ppf "@<0>%s" ansi_style_reset) ppf "@<0>%s%a"
       (ansi_style_code style) pp_v
 
 let styled_string style = styled style string

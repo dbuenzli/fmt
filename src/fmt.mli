@@ -13,17 +13,16 @@
 type 'a t = Format.formatter -> 'a -> unit
 (** The type for formatters of values of type ['a]. *)
 
-val pp : Format.formatter ->
+val pf : Format.formatter ->
   ('a, Format.formatter, unit) Pervasives.format -> 'a
-(** [pp] is {!Format.fprintf}. *)
+(** [pf] is {!Format.fprintf}. *)
 
-val kpp : (Format.formatter -> 'a) -> Format.formatter ->
+val kpf : (Format.formatter -> 'a) -> Format.formatter ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
-(** [kpp] is {!Format.kfprintf}. *)
+(** [kpf] is {!Format.kfprintf}. *)
 
-val rpp : ('a, Format.formatter, unit) Pervasives.format ->
-  Format.formatter -> 'a
-(** [rpp] is [pp fmt ppf] *)
+val pr : ('a, Format.formatter, unit) format -> 'a
+(** [pr] is {!Format.printf}. *)
 
 val nop : 'a t
 (** [nop] formats nothing. *)
