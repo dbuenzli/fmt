@@ -158,6 +158,18 @@ val text_range : ((int * int) * (int * int)) t
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 
+(** {1:combi Concatenation and various combinators} *)
+
+val concat : 'a t -> 'b t -> ('a * 'b) t
+(** [concat pp1 pp2 fmt (v1, v2)] is [pp1 fmt v1; pp2 fmt v2]. *)
+
+
+val prefix : unit t -> 'a t -> 'a t
+(** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
+
+val suffix : unit t -> 'a t -> 'a t
+(** [suffix pp_suf pp] suffixes [pp] by [pp_suf]. *)
+
 (** {1 Byte sizes} *)
 
 val byte_size : int t
