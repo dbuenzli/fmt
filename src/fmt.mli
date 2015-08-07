@@ -104,6 +104,9 @@ val char : char t
 val const_string : string -> unit t
 (** [const_string s] is [const string s]. *)
 
+val of_to_string : ('a -> string) -> 'a t
+(** [of_to_string f ppf v] is [string ppf (f v)]. *)
+
 (** {1:conts OCaml container formatters} *)
 
 val none : unit t
