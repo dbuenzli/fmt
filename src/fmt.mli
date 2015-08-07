@@ -8,10 +8,7 @@
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
-(** {1 Formatters} *)
-
-type 'a t = Format.formatter -> 'a -> unit
-(** The type for formatters of values of type ['a]. *)
+(** {1 Formatting} *)
 
 val pf : Format.formatter ->
   ('a, Format.formatter, unit) Pervasives.format -> 'a
@@ -23,6 +20,17 @@ val kpf : (Format.formatter -> 'a) -> Format.formatter ->
 
 val pr : ('a, Format.formatter, unit) format -> 'a
 (** [pr] is {!Format.printf}. *)
+
+val epr : ('a, Format.formatter, unit) format -> 'a
+(** [epr] is {!Format.eprintf}. *)
+
+val strf : ('a, Format.formatter, unit, string) format4 -> 'a
+(** [strf] is {!Format.asprintf}. *)
+
+(** {1 Formatters} *)
+
+type 'a t = Format.formatter -> 'a -> unit
+(** The type for formatters of values of type ['a]. *)
 
 val nop : 'a t
 (** [nop] formats nothing. *)

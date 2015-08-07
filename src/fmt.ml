@@ -4,13 +4,17 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+(* Formatting *)
+
+let pf = Format.fprintf
+let kpf = Format.kfprintf
+let pr = Format.printf
+let epr = Format.eprintf
+let strf = Format.asprintf
+
 (* Formatters *)
 
 type 'a t = Format.formatter -> 'a -> unit
-
-let pf ppf fmt = Format.fprintf ppf fmt
-let kpf ppf fmt = Format.kfprintf ppf fmt
-let pr fmt = Format.printf fmt
 
 let nop fmt ppf = ()
 let cut = Format.pp_print_cut
