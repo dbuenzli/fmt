@@ -103,6 +103,15 @@ let doomed ppf reason =
   pf ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
     text reason
 
+(* Concatenation *)
+
+let concat (pp1 : 'a t) (pp2 : 'b t) ppf (v1, v2) =
+  pp1 ppf v1 ; pp2 ppf v2
+
+let prefix pp_p pp_v ppf v = concat pp_p pp_v ppf ((),v)
+
+let suffix pp_s pp_v ppf v = concat pp_v pp_s ppf (v,())
+
 (* Byte sizes *)
 
 let _pp_byte_size k i ppf s =
