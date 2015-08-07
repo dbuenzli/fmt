@@ -112,6 +112,11 @@ let prefix pp_p pp_v ppf v = concat pp_p pp_v ppf ((),v)
 
 let suffix pp_s pp_v ppf v = concat pp_v pp_s ppf (v,())
 
+let (<.>) = concat
+
+let (@>) pre x = prefix pre x
+let (<@) x suf = suffix suf x
+
 (* Byte sizes *)
 
 let _pp_byte_size k i ppf s =
