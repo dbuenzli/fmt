@@ -39,6 +39,8 @@ let string = Format.pp_print_string
 let char = Format.pp_print_char
 let const_string s ppf () = pf ppf "%s" s
 
+let of_to_string f ppf v = string ppf (f v)
+
 (* Floats *)
 
 let float ppf v = pf ppf "%g" v
