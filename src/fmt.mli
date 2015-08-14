@@ -27,6 +27,10 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [strf] is {!Format.asprintf}. *)
 
+val kstrf : (string -> 'a) ->
+  ('b, Format.formatter, unit, 'a) format4 -> 'b
+(** [kstrf] is a version for {!Format.ksprintf} which handle "%a". *)
+
 (** {1 Formatters} *)
 
 type 'a t = Format.formatter -> 'a -> unit
@@ -94,8 +98,14 @@ val float_dsig : int -> float t
 val string : string t
 (** [string] is {!Format.pp_print_string}. *)
 
+val char : char t
+(** [char] is {!Format.pp_print_char}. *)
+
 val const_string : string -> unit t
 (** [const_string s] is [const string s]. *)
+
+val of_to_string : ('a -> string) -> 'a t
+(** [of_to_string f ppf v] is [string ppf (f v)]. *)
 
 (** {1:conts OCaml container formatters} *)
 
@@ -113,6 +123,17 @@ val list : ?pp_sep:unit t -> 'a t -> 'a list t
 (** [pp_list pp_sep pp_v] formats lists of type ['a]. Each value is
      printed with [pp_v], and values are separated by [pp_sep]
      (defaults to {!cut}). {!nop} on empty lists. *)
+
+val hashtbl :
+  ?pp_sep:unit t -> pp_k:'a t -> pp_v:'b t -> ('a, 'b) Hashtbl.t t
+(** [hashtbl ~pp_sep ~pp_k ~pp_v] formats hash tables.
+    Keys are printed with [pp_k] and values are printed with [pp_v].
+    Each binding (key,value) is separated by [pp_sep]
+    (defaults to {!cut}).
+
+    If the hash table contains multiple bindings for a key, all of
+    them are printed.
+*)
 
 (** {1:bracks Brackets} *)
 
@@ -139,6 +160,26 @@ val text_range : ((int * int) * (int * int)) t
 (** [text_range] formats a line-column text range according to
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
+
+(** {1:combi Concatenation and various combinators} *)
+
+val concat : 'a t -> 'b t -> ('a * 'b) t
+(** [concat pp1 pp2 fmt (v1, v2)] is [pp1 fmt v1; pp2 fmt v2]. *)
+
+val (<.>) : 'a t -> 'b t -> ('a * 'b) t
+(** [pp1 <.> pp2] is [concat pp1 pp2]. *)
+
+val prefix : unit t -> 'a t -> 'a t
+(** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
+
+val suffix : unit t -> 'a t -> 'a t
+(** [suffix pp_suf pp] suffixes [pp] by [pp_suf]. *)
+
+val (@>) : unit t -> 'a t -> 'a t
+(** [pp_p @> pp] is [prefix pp_p pp]. *)
+
+val (<@) : 'a t -> unit t -> 'a t
+(** [pp <@ pp_s] is [suffix pp_s pp]. *)
 
 (** {1 Byte sizes} *)
 
@@ -217,6 +258,26 @@ val stdout : Format.formatter
 
 val stderr : Format.formatter
 (** [stderr] is the standard error formatter. *)
+
+val with_strf: (Format.formatter -> unit) -> string
+(** [with_strf (fun ppf -> ...)] bundles a set of formatting operations
+    together and output the resulting string.
+
+    This function can be used concurrently.
+*)
+
+val to_to_string : 'a t -> 'a -> string
+(** [to_to_string pp_v v] returns the string resulting from [pp_v] applies
+    to [v].
+
+    Using this function for composition is not advisable, since the layout
+    engine is reset between uses.
+*)
+
+val with_file : string -> (Format.formatter -> unit) -> unit
+(** [with_file filename (fun ppf -> ...)] bundles a set of formatting
+    operations together and emit them on [filename].
+*)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.

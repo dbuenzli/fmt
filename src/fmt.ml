@@ -11,6 +11,10 @@ let kpf = Format.kfprintf
 let pr = Format.printf
 let epr = Format.eprintf
 let strf = Format.asprintf
+let kstrf f fmt =
+  let buf = Buffer.create 17 in
+  let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
+  Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
 (* Formatters *)
 
@@ -32,7 +36,10 @@ let uint64 ppf v = pf ppf "%Lu" v
 let uint ppf v = pf ppf "%u" v
 
 let string = Format.pp_print_string
+let char = Format.pp_print_char
 let const_string s ppf () = pf ppf "%s" s
+
+let of_to_string f ppf v = string ppf (f v)
 
 (* Floats *)
 
@@ -65,6 +72,10 @@ let rec list ?(pp_sep = cut) pp_v ppf = function
 | v :: vs ->
     pp_v ppf v; if vs <> [] then (pp_sep ppf (); list ~pp_sep pp_v ppf vs)
 
+let hashtbl ?(pp_sep = cut) ~pp_k ~pp_v ppf tbl =
+  let f ppf k v = pf ppf "@[<1>%a:@.%a@]%a" pp_k k pp_v v pp_sep () in
+  Hashtbl.iter (f ppf) tbl
+
 (* Brackets *)
 
 let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
@@ -93,6 +104,20 @@ let text_range ppf ((l0, c0), (l1, c1)) = pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 let doomed ppf reason =
   pf ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
     text reason
+
+(* Concatenation *)
+
+let concat (pp1 : 'a t) (pp2 : 'b t) ppf (v1, v2) =
+  pp1 ppf v1 ; pp2 ppf v2
+
+let prefix pp_p pp_v ppf v = concat pp_p pp_v ppf ((),v)
+
+let suffix pp_s pp_v ppf v = concat pp_v pp_s ppf (v,())
+
+let (<.>) = concat
+
+let (@>) pre x = prefix pre x
+let (<@) x suf = suffix suf x
 
 (* Byte sizes *)
 
@@ -186,6 +211,23 @@ let styled_string style = styled style string
 
 let stdout = Format.std_formatter
 let stderr = Format.err_formatter
+
+let with_strf f =
+  let buf = Buffer.create 17 in
+  let ppf = Format.formatter_of_buffer buf in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  Buffer.contents buf
+
+let to_to_string pp_v v = strf "%a" pp_v v
+
+let with_file filename f =
+  let oc = open_out filename in
+  let ppf = Format.formatter_of_out_channel oc in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  close_out oc
+
 
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.
