@@ -25,11 +25,15 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 (** [epr] is {!Format.eprintf}. *)
 
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
-(** [strf] is {!Format.asprintf}. *)
+(** [strf] is {!Format.asprintf}. {b Warning.} This function is not
+    thread-safe. *)
 
 val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
-(** [kstrf] is a version for {!Format.ksprintf} which handle "%a". *)
+(** [kstrf] is like {!Format.ksprintf} but handles "%a" directives. *)
+
+val with_strf: (Format.formatter -> unit) -> string
+(** [with_strf pp] is [strf "%a" pp ()] but the function is thread-safe. *)
 
 (** {1 Formatters} *)
 
@@ -104,9 +108,6 @@ val char : char t
 val const_string : string -> unit t
 (** [const_string s] is [const string s]. *)
 
-val of_to_string : ('a -> string) -> 'a t
-(** [of_to_string f ppf v] is [string ppf (f v)]. *)
-
 (** {1:conts OCaml container formatters} *)
 
 val none : unit t
@@ -132,8 +133,7 @@ val hashtbl :
     (defaults to {!cut}).
 
     If the hash table contains multiple bindings for a key, all of
-    them are printed.
-*)
+    them are printed. *)
 
 (** {1:bracks Brackets} *)
 
@@ -165,7 +165,6 @@ val text_range : ((int * int) * (int * int)) t
 
 val concat : 'a t -> 'b t -> ('a * 'b) t
 (** [concat pp1 pp2 fmt (v1, v2)] is [pp1 fmt v1; pp2 fmt v2]. *)
-
 
 val prefix : unit t -> 'a t -> 'a t
 (** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
@@ -243,6 +242,14 @@ val set_style_tags : style_tags -> unit
 (** [set_style_tags s] sets the current tag style used by
       {!Fmt.pp_styled}. *)
 
+(** {1:stringconverters Converting with string value converters} *)
+
+val of_to_string : ('a -> string) -> 'a t
+(** [of_to_string f ppf v] is [string ppf (f v)]. *)
+
+val to_to_string : 'a t -> 'a -> string
+(** [to_to_string pp_v v] is [strf "%a" pp_v v]. *)
+
 (** {1:fmt Standard output formatters} *)
 
 val stdout : Format.formatter
@@ -250,21 +257,6 @@ val stdout : Format.formatter
 
 val stderr : Format.formatter
 (** [stderr] is the standard error formatter. *)
-
-val with_strf: (Format.formatter -> unit) -> string
-(** [with_strf (fun ppf -> ...)] bundles a set of formatting operations
-    together and output the resulting string.
-
-    This function can be used concurrently.
-*)
-
-val to_to_string : 'a t -> 'a -> string
-(** [to_to_string pp_v v] returns the string resulting from [pp_v] applies
-    to [v].
-
-    Using this function for composition is not advisable, since the layout
-    engine is reset between uses.
-*)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.

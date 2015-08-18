@@ -16,6 +16,13 @@ let kstrf f fmt =
   let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
   Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
+let with_strf f =
+  let buf = Buffer.create 17 in
+  let ppf = Format.formatter_of_buffer buf in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  Buffer.contents buf
+
 (* Formatters *)
 
 type 'a t = Format.formatter -> 'a -> unit
@@ -202,10 +209,7 @@ let styled style pp_v ppf = match style_tags () with
 
 let styled_string style = styled style string
 
-(* Formatters *)
-
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
+(* Converting with string converters. *)
 
 let with_strf f =
   let buf = Buffer.create 17 in
@@ -216,6 +220,10 @@ let with_strf f =
 
 let to_to_string pp_v v = strf "%a" pp_v v
 
+(* Formatters *)
+
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
 
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.
