@@ -16,12 +16,7 @@ let kstrf f fmt =
   let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
   Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
-let with_strf f =
-  let buf = Buffer.create 17 in
-  let ppf = Format.formatter_of_buffer buf in
-  f ppf ;
-  Format.pp_print_flush ppf () ;
-  Buffer.contents buf
+let with_strf fmt = kstrf (fun s -> s) fmt
 
 (* Formatters *)
 
@@ -45,8 +40,6 @@ let uint ppf v = pf ppf "%u" v
 let string = Format.pp_print_string
 let char = Format.pp_print_char
 let const_string s ppf () = pf ppf "%s" s
-
-let of_to_string f ppf v = string ppf (f v)
 
 (* Floats *)
 
@@ -211,13 +204,7 @@ let styled_string style = styled style string
 
 (* Converting with string converters. *)
 
-let with_strf f =
-  let buf = Buffer.create 17 in
-  let ppf = Format.formatter_of_buffer buf in
-  f ppf ;
-  Format.pp_print_flush ppf () ;
-  Buffer.contents buf
-
+let of_to_string f ppf v = string ppf (f v)
 let to_to_string pp_v v = strf "%a" pp_v v
 
 (* Formatters *)

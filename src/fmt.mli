@@ -32,8 +32,8 @@ val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
 (** [kstrf] is like {!Format.ksprintf} but handles "%a" directives. *)
 
-val with_strf: (Format.formatter -> unit) -> string
-(** [with_strf pp] is [strf "%a" pp ()] but the function is thread-safe. *)
+val with_strf : ('a, Format.formatter, unit, string) format4 -> 'a
+(** [with_strf pp] is like {!strf} but thread-safe. *)
 
 (** {1 Formatters} *)
 
