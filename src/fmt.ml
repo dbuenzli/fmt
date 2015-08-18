@@ -8,15 +8,18 @@
 
 let pf = Format.fprintf
 let kpf = Format.kfprintf
-let pr = Format.printf
-let epr = Format.eprintf
 let strf = Format.asprintf
 let kstrf f fmt =
   let buf = Buffer.create 17 in
   let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
   Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
-let with_strf fmt = kstrf (fun s -> s) fmt
+(* Standard output formatting *)
+
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
+let pr = Format.printf
+let epr = Format.eprintf
 
 (* Formatters *)
 
@@ -27,7 +30,21 @@ let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
 let const pp_v v ppf () = pf ppf "%a" pp_v v
 
-(* OCaml base type formatters *)
+(* Boxes *)
+
+let box ?(indent = 0) pp ppf =
+  Format.pp_open_hovbox ppf indent; pf ppf "%a@]" pp
+
+let hbox pp ppf =
+  Format.pp_open_hbox ppf (); pf ppf "%a@]" pp
+
+let vbox ?(indent = 0) pp ppf =
+  Format.pp_open_vbox ppf indent; pf ppf "%a@]" pp
+
+let hvbox ?(indent = 0) pp ppf =
+  Format.pp_open_hvbox ppf indent; pf ppf "%a@]" pp
+
+(* Base type formatters *)
 
 let bool = Format.pp_print_bool
 let int = Format.pp_print_int
@@ -37,9 +54,9 @@ let uint32 ppf v = pf ppf "%lu" v
 let uint64 ppf v = pf ppf "%Lu" v
 let uint ppf v = pf ppf "%u" v
 
-let string = Format.pp_print_string
 let char = Format.pp_print_char
-let const_string s ppf () = pf ppf "%s" s
+let string = Format.pp_print_string
+let buffer ppf b = string ppf (Buffer.contents b)
 
 (* Floats *)
 
@@ -59,22 +76,104 @@ let round_dsig d x =
 let float_dfrac d ppf f = pf ppf "%g" (round_dfrac d f)
 let float_dsig d ppf f = pf ppf "%g" (round_dsig d f)
 
-(* OCaml container formatters *)
+(* Polymorphic type formatters *)
 
-let none ppf () = pf ppf "None"
-let some pp_v ppf v = pf ppf "@[<1>Some@ %a@]" pp_v v
-let option ?(pp_none = fun ppf () -> ()) pp_v ppf = function
+let pair ?sep:(pp_sep = cut) pp_fst pp_snd ppf (fst, snd) =
+  pp_fst ppf fst; pp_sep ppf (); pp_snd ppf snd
+
+let option ?none:(pp_none = nop) pp_v ppf = function
 | None -> pp_none ppf ()
 | Some v -> pp_v ppf v
 
-let rec list ?(pp_sep = cut) pp_v ppf = function
+let rec list ?sep:(pp_sep = cut) pp_v ppf = function
 | [] -> ()
 | v :: vs ->
-    pp_v ppf v; if vs <> [] then (pp_sep ppf (); list ~pp_sep pp_v ppf vs)
+    pp_v ppf v; if vs <> [] then (pp_sep ppf (); list ~sep:pp_sep pp_v ppf vs)
 
-let hashtbl ?(pp_sep = cut) ~pp_k ~pp_v ppf tbl =
-  let f ppf k v = pf ppf "@[<1>%a:@.%a@]%a" pp_k k pp_v v pp_sep () in
-  Hashtbl.iter (f ppf) tbl
+let array ?sep:(pp_sep = cut) pp_v ppf a =
+  for i = 0 to Array.length a - 1 do
+    if i = 0 then () else pp_sep ppf ();
+    pp_v ppf a.(i)
+  done
+
+let hashtbl ?sep:(pp_sep = cut) pp_binding ppf h =
+  let pp_binding k v is_first =
+    if is_first then () else pp_sep ppf ();
+    pp_binding ppf (k, v);
+    false
+  in
+  ignore (Hashtbl.fold pp_binding h true)
+
+let queue ?sep:(pp_sep = cut) pp_v ppf q =
+  let pp_v is_first v =
+    if is_first then () else pp_sep ppf ();
+    pp_v ppf v; false
+  in
+  ignore (Queue.fold pp_v true q)
+
+let stack ?sep:(pp_sep = cut) pp_v ppf s =
+  let is_first = ref true in
+  let pp_v v =
+    if !is_first then (is_first := false) else pp_sep ppf ();
+    pp_v ppf v
+  in
+  ignore (Stack.iter pp_v s)
+
+module Dump = struct
+
+  let pair pp_fst pp_snd ppf (fst, snd) =
+    pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
+
+  let option pp_v ppf = function
+  | None -> pf ppf "None"
+  | Some v -> pf ppf "@[<1>Some@ @[%a@]@]" pp_v v
+
+  let list pp_v ppf vs =
+    let rec loop = function
+    | [] -> ()
+    | v :: vs ->
+        if vs = [] then (pf ppf "@[%a@]" pp_v v) else
+        (pf ppf "@[%a@];@ " pp_v v; loop vs)
+    in
+    pf ppf "@[<1>["; loop vs; pf ppf "]@]"
+
+  let array pp_v ppf a =
+    pf ppf "@[<2>[|";
+    for i = 0 to Array.length a - 1 do
+      if i = 0 then pf ppf "@[%a@]" pp_v a.(i) else
+      pf ppf ";@ @[%a@]" pp_v a.(i)
+    done;
+    pf ppf "|]@]"
+
+  let hashtbl pp_k pp_v ppf h =
+    let pp_binding k v is_first =
+      if is_first then () else pf ppf "@ ";
+      pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_k k pp_v v;
+      false
+    in
+    pf ppf "@[<1>(hashtbl@ ";
+    ignore (Hashtbl.fold pp_binding h true);
+    pf ppf ")@]"
+
+  let queue pp_v ppf q =
+    let pp_v is_first v =
+      if is_first then () else pf ppf "@ ";
+      pf ppf "@[%a@]" pp_v v; false
+    in
+    pf ppf "@[<1>(queue@ ";
+    ignore (Queue.fold pp_v true q);
+    pf ppf ")@]"
+
+  let stack pp_v ppf s =
+    let is_first = ref true in
+    let pp_v v =
+      if !is_first then (is_first := false) else pf ppf "@ ";
+      pf ppf "@[%a@]" pp_v v
+    in
+    pf ppf "@[<1>(stack@ ";
+    ignore (Stack.iter pp_v s);
+    pf ppf ")@]"
+end
 
 (* Brackets *)
 
@@ -83,6 +182,8 @@ let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
 let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
 
 (* Text and lines *)
+
+let verbatim s ppf () = pf ppf "%s" s
 
 let white_str ~spaces ppf s =
   let left = ref 0 and right = ref 0 and len = String.length s in
@@ -105,14 +206,11 @@ let doomed ppf reason =
   pf ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
     text reason
 
-(* Concatenation *)
+(* Appending *)
 
-let concat (pp1 : 'a t) (pp2 : 'b t) ppf (v1, v2) =
-  pp1 ppf v1 ; pp2 ppf v2
-
-let prefix pp_p pp_v ppf v = concat pp_p pp_v ppf ((),v)
-
-let suffix pp_s pp_v ppf v = concat pp_v pp_s ppf (v,())
+let append pp_v0 pp_v1 ppf (v0, v1) = pp_v0 ppf v0 ; pp_v1 ppf v1
+let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
+let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
 
 (* Byte sizes *)
 
@@ -206,11 +304,6 @@ let styled_string style = styled style string
 
 let of_to_string f ppf v = string ppf (f v)
 let to_to_string pp_v v = strf "%a" pp_v v
-
-(* Formatters *)
-
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
 
 (*---------------------------------------------------------------------------
    Copyright 2014 Daniel C. Bünzli.

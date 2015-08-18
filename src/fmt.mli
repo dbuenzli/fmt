@@ -6,9 +6,14 @@
 
 (** {!Format} pretty-printer combinators.
 
+    {b References}
+    {ul
+    {- The required reading {!Format} module
+       {{:https://ocaml.org/learn/tutorials/format.html}tutorial}.}}
+
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
-(** {1 Formatting} *)
+(** {1:formatting Formatting} *)
 
 val pf : Format.formatter ->
   ('a, Format.formatter, unit) Pervasives.format -> 'a
@@ -18,22 +23,26 @@ val kpf : (Format.formatter -> 'a) -> Format.formatter ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
 (** [kpf] is {!Format.kfprintf}. *)
 
-val pr : ('a, Format.formatter, unit) format -> 'a
-(** [pr] is {!Format.printf}. *)
-
-val epr : ('a, Format.formatter, unit) format -> 'a
-(** [epr] is {!Format.eprintf}. *)
-
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
-(** [strf] is {!Format.asprintf}. {b Warning.} This function is not
-    thread-safe. *)
+(** [strf] is {!Format.asprintf}. *)
 
 val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
 (** [kstrf] is like {!Format.ksprintf} but handles "%a" directives. *)
 
-val with_strf : ('a, Format.formatter, unit, string) format4 -> 'a
-(** [with_strf pp] is like {!strf} but thread-safe. *)
+(** {1:fmt Standard output formatting} *)
+
+val stdout : Format.formatter
+(** [stdout] is the standard output formatter. *)
+
+val stderr : Format.formatter
+(** [stderr] is the standard error formatter. *)
+
+val pr : ('a, Format.formatter, unit) format -> 'a
+(** [pr] is [pf stdout]. *)
+
+val epr : ('a, Format.formatter, unit) format -> 'a
+(** [epr] is [pf stderr]. *)
 
 (** {1 Formatters} *)
 
@@ -52,12 +61,27 @@ val sp : unit t
 val const : 'a t -> 'a -> unit t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
-val doomed : string t
-(** [doomed] should be used for printing a message when reasonable
-    assumptions are being violated. The string should be a short
-    description of what is going on. *)
+(** {1:boxes Boxes} *)
 
-(** {1:basetypes OCaml base type formatters} *)
+val box : ?indent:int -> 'a t -> 'a t
+(** [box ~indent pp ppf] wraps [pp] in a horizontal or vertical box. Break
+    hints that lead to a new line add [indent] to the current indentation
+    (defaults to [0]). *)
+
+val hbox : 'a t -> 'a t
+(** [hbox] is like {!box} but is a horizontal box: the line is not split
+    in this box (but may be in sub-boxes). *)
+
+val vbox : ?indent:int -> 'a t -> 'a t
+(** [vbox] is like {!box} but is a vertical box: every break hint leads
+    to a new line which adds [indent] to the current indentation
+    (default to [0]). *)
+
+val hvbox : ?indent:int -> 'a t -> 'a t
+(** [hvbox] is like {!box} but is either {!hbox} if its fits on
+    a single line or {!vbox} otherwise. *)
+
+(** {1:basetypes Base type formatters} *)
 
 val bool : bool t
 (** [bool] is {!Format.pp_print_bool}. *)
@@ -66,22 +90,22 @@ val int : int t
 (** [int] is {!Format.pp_print_int}. *)
 
 val int32 : int32 t
-(** [int32 ppf] is [pp ppf "%ld"]. *)
+(** [int32 ppf] is [pf ppf "%ld"]. *)
 
 val int64 : int64 t
-(** [int64 ppf] is [pp ppf "%Ld"]. *)
+(** [int64 ppf] is [pf ppf "%Ld"]. *)
 
 val uint32 : int32 t
-(** [int32 ppf] is [pp ppf "%lu"]. *)
+(** [int32 ppf] is [pf ppf "%lu"]. *)
 
 val uint64 : int64 t
-(** [uint64 ppf] is [pp ppf "%Lu"]. *)
+(** [uint64 ppf] is [pf ppf "%Lu"]. *)
 
 val uint : int t
-(** [uint ppf] is [pp ppf "%u"]. *)
+(** [uint ppf] is [pf ppf "%u"]. *)
 
 val float : float t
-(** [float ppf] is [pp ppf "%g".] *)
+(** [float ppf] is [pf ppf "%g".] *)
 
 val float_dfrac : int -> float t
 (** [float_dfrac d] rounds the float to the [d]th {e decimal}
@@ -99,54 +123,118 @@ val float_dsig : int -> float t
     {b Warning.} The current implementation overflows on large [d]
     and floats. *)
 
-val string : string t
-(** [string] is {!Format.pp_print_string}. *)
-
 val char : char t
 (** [char] is {!Format.pp_print_char}. *)
 
-val const_string : string -> unit t
-(** [const_string s] is [const string s]. *)
+val string : string t
+(** [string] is {!Format.pp_print_string}. *)
 
-(** {1:conts OCaml container formatters} *)
+val buffer : Buffer.t t
+(** [buffer] formats a {!Buffer.t} value's current contents. *)
 
-val none : unit t
-(** [none ppf] is [pp ppf "None"]. *)
+(** {1:polytypes Polymorphic type formatters}
 
-val some : 'a t -> 'a t
-(** [some pp_v ppf] is [pp ppf "@[<1>Some@ %a@]" pp_v]. *)
+    These formatters give full control to the client over the
+    formatting process and do not wrap the formatted structures with
+    boxes. Use the {!Dump} module to quickly format values for
+    inspection.  *)
 
-val option : ?pp_none:unit t -> 'a t -> 'a option t
-(** [option pp_none pp_v] formats value of type ['a option] using
-    [pp_v] and [pp_none] defaults to {!nop}. *)
+val pair : ?sep:unit t -> 'a t -> 'b t -> ('a * 'b) t
+(** [pair ~sep pp_fst pp_snd] formats a pair. The first and second
+    projection are formatted using [pp_fst] and [pp_snd] and are
+    separated by [sep] (defaults to {!cut}). *)
 
-val list : ?pp_sep:unit t -> 'a t -> 'a list t
-(** [pp_list pp_sep pp_v] formats lists of type ['a]. Each value is
-     printed with [pp_v], and values are separated by [pp_sep]
-     (defaults to {!cut}). {!nop} on empty lists. *)
+val option : ?none:unit t -> 'a t -> 'a option t
+(** [option ~none pp_v] formats an optional value. The [Some] case
+    uses [pp_v] and [None] uses [none] (defaults to {!nop}). *)
 
-val hashtbl :
-  ?pp_sep:unit t -> pp_k:'a t -> pp_v:'b t -> ('a, 'b) Hashtbl.t t
-(** [hashtbl ~pp_sep ~pp_k ~pp_v] formats hash tables.
-    Keys are printed with [pp_k] and values are printed with [pp_v].
-    Each binding (key,value) is separated by [pp_sep]
-    (defaults to {!cut}).
+val list : ?sep:unit t -> 'a t -> 'a list t
+(** [list sep pp_v] formats list elements. Each element of the list is
+    formatted in order with [pp_v]. Elements are separated by [sep]
+    (defaults to {!cut}). If the list is empty, this is {!nop}. *)
 
-    If the hash table contains multiple bindings for a key, all of
-    them are printed. *)
+val array : ?sep:unit t -> 'a t -> 'a array t
+(** [array sep pp_v] formats array elements. Each element of the array
+    is formatted in order with [pp_v]. Elements are separated by [sep]
+    (defaults to {!cut}). If the array is empty, this is {!nop}. *)
+
+val hashtbl : ?sep:unit t -> ('a * 'b) t -> ('a, 'b) Hashtbl.t t
+(** [hashtbl ~sep pp_binding] formats the bindings of a hash
+    table. Each binding is formatted with [pp_binding] and bindings
+    are separated by [sep] (defaults to {!cut}). If the hash table has
+    multiple bindings for a given key, all bindings are formatted,
+    with the most recent binding first. If the hash table is empty,
+    this is {!nop}. *)
+
+val queue : ?sep:unit t -> 'a t -> 'a Queue.t t
+(** [queue ~sep pp_v] formats queue elements. Each element of the
+    queue is formatted in least recently added order with
+    [pp_v]. Elements are separated by [sep] (defaults to {!cut}). If
+    the queue is empty, this is {!nop}. *)
+
+val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
+(** [stack ~sep pp_v] formats stack elements. Each element of the
+    stack is formatted from top to bottom order with [pp_v].  Elements
+    are separated by [sep] (defaults to {!cut}). If the stack is
+    empty, this is {!nop}. *)
+
+(** Formatters for inspecting OCaml values.
+
+    Formatters of this module dump OCaml value with little control
+    over the representation but with good default box structures and,
+    whenever possible, using OCaml syntax. *)
+module Dump : sig
+
+  (** {1:polytypes Polymorphic type formatters} *)
+
+  val pair : 'a t -> 'b t -> ('a * 'b) t
+  (** [pair pp_fst pp_snd] formats an OCaml pair using [pp_fst] and [pp_snd]
+      for the first and second projection. *)
+
+  val option : 'a t -> 'a option t
+  (** [option pp_v] formats an OCaml option using [pp_v] for the [Some]
+      case. No parentheses are added. *)
+
+  val list : 'a t -> 'a list t
+  (** [list pp_v] formats an OCaml list using [pp_v] for the list
+      elements. *)
+
+  val array : 'a t -> 'a array t
+  (** [array pp_v] formats an OCaml array using [pp_v] for the array
+      elements. *)
+
+  val hashtbl : 'a t -> 'b t -> ('a, 'b) Hashtbl.t t
+  (** [hashtbl pp_k pp_v] formats an unspecified representation of the
+      bindings of a hash table using [pp_k] for the keys and [pp_v]
+      for the values. If the hash table has multiple bindings for a
+      given key, all bindings are formatted, with the most recent
+      binding first. *)
+
+  val queue : 'a t -> 'a Queue.t t
+  (** [queue pp_v] formats an unspecified representation of an OCaml
+      queue using [pp_v] to format its elements, in least recently added
+      order. *)
+
+  val stack : 'a t -> 'a Stack.t t
+  (** [stack pp_v] formats an unspecified representation of an OCaml
+      stack using [pp_v] to format its elements in top to botttom order. *)
+end
 
 (** {1:bracks Brackets} *)
 
 val parens : 'a t -> 'a t
-(** [parens pp_v ppf] is [pp "@[<1>(%a)@]" pp_v]. *)
+(** [parens pp_v ppf] is [pf "@[<1>(%a)@]" pp_v]. *)
 
 val brackets : 'a t -> 'a t
-(** [brackets pp_v ppf] is [pp "@[<1>[%a]@]" pp_v]. *)
+(** [brackets pp_v ppf] is [pf "@[<1>[%a]@]" pp_v]. *)
 
 val braces : 'a t -> 'a t
-(** [brackets pp_v ppf] is [pp "@[<1>{%a}@]" pp_v]. *)
+(** [brackets pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
 
 (** {1:text Text and lines} *)
+
+val verbatim : string -> unit t
+(** [verbatim s] is [const string s]. *)
 
 val text : string t
   (** [pp_text] formats text by replacing spaces and newlines in the string
@@ -161,10 +249,15 @@ val text_range : ((int * int) * (int * int)) t
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 
-(** {1:combi Concatenation and various combinators} *)
+val doomed : string t
+(** [doomed] should be used for printing a message when reasonable
+    assumptions are being violated. The string should be a short
+    description of what is going on. *)
 
-val concat : 'a t -> 'b t -> ('a * 'b) t
-(** [concat pp1 pp2 fmt (v1, v2)] is [pp1 fmt v1; pp2 fmt v2]. *)
+(** {1:combi Appending} *)
+
+val append : 'a t -> 'b t -> ('a * 'b) t
+(** [append pp_v0 pp_v1 ppf (v0, v1)] is [pp_v0 ppf v0; pp_v1 ppf v1]. *)
 
 val prefix : unit t -> 'a t -> 'a t
 (** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
@@ -249,14 +342,6 @@ val of_to_string : ('a -> string) -> 'a t
 
 val to_to_string : 'a t -> 'a -> string
 (** [to_to_string pp_v v] is [strf "%a" pp_v v]. *)
-
-(** {1:fmt Standard output formatters} *)
-
-val stdout : Format.formatter
-(** [stdout] is the standard output formatter. *)
-
-val stderr : Format.formatter
-(** [stderr] is the standard error formatter. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.
