@@ -70,26 +70,6 @@ val fmt : ('a, Format.formatter, unit) Pervasives.format ->
     non-constant formatting directive, generates a value of type
     {!t}. *)
 
-(** {1:boxes Boxes} *)
-
-val box : ?indent:int -> 'a t -> 'a t
-(** [box ~indent pp ppf] wraps [pp] in a horizontal or vertical box. Break
-    hints that lead to a new line add [indent] to the current indentation
-    (defaults to [0]). *)
-
-val hbox : 'a t -> 'a t
-(** [hbox] is like {!box} but is a horizontal box: the line is not split
-    in this box (but may be in sub-boxes). *)
-
-val vbox : ?indent:int -> 'a t -> 'a t
-(** [vbox] is like {!box} but is a vertical box: every break hint leads
-    to a new line which adds [indent] to the current indentation
-    (default to [0]). *)
-
-val hvbox : ?indent:int -> 'a t -> 'a t
-(** [hvbox] is like {!box} but is either {!hbox} if its fits on
-    a single line or {!vbox} otherwise. *)
-
 (** {1:basetypes Base type formatters} *)
 
 val bool : bool t
@@ -228,6 +208,26 @@ module Dump : sig
   (** [stack pp_v] formats an unspecified representation of an OCaml
       stack using [pp_v] to format its elements in top to botttom order. *)
 end
+
+(** {1:boxes Boxes} *)
+
+val box : ?indent:int -> 'a t -> 'a t
+(** [box ~indent pp ppf] wraps [pp] in a horizontal or vertical box. Break
+    hints that lead to a new line add [indent] to the current indentation
+    (defaults to [0]). *)
+
+val hbox : 'a t -> 'a t
+(** [hbox] is like {!box} but is a horizontal box: the line is not split
+    in this box (but may be in sub-boxes). *)
+
+val vbox : ?indent:int -> 'a t -> 'a t
+(** [vbox] is like {!box} but is a vertical box: every break hint leads
+    to a new line which adds [indent] to the current indentation
+    (default to [0]). *)
+
+val hvbox : ?indent:int -> 'a t -> 'a t
+(** [hvbox] is like {!box} but is either {!hbox} if its fits on
+    a single line or {!vbox} otherwise. *)
 
 (** {1:bracks Brackets} *)
 

@@ -32,20 +32,6 @@ let const pp_v v ppf () = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
 
-(* Boxes *)
-
-let box ?(indent = 0) pp ppf =
-  Format.pp_open_hovbox ppf indent; pf ppf "%a@]" pp
-
-let hbox pp ppf =
-  Format.pp_open_hbox ppf (); pf ppf "%a@]" pp
-
-let vbox ?(indent = 0) pp ppf =
-  Format.pp_open_vbox ppf indent; pf ppf "%a@]" pp
-
-let hvbox ?(indent = 0) pp ppf =
-  Format.pp_open_hvbox ppf indent; pf ppf "%a@]" pp
-
 (* Base type formatters *)
 
 let bool = Format.pp_print_bool
@@ -176,6 +162,20 @@ module Dump = struct
     ignore (Stack.iter pp_v s);
     pf ppf ")@]"
 end
+
+(* Boxes *)
+
+let box ?(indent = 0) pp ppf =
+  Format.pp_open_hovbox ppf indent; pf ppf "%a@]" pp
+
+let hbox pp ppf =
+  Format.pp_open_hbox ppf (); pf ppf "%a@]" pp
+
+let vbox ?(indent = 0) pp ppf =
+  Format.pp_open_vbox ppf indent; pf ppf "%a@]" pp
+
+let hvbox ?(indent = 0) pp ppf =
+  Format.pp_open_hvbox ppf indent; pf ppf "%a@]" pp
 
 (* Brackets *)
 
