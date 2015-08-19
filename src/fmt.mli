@@ -61,6 +61,15 @@ val sp : unit t
 val const : 'a t -> 'a -> unit t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
+val unit : (unit, Format.formatter, unit) Pervasives.format -> unit t
+(** [unit fmt] formats a unit value with the format [fmt]. *)
+
+val fmt : ('a, Format.formatter, unit) Pervasives.format ->
+  Format.formatter -> 'a
+(** [fmt fmt ppf] is [pf ppf fmt]. If [fmt] is used with a single
+    non-constant formatting directive, generates a value of type
+    {!t}. *)
+
 (** {1:boxes Boxes} *)
 
 val box : ?indent:int -> 'a t -> 'a t
@@ -233,16 +242,13 @@ val braces : 'a t -> 'a t
 
 (** {1:text Text and lines} *)
 
-val verbatim : string -> unit t
-(** [verbatim s] is [const string s]. *)
-
 val text : string t
-  (** [pp_text] formats text by replacing spaces and newlines in the string
-      with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
+(** [pp_text] formats text by replacing spaces and newlines in the string
+    with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
 
 val lines : string t
 (** [pp_lines] formats lines by replacing newlines in the string
-      with calls to {!Format.pp_force_newline}. *)
+    with calls to {!Format.pp_force_newline}. *)
 
 val text_range : ((int * int) * (int * int)) t
 (** [text_range] formats a line-column text range according to

@@ -29,6 +29,8 @@ let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
 let const pp_v v ppf () = pf ppf "%a" pp_v v
+let unit fmt ppf () = pf ppf fmt
+let fmt fmt ppf = pf ppf fmt
 
 (* Boxes *)
 
@@ -182,8 +184,6 @@ let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
 let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
 
 (* Text and lines *)
-
-let verbatim s ppf () = pf ppf "%s" s
 
 let white_str ~spaces ppf s =
   let left = ref 0 and right = ref 0 and len = String.length s in
