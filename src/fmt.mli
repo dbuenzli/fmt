@@ -289,17 +289,22 @@ val bi_byte_size : int t
     may derail the pretty printing process. Use the pretty-printers
     from {!Uuseg_string} if you are serious about UTF-8 formatting. *)
 
+val utf_8 : Format.formatter -> bool
+(** [utf_8 ppf] is [true] if UTF-8 output is enabled on [ppf]. If
+    {!set_utf_8} hasn't been called on [ppf] this is [true]. *)
+
+val set_utf_8 : Format.formatter -> bool -> unit
+(** [set_utf_8 ppf b] enables or disables conditional UTF-8 formatting
+    on [ppf].
+
+    {b Warning.} Using this function replaces any {!Format.tag} functions
+    that may be in place. *)
+
 val if_utf_8 : 'a t -> 'a t -> 'a t
-(** [if_utf_8 pp_u pp] is a t that will use [pp_u] if UTF-8
-    output is {{!utf_8_enabled}enabled} and [pp] otherwise. *)
-
-(** {2:utf8_cond Conditional UTF-8 formatting control} *)
-
-val utf_8_enabled : unit -> bool
-(** [utf_8_enabled ()] is [true] if UTF-8 pretty-printing is enabled. *)
-
-val set_utf_8_enabled : bool -> unit
-(** [set_utf_8_enabled b] sets UTF-8 pretty-printing to [b]. *)
+(** [if_utf_8 pp_u pp ppf v] is:
+    {ul
+    {- [pp_u ppf v] if [utf_8 ppf] is [true].}
+    {- [pp ppf v] otherwise.}} *)
 
 (** {1:styled Styled formatting} *)
 
@@ -318,28 +323,32 @@ type style =
 (** The type for styles. *)
 
 val styled : style -> 'a t -> 'a t
-(** [styled style pp] formats according to [pp] but styled with [style]. *)
+(** [styled s pp] formats like [pp] but styled with [s]. *)
 
-val styled_string : style -> string t
-(** [styled_string style] is [pp_styled style string]. *)
+val styled_unit : style -> (unit, Format.formatter, unit) Pervasives.format ->
+  unit t
+(** [styled_unit s fmt] is [style s (unit fmt)]. *)
 
-(** {2 Styled formatting control} *)
+(** {2 Style rendering control} *)
 
-type style_tags = [ `Ansi | `None ]
-(** The type for style tags.
-      {ul
-      {- [`Ansi], tags the text with
+type style_renderer = [ `Ansi_tty | `None ]
+(** The type for style renderers.
+    {ul
+    {- [`Ansi_tty], renders styles using
        {{:http://www.ecma-international.org/publications/standards/Ecma-048.htm}
-           ANSI escape sequences}.}
-      {- [`None], text remains untagged.}} *)
+       ANSI escape sequences}.}
+    {- [`None], styled rendering has no effect.}} *)
 
-val style_tags : unit -> style_tags
-(** [style_tags ()] is the current tag style used by {!Fmt.pp_styled}.
-      Initial value is [`None]. *)
+val style_renderer : Format.formatter  -> style_renderer
+(** [style_renderer ppf] is the style renderer used by [ppf].  If
+    {!set_style_renderer} has never been called on [ppf] this is
+    [`None]. *)
 
-val set_style_tags : style_tags -> unit
-(** [set_style_tags s] sets the current tag style used by
-      {!Fmt.pp_styled}. *)
+val set_style_renderer : Format.formatter -> style_renderer -> unit
+(** [set_style_renderer ppf r] sets the style renderer of [ppf] to [r].
+
+    {b Warning.} Using this function replaces any {!Format.tag} functions
+    that may be in place. *)
 
 (** {1:stringconverters Converting with string value converters} *)
 

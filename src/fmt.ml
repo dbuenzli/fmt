@@ -257,24 +257,76 @@ let _pp_byte_size k i ppf s =
 let byte_size ppf s = _pp_byte_size 1000 "" ppf s
 let bi_byte_size ppf s = _pp_byte_size 1024 "i" ppf s
 
+(* Conditional UTF-8 and styled formatting.
+
+   This is very ugly, formally what we would like is to be able to
+   store arbitrary typed metadata in formatters for clients to consult
+   (tried to provide an API for doing that but dismissed it for
+   uglyness and lack of an efficient implementation). In the following
+   we are using the tags functions (but not the tags mechanism itself)
+   as a way to store two metadata keys, one for formatter UTF-8
+   awareness and the other for the formatter style renderer. *)
+
+let utf_8_tag = "fmt.utf8"
+
+let utf_8_of_raw = function
+| "\x00" -> false
+| "\x01" -> true
+| _ -> true
+
+let utf_8_to_raw = function
+| false -> "\x00"
+| true -> "\x01"
+
+type style_renderer = [ `Ansi_tty | `None ]
+
+let style_renderer_tag = "fmt.style_renderer"
+
+let style_renderer_of_raw = function
+| "\x00" -> `None
+| "\x01" -> `Ansi_tty
+| _ -> `None
+
+let style_renderer_to_raw = function
+| `None -> "\x00"
+| `Ansi_tty -> "\x01"
+
+let meta_store ppf = Format.pp_get_formatter_tag_functions ppf ()
+let meta_raw store tag = store.Format.mark_open_tag tag
+let set_meta ppf store ~utf_8 ~style_renderer =
+  let meta = function
+  | "fmt.utf8" -> utf_8
+  | "fmt.style_renderer" -> style_renderer
+  | _ -> "Fmt: do not use the tags mecanism, it is a broken idea"
+  in
+  let store = { store with Format.mark_open_tag = meta } in
+  Format.pp_set_formatter_tag_functions ppf store
+
+let utf_8 ppf = utf_8_of_raw (meta_raw (meta_store ppf) utf_8_tag)
+let set_utf_8 ppf utf_8 =
+  let store = meta_store ppf in
+  let style_renderer = meta_raw store style_renderer_tag in
+  let utf_8 = utf_8_to_raw utf_8 in
+  set_meta ppf store ~utf_8 ~style_renderer
+
+let style_renderer ppf =
+  style_renderer_of_raw (meta_raw (meta_store ppf) style_renderer_tag)
+
+let set_style_renderer ppf renderer =
+  let store = meta_store ppf in
+  let utf_8 = meta_raw store utf_8_tag in
+  let style_renderer = style_renderer_to_raw renderer in
+  set_meta ppf store ~utf_8 ~style_renderer
+
 (* Conditional UTF-8 formatting *)
 
-let utf_8_enabled, set_utf_8_enabled =
-  let enabled = ref false in
-  (fun () -> !enabled), (fun b -> enabled := b)
-
-let if_utf_8 pp_u pp ppf v = (if utf_8_enabled () then pp_u else pp) ppf v
+let if_utf_8 pp_u pp = fun ppf v -> (if utf_8 ppf then pp_u else pp) ppf v
 
 (* Styled formatting *)
 
-type style_tags = [ `Ansi | `None ]
 type style =
   [ `Bold | `Underline | `Black | `Red | `Green | `Yellow | `Blue | `Magenta
   | `Cyan | `White | `None ]
-
-let (style_tags : unit -> style_tags), (set_style_tags : style_tags -> unit) =
-  let style_tags = ref `None in
-  (fun () -> !style_tags), (fun s -> style_tags := s)
 
 let ansi_style_code = function
 | `Bold -> "\027[01m"
@@ -291,14 +343,13 @@ let ansi_style_code = function
 
 let ansi_style_reset = "\027[m"
 
-let styled style pp_v ppf = match style_tags () with
+let styled style pp_v ppf = match style_renderer ppf with
 | `None -> pp_v ppf
-| `Ansi ->
-    Format.kfprintf
-      (fun ppf -> pf ppf "@<0>%s" ansi_style_reset) ppf "@<0>%s%a"
-      (ansi_style_code style) pp_v
+| `Ansi_tty ->
+    let reset ppf = pf ppf "@<0>%s" ansi_style_reset in
+    kpf reset ppf "@<0>%s%a" (ansi_style_code style) pp_v
 
-let styled_string style = styled style string
+let styled_unit style fmt = styled style (unit fmt)
 
 (* Converting with string converters. *)
 
