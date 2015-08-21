@@ -107,6 +107,16 @@ let stack ?sep:(pp_sep = cut) pp_v ppf s =
   in
   ignore (Stack.iter pp_v s)
 
+let set
+    (type t) (type elt) (module S: Set.S with type t = t and type elt = elt)
+    ?sep:(pp_sep = cut) pp_v ppf set =
+  let pp_v v is_first =
+    if is_first then () else pp_sep ppf ();
+    pp_v ppf v; false
+  in
+  ignore (S.fold pp_v set true)
+
+
 module Dump = struct
 
   let pair pp_fst pp_snd ppf (fst, snd) =
@@ -161,6 +171,18 @@ module Dump = struct
     pf ppf "@[<1>(stack@ ";
     ignore (Stack.iter pp_v s);
     pf ppf ")@]"
+
+  let set
+      (type t) (type elt) (module S: Set.S with type t = t and type elt = elt)
+      pp_v ppf set =
+    let pp_v v is_first =
+      if is_first then () else pf ppf "@ ";
+      pf ppf "@[%a@]" pp_v v; false
+    in
+    pf ppf "@[<1>(set@ ";
+    ignore (S.fold pp_v set true);
+    pf ppf ")@]"
+
 end
 
 (* Boxes *)

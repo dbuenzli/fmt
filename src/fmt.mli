@@ -167,6 +167,14 @@ val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
     are separated by [sep] (defaults to {!cut}). If the stack is
     empty, this is {!nop}. *)
 
+val set :
+  (module Set.S with type elt = 'elt and type t = 'set) ->
+  ?sep:unit t -> 'elt t -> 'set t
+(** [set (module S) ~sep pp_v] formats set elements. Each element of
+    set is formatted with [pp_v]. Elements are separated by [sep]
+    (defaults to {!cut}). If the set is empty, this is {!nop}.
+*)
+
 (** Formatters for inspecting OCaml values.
 
     Formatters of this module dump OCaml value with little control
@@ -207,6 +215,13 @@ module Dump : sig
   val stack : 'a t -> 'a Stack.t t
   (** [stack pp_v] formats an unspecified representation of an OCaml
       stack using [pp_v] to format its elements in top to botttom order. *)
+
+  val set :
+    (module Set.S with type elt = 'elt and type t = 'set) ->
+    'elt t -> 'set t
+  (** [set (module S) pp_v] formats an unspecified representation of an OCaml
+      set using [pp_v] to format its elements. *)
+
 end
 
 (** {1:boxes Boxes} *)
