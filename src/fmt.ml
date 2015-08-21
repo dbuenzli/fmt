@@ -119,6 +119,8 @@ let set
 
 module Dump = struct
 
+  let string ppf s = pf ppf "%S" s
+
   let pair pp_fst pp_snd ppf (fst, snd) =
     pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
 

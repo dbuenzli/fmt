@@ -182,6 +182,11 @@ val set :
     whenever possible, using OCaml syntax. *)
 module Dump : sig
 
+  val string : string t
+  (** [string ppf s] formats an OCaml string.
+      It is equivalent to [pf ppf "%S" s].
+  *)
+
   (** {1:polytypes Polymorphic type formatters} *)
 
   val pair : 'a t -> 'b t -> ('a * 'b) t
