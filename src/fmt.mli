@@ -70,6 +70,9 @@ val fmt : ('a, Format.formatter, unit) Pervasives.format ->
     non-constant formatting directive, generates a value of type
     {!t}. *)
 
+val always : (unit, Format.formatter, unit) Pervasives.format -> 'a t
+(** [always fmt ppf v] formats any value with the constant format [fmt]. *)
+
 (** {1:basetypes Base type formatters} *)
 
 val bool : bool t
@@ -167,6 +170,17 @@ val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
     are separated by [sep] (defaults to {!cut}). If the stack is
     empty, this is {!nop}. *)
 
+val iter : ?sep:unit t -> (('a -> unit) -> 'b -> unit) -> 'a t -> 'b t
+(** [iter ~sep iter pp_elt] formats the iterations of [iter] over a
+    value using [pp_elt]. Iterations are separated by [sep] (defaults to
+    {!cut}). *)
+
+val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
+  ('a * 'b) t -> 'c t
+(** [iter_bindings ~sep iter pp_binding] formats the iterations of
+    [iter] over a value using [pp_binding]. Iterations are separated
+    by [sep] (defaults to {!cut}). *)
+
 (** Formatters for inspecting OCaml values.
 
     Formatters of this module dump OCaml value with little control
@@ -207,7 +221,18 @@ module Dump : sig
   val stack : 'a t -> 'a Stack.t t
   (** [stack pp_v] formats an unspecified representation of an OCaml
       stack using [pp_v] to format its elements in top to bottom order. *)
-end
+
+  val iter : (('a -> unit) -> 'b -> unit) -> 'b t -> 'a t -> 'b t
+  (** [iter iter pp_name pp_elt] formats an unspecified representation
+      of the iterations of [iter] over a value using [pp_elt]. The
+      iteration is named by [pp_name]. *)
+
+  val iter_bindings : (('a -> 'b -> unit) -> 'c -> unit) -> 'c t -> 'a t
+    -> 'b t -> 'c t
+  (** [iter_bindings ~sep iter pp_name pp_k pp_v] formats an
+      unspecified representation of the iterations of [iter] over a
+      value using [pp_k] and [pp_v]. The iteration is named by
+      [pp_name]. *) end
 
 (** {1:boxes Boxes} *)
 

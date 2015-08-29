@@ -31,6 +31,7 @@ let sp = Format.pp_print_space
 let const pp_v v ppf () = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
+let always fmt ppf v = pf ppf fmt
 
 (* Base type formatters *)
 
@@ -73,39 +74,27 @@ let option ?none:(pp_none = nop) pp_v ppf = function
 | None -> pp_none ppf ()
 | Some v -> pp_v ppf v
 
-let rec list ?sep:(pp_sep = cut) pp_v ppf = function
-| [] -> ()
-| v :: vs ->
-    pp_v ppf v; if vs <> [] then (pp_sep ppf (); list ~sep:pp_sep pp_v ppf vs)
-
-let array ?sep:(pp_sep = cut) pp_v ppf a =
-  for i = 0 to Array.length a - 1 do
-    if i = 0 then () else pp_sep ppf ();
-    pp_v ppf a.(i)
-  done
-
-let hashtbl ?sep:(pp_sep = cut) pp_binding ppf h =
-  let pp_binding k v is_first =
-    if is_first then () else pp_sep ppf ();
-    pp_binding ppf (k, v);
-    false
-  in
-  ignore (Hashtbl.fold pp_binding h true)
-
-let queue ?sep:(pp_sep = cut) pp_v ppf q =
-  let pp_v is_first v =
-    if is_first then () else pp_sep ppf ();
-    pp_v ppf v; false
-  in
-  ignore (Queue.fold pp_v true q)
-
-let stack ?sep:(pp_sep = cut) pp_v ppf s =
+let iter ?sep:(pp_sep = cut) iter pp_elt ppf v =
   let is_first = ref true in
-  let pp_v v =
+  let pp_elt v =
     if !is_first then (is_first := false) else pp_sep ppf ();
-    pp_v ppf v
+    pp_elt ppf v
   in
-  ignore (Stack.iter pp_v s)
+  iter pp_elt v
+
+let iter_bindings ?sep:(pp_sep = cut) iter pp_binding ppf v =
+  let is_first = ref true in
+  let pp_binding k v =
+    if !is_first then (is_first := false) else pp_sep ppf ();
+    pp_binding ppf (k, v)
+  in
+  iter pp_binding v
+
+let list ?sep pp_elt = iter ?sep List.iter pp_elt
+let array ?sep pp_elt = iter ?sep Array.iter pp_elt
+let hashtbl ?sep pp_binding = iter_bindings ?sep Hashtbl.iter pp_binding
+let queue ?sep pp_elt = iter Queue.iter pp_elt
+let stack ?sep pp_elt = iter Stack.iter pp_elt
 
 module Dump = struct
 
@@ -116,51 +105,48 @@ module Dump = struct
   | None -> pf ppf "None"
   | Some v -> pf ppf "@[<1>Some@ @[%a@]@]" pp_v v
 
-  let list pp_v ppf vs =
+  let list pp_elt ppf vs =
     let rec loop = function
     | [] -> ()
     | v :: vs ->
-        if vs = [] then (pf ppf "@[%a@]" pp_v v) else
-        (pf ppf "@[%a@];@ " pp_v v; loop vs)
+        if vs = [] then (pf ppf "@[%a@]" pp_elt v) else
+        (pf ppf "@[%a@];@ " pp_elt v; loop vs)
     in
     pf ppf "@[<1>["; loop vs; pf ppf "]@]"
 
-  let array pp_v ppf a =
+  let array pp_elt ppf a =
     pf ppf "@[<2>[|";
     for i = 0 to Array.length a - 1 do
-      if i = 0 then pf ppf "@[%a@]" pp_v a.(i) else
-      pf ppf ";@ @[%a@]" pp_v a.(i)
+      if i = 0 then pf ppf "@[%a@]" pp_elt a.(i) else
+      pf ppf ";@ @[%a@]" pp_elt a.(i)
     done;
     pf ppf "|]@]"
 
-  let hashtbl pp_k pp_v ppf h =
-    let pp_binding k v is_first =
-      if is_first then () else pf ppf "@ ";
-      pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_k k pp_v v;
-      false
-    in
-    pf ppf "@[<1>(hashtbl@ ";
-    ignore (Hashtbl.fold pp_binding h true);
-    pf ppf ")@]"
-
-  let queue pp_v ppf q =
-    let pp_v is_first v =
-      if is_first then () else pf ppf "@ ";
-      pf ppf "@[%a@]" pp_v v; false
-    in
-    pf ppf "@[<1>(queue@ ";
-    ignore (Queue.fold pp_v true q);
-    pf ppf ")@]"
-
-  let stack pp_v ppf s =
+  let iter iter pp_name pp_elt ppf v =
     let is_first = ref true in
-    let pp_v v =
+    let pp_elt v =
       if !is_first then (is_first := false) else pf ppf "@ ";
-      pf ppf "@[%a@]" pp_v v
+      pf ppf "@[%a@]" pp_elt v
     in
-    pf ppf "@[<1>(stack@ ";
-    ignore (Stack.iter pp_v s);
+    pf ppf "@[<1>(%a@ " pp_name v;
+    iter pp_elt v;
     pf ppf ")@]"
+
+  let iter_bindings iter pp_name pp_k pp_v ppf bs =
+    let is_first = ref true in
+    let pp_binding k v =
+      if !is_first then () else pf ppf "@ ";
+      pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_k k pp_v v
+    in
+    pf ppf "@[<1>(%a@ " pp_name bs;
+    iter pp_binding bs;
+    pf ppf ")@]"
+
+  let hashtbl pp_k pp_v =
+    iter_bindings Hashtbl.iter (always "hashtbl") pp_k pp_v
+
+  let stack pp_elt = iter Stack.iter (always "stack") pp_elt
+  let queue pp_elt = iter Queue.iter (always "queue") pp_elt
 end
 
 (* Boxes *)
