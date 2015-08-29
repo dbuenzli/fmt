@@ -85,7 +85,7 @@ val int64 : int64 t
 (** [int64 ppf] is [pf ppf "%Ld"]. *)
 
 val uint32 : int32 t
-(** [int32 ppf] is [pf ppf "%lu"]. *)
+(** [uint32 ppf] is [pf ppf "%lu"]. *)
 
 val uint64 : int64 t
 (** [uint64 ppf] is [pf ppf "%Lu"]. *)
@@ -103,7 +103,7 @@ val float_dfrac : int -> float t
     for [0 <= d <= 16]. *)
 
 val float_dsig : int -> float t
-(** [pp_float_dsig d] rounds the normalized {e decimal} significand
+(** [float_dsig d] rounds the normalized {e decimal} significand
     of the float to the [d]th decimal fractional digit and formats
     the result with ["%g"]. Ties are rounded towards positive
     infinity. The result is NaN on infinities and only defined for
@@ -206,7 +206,7 @@ module Dump : sig
 
   val stack : 'a t -> 'a Stack.t t
   (** [stack pp_v] formats an unspecified representation of an OCaml
-      stack using [pp_v] to format its elements in top to botttom order. *)
+      stack using [pp_v] to format its elements in top to bottom order. *)
 end
 
 (** {1:boxes Boxes} *)
@@ -243,11 +243,11 @@ val braces : 'a t -> 'a t
 (** {1:text Text and lines} *)
 
 val text : string t
-(** [pp_text] formats text by replacing spaces and newlines in the string
+(** [text] formats text by replacing spaces and newlines in the string
     with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
 
 val lines : string t
-(** [pp_lines] formats lines by replacing newlines in the string
+(** [lines] formats lines by replacing newlines in the string
     with calls to {!Format.pp_force_newline}. *)
 
 val text_range : ((int * int) * (int * int)) t
@@ -274,12 +274,12 @@ val suffix : unit t -> 'a t -> 'a t
 (** {1 Byte sizes} *)
 
 val byte_size : int t
-(** [pp_byte_size] formats a byte size according to its magnitude
+(** [byte_size] formats a byte size according to its magnitude
     using {{:http://www.bipm.org/en/publications/si-brochure/chapter3.html}
     SI prefixes} up to peta bytes (10{^15}). *)
 
 val bi_byte_size : int t
-(** [pp_bi_byte_size] formats a byte size according to its magnitude
+(** [bi_byte_size] formats a byte size according to its magnitude
     using {{:https://en.wikipedia.org/wiki/Binary_prefix}binary prefixes}
     up to pebi bytes (2{^15}). *)
 
