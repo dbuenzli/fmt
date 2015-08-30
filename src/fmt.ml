@@ -98,6 +98,8 @@ let hashtbl ?sep pp_binding = iter_bindings ?sep Hashtbl.iter pp_binding
 let queue ?sep pp_elt = iter Queue.iter pp_elt
 let stack ?sep pp_elt = iter Stack.iter pp_elt
 
+let using f pp ppf v = pp ppf (f v)
+
 module Dump = struct
 
   let pair pp_fst pp_snd ppf (fst, snd) =

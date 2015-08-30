@@ -190,6 +190,9 @@ val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
     [iter] over a value using [pp_binding]. Iterations are separated
     by [sep] (defaults to {!cut}). *)
 
+val using : ('a -> 'b) -> 'b t -> 'a t
+(** [using f pp] maps values using [f] and formats them with [pp]. *)
+
 (** Formatters for inspecting OCaml values.
 
     Formatters of this module dump OCaml value with little control
