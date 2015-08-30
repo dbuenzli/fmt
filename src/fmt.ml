@@ -37,11 +37,13 @@ let always fmt ppf v = pf ppf fmt
 
 let bool = Format.pp_print_bool
 let int = Format.pp_print_int
+let nativeint ppf v = pf ppf "%nd" v
 let int32 ppf v = pf ppf "%ld" v
 let int64 ppf v = pf ppf "%Ld" v
+let uint ppf v = pf ppf "%u" v
 let uint32 ppf v = pf ppf "%lu" v
 let uint64 ppf v = pf ppf "%Lu" v
-let uint ppf v = pf ppf "%u" v
+let unativeint ppf v = pf ppf "%nu" v
 
 let char = Format.pp_print_char
 let string = Format.pp_print_string

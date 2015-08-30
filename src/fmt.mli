@@ -79,7 +79,13 @@ val bool : bool t
 (** [bool] is {!Format.pp_print_bool}. *)
 
 val int : int t
-(** [int] is {!Format.pp_print_int}. *)
+(** [int] is [pf ppf "%ud"]. *)
+
+val int : int t
+(** [uint ppf] is [pf ppf "%ud"] *)
+
+val nativeint : nativeint t
+(** [nativeint ppf] is [pf ppf "%nd"]. *)
 
 val int32 : int32 t
 (** [int32 ppf] is [pf ppf "%ld"]. *)
@@ -87,14 +93,17 @@ val int32 : int32 t
 val int64 : int64 t
 (** [int64 ppf] is [pf ppf "%Ld"]. *)
 
+val uint : int t
+(** [uint ppf] is [pf ppf "%u"]. *)
+
+val unativeint : nativeint t
+(** [unativeint ppf] is [pf ppf "%nu"]. *)
+
 val uint32 : int32 t
 (** [uint32 ppf] is [pf ppf "%lu"]. *)
 
 val uint64 : int64 t
 (** [uint64 ppf] is [pf ppf "%Lu"]. *)
-
-val uint : int t
-(** [uint ppf] is [pf ppf "%u"]. *)
 
 val float : float t
 (** [float ppf] is [pf ppf "%g".] *)
