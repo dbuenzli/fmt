@@ -11,7 +11,7 @@ action ()
 {
     case $1 in
         default) action lib;;
-        lib) $OCAMLBUILD fmt.cma fmt.cmxa ;;
+        lib) $OCAMLBUILD fmt.cma fmt.cmxa fmt_tty.cma fmt_tty.cmxa ;;
         test)
             action lib
             $OCAMLBUILD test/tests.otarget

@@ -6,3 +6,25 @@ archive(byte, plugin) = "fmt.cma"
 archive(native) = "fmt.cmxa"
 archive(native, plugin) = "fmt.cmxs"
 exists_if = "fmt.cma"
+
+package "tty" (
+  description = "Fmt TTY setup"
+  version = "%%VERSION%%"
+  requires = "unix fmt"
+  archive(byte) = "fmt_tty.cma"
+  archive(byte, plugin) = "fmt_tty.cma"
+  archive(native) = "fmt_tty.cmxa"
+  archive(native, plugin) = "fmt_tty.cmxs"
+  exists_if = "fmt_tty.cma"
+)
+
+package "top" (
+  description = "Fmt toplevel support"
+  version = "%%VERSION%%"
+  requires = "fmt fmt.tty"
+  archive(byte) = "fmt_top.cma"
+  archive(byte, plugin) = "fmt_top.cma"
+  archive(native) = "fmt_top.cmxa"
+  archive(native, plugin) = "fmt_top.cmxs"
+  exists_if = "fmt_top.cma"
+)
