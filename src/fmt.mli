@@ -335,7 +335,10 @@ val set_utf_8 : Format.formatter -> bool -> unit
     on [ppf].
 
     {b Warning.} Using this function replaces any {!Format.tag} functions
-    that may be in place. *)
+    that may be in place.
+
+    @raise Invalid_argument if [ppf] is {!Format.str_formatter}: it is
+    is always UTF-8 enabled. *)
 
 val if_utf_8 : 'a t -> 'a t -> 'a t
 (** [if_utf_8 pp_u pp ppf v] is:
@@ -385,7 +388,10 @@ val set_style_renderer : Format.formatter -> style_renderer -> unit
 (** [set_style_renderer ppf r] sets the style renderer of [ppf] to [r].
 
     {b Warning.} Using this function replaces any {!Format.tag} functions
-    that may be in place. *)
+    that may be in place.
+
+    @raise Invalid_argument if [ppf] is {!Format.str_formatter}: its
+    renderer is always [`None]. *)
 
 (** {1:stringconverters Converting with string value converters} *)
 

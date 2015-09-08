@@ -4,6 +4,10 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+(* Errors *)
+
+let err_str_formatter = "Format.str_formatter can't be set."
+
 (* Formatting *)
 
 let pf = Format.fprintf
@@ -294,6 +298,7 @@ let set_meta ppf store ~utf_8 ~style_renderer =
 
 let utf_8 ppf = utf_8_of_raw (meta_raw (meta_store ppf) utf_8_tag)
 let set_utf_8 ppf utf_8 =
+  if ppf == Format.std_formatter then invalid_arg err_str_formatter else
   let store = meta_store ppf in
   let style_renderer = meta_raw store style_renderer_tag in
   let utf_8 = utf_8_to_raw utf_8 in
@@ -303,6 +308,7 @@ let style_renderer ppf =
   style_renderer_of_raw (meta_raw (meta_store ppf) style_renderer_tag)
 
 let set_style_renderer ppf renderer =
+  if ppf == Format.std_formatter then invalid_arg err_str_formatter else
   let store = meta_store ppf in
   let utf_8 = meta_raw store utf_8_tag in
   let style_renderer = style_renderer_to_raw renderer in
