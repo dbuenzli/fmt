@@ -24,13 +24,25 @@ val kpf : (Format.formatter -> 'a) -> Format.formatter ->
 (** [kpf] is {!Format.kfprintf}. *)
 
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
-(** [strf] is {!Format.asprintf}. *)
+(** [strf] is {!Format.asprintf}.
+
+    {b Note} {!utf_8} and {!style_renderer} are always respectively
+    set to [true] and [`None]. See also {!strf_like}. *)
 
 val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
-(** [kstrf] is like {!Format.ksprintf} but handles "%a" directives. *)
+(** [kstrf] is like {!strf} but continuation based. *)
 
-(** {1:fmt Standard output formatting} *)
+val strf_like : Format.formatter ->
+  ('a, Format.formatter, unit, string) format4 -> 'a
+(** [strf_like ppf] is like {!strf} except its {!utf_8} and {!style_renderer}
+    settings are those of [ppf]. *)
+
+(** {1:fmt Formatting to buffers and standard outputs} *)
+
+val of_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
+(** [of_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
+    settings are copied from those of {!like} (if provided). *)
 
 val stdout : Format.formatter
 (** [stdout] is the standard output formatter. *)
@@ -326,6 +338,12 @@ val bi_byte_size : int t
     may derail the pretty printing process. Use the pretty-printers
     from {!Uuseg_string} if you are serious about UTF-8 formatting. *)
 
+val if_utf_8 : 'a t -> 'a t -> 'a t
+(** [if_utf_8 pp_u pp ppf v] is:
+    {ul
+    {- [pp_u ppf v] if [utf_8 ppf] is [true].}
+    {- [pp ppf v] otherwise.}} *)
+
 val utf_8 : Format.formatter -> bool
 (** [utf_8 ppf] is [true] if UTF-8 output is enabled on [ppf]. If
     {!set_utf_8} hasn't been called on [ppf] this is [true]. *)
@@ -339,12 +357,6 @@ val set_utf_8 : Format.formatter -> bool -> unit
 
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: it is
     is always UTF-8 enabled. *)
-
-val if_utf_8 : 'a t -> 'a t -> 'a t
-(** [if_utf_8 pp_u pp ppf v] is:
-    {ul
-    {- [pp_u ppf v] if [utf_8 ppf] is [true].}
-    {- [pp ppf v] otherwise.}} *)
 
 (** {1:styled Styled formatting} *)
 

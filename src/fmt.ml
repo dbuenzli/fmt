@@ -286,6 +286,7 @@ let style_renderer_to_raw = function
 | `Ansi_tty -> "\x01"
 
 let meta_store ppf = Format.pp_get_formatter_tag_functions ppf ()
+let set_meta_store ppf store = Format.pp_set_formatter_tag_functions ppf store
 let meta_raw store tag = store.Format.mark_open_tag tag
 let set_meta ppf store ~utf_8 ~style_renderer =
   let meta = function
@@ -294,7 +295,7 @@ let set_meta ppf store ~utf_8 ~style_renderer =
   | _ -> "Fmt: do not use the tags mecanism, it is a broken idea"
   in
   let store = { store with Format.mark_open_tag = meta } in
-  Format.pp_set_formatter_tag_functions ppf store
+  set_meta_store ppf store
 
 let utf_8 ppf = utf_8_of_raw (meta_raw (meta_store ppf) utf_8_tag)
 let set_utf_8 ppf utf_8 =
@@ -313,6 +314,18 @@ let set_style_renderer ppf renderer =
   let utf_8 = meta_raw store utf_8_tag in
   let style_renderer = style_renderer_to_raw renderer in
   set_meta ppf store ~utf_8 ~style_renderer
+
+let of_buffer ?like buf =
+  let ppf = Format.formatter_of_buffer buf in
+  match like with
+  | None -> ppf
+  | Some like ->  set_meta_store ppf (meta_store like); ppf
+
+let strf_like ppf fmt =
+  let buf = Buffer.create 17 in
+  let bppf = of_buffer ~like:ppf buf in
+  let flush ppf = Format.pp_print_flush ppf () ; (Buffer.contents buf) in
+  Format.kfprintf flush bppf fmt
 
 (* Conditional UTF-8 formatting *)
 
