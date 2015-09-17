@@ -6,6 +6,9 @@
 
 (** {!Format} pretty-printer combinators.
 
+    See a few {{!nameconv}naming conventions} for your
+    pretty-printers.
+
     {b References}
     {ul
     {- The required reading {!Format} module
@@ -412,6 +415,29 @@ val of_to_string : ('a -> string) -> 'a t
 
 val to_to_string : 'a t -> 'a -> string
 (** [to_to_string pp_v v] is [strf "%a" pp_v v]. *)
+
+(** {1:nameconv Naming conventions}
+
+    Given a type [ty] use:
+
+    {ul
+    {- [pp_ty] for a pretty printer that provide full control to
+       the client and does not wrap formatted structured in enclosing
+       boxes. See {{!polytypes}these examples}.}
+    {- [dump_ty] for a pretty printer that provides little control
+       over the pretty-printing process, wraps the rendering in an
+       enclosing box and tries as much as possible to respect the
+       OCaml syntax. These pretty-printers should make it easy to
+       inspect and understand values of the given type, they are
+       mainly used for quick printf debugging.  See {{!Dump.polytypes}
+       these examples}.}}
+
+    If you are in a case were making a difference between [dump_ty]
+    and [pp_ty] doesn't make sense then use [pp_ty].
+
+    For a type [ty] that is the main type of the module (the "[M.t]"
+    convention) drop the suffix, that is simply use [M.pp] and
+    [M.dump]. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli.
