@@ -4,7 +4,7 @@ Release %%VERSION%%
 
 Fmt exposes combinators to devise `Format` pretty-printing functions.
 
-Fmt depends only on the OCaml standard library. The Fmt_tty optional
+Fmt depends only on the OCaml standard library. The optional Fmt_tty
 library that allows to setup formatters for terminal color output
 depends on the Unix library. Fmt is distributed under the BSD3
 license.

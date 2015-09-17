@@ -6,11 +6,11 @@
 
 (** {!Format} pretty-printer combinators.
 
-    See a few {{!nameconv}naming conventions} for your
-    pretty-printers.
+    Consult {{!nameconv}naming conventions} for your pretty-printers.
 
     {b References}
     {ul
+    {- The {!Format} module documentation.}
     {- The required reading {!Format} module
        {{:https://ocaml.org/learn/tutorials/format.html}tutorial}.}}
 
@@ -29,8 +29,9 @@ val kpf : (Format.formatter -> 'a) -> Format.formatter ->
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [strf] is {!Format.asprintf}.
 
-    {b Note} {!utf_8} and {!style_renderer} are always respectively
-    set to [true] and [`None]. See also {!strf_like}. *)
+    {b Note.} When using [strf] {!utf_8} and {!style_renderer} are
+    always respectively set to [true] and [`None]. See also
+    {!strf_like}. *)
 
 val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
@@ -41,11 +42,11 @@ val strf_like : Format.formatter ->
 (** [strf_like ppf] is like {!strf} except its {!utf_8} and {!style_renderer}
     settings are those of [ppf]. *)
 
-(** {1:fmt Formatting to buffers and standard outputs} *)
-
 val with_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
 (** [with_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
     settings are copied from those of {!like} (if provided). *)
+
+(** {1:fmt Formatting to standard outputs} *)
 
 val stdout : Format.formatter
 (** [stdout] is the standard output formatter. *)
@@ -296,11 +297,20 @@ val braces : 'a t -> 'a t
 
 val text : string t
 (** [text] formats text by replacing spaces and newlines in the string
-    with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
+    with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}.
+
+    {b Note.} This function will only work on US-ASCII strings. If you
+    are dealing with UTF-8 text you should use the pretty-printers
+    from {!Uuseg_string}. *)
 
 val lines : string t
-(** [lines] formats lines by replacing newlines in the string
-    with calls to {!Format.pp_force_newline}. *)
+(** [lines] formats lines by replacing newlines (['\n']) in the string
+    with calls to {!Format.pp_force_newline}.
+
+    {b Note.} This function will only work on US-ASCII string and with
+    newlines. If you are dealing with UTF-8 strings and different
+    kinds of line endings you should use the pretty-printers from
+    {!Uuseg_string}. *)
 
 val text_range : ((int * int) * (int * int)) t
 (** [text_range] formats a line-column text range according to
@@ -421,18 +431,18 @@ val to_to_string : 'a t -> 'a -> string
     Given a type [ty] use:
 
     {ul
-    {- [pp_ty] for a pretty printer that provide full control to
-       the client and does not wrap formatted structured in enclosing
-       boxes. See {{!polytypes}these examples}.}
+    {- [pp_ty] for a pretty printer that provide full control to the
+       client and does not wrap the formatted value in an enclosing
+       box. See {{!polytypes}these examples}.}
     {- [dump_ty] for a pretty printer that provides little control
        over the pretty-printing process, wraps the rendering in an
        enclosing box and tries as much as possible to respect the
        OCaml syntax. These pretty-printers should make it easy to
        inspect and understand values of the given type, they are
-       mainly used for quick printf debugging.  See {{!Dump.polytypes}
-       these examples}.}}
+       mainly used for quick printf debugging and/or toplevel interaction.
+       See {{!Dump.polytypes} these examples}.}}
 
-    If you are in a case were making a difference between [dump_ty]
+    If you are in a situation were making a difference between [dump_ty]
     and [pp_ty] doesn't make sense then use [pp_ty].
 
     For a type [ty] that is the main type of the module (the "[M.t]"
