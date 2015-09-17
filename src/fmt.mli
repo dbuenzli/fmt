@@ -317,11 +317,6 @@ val text_range : ((int * int) * (int * int)) t
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 
-val doomed : string t
-(** [doomed] should be used for printing a message when reasonable
-    assumptions are being violated. The string should be a short
-    description of what is going on. *)
-
 (** {1:combi Appending} *)
 
 val append : 'a t -> 'b t -> ('a * 'b) t

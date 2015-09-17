@@ -196,10 +196,6 @@ let text = white_str ~spaces:true
 let lines = white_str ~spaces:false
 let text_range ppf ((l0, c0), (l1, c1)) = pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 
-let doomed ppf reason =
-  pf ppf "Something@ unreasonable@ is@ going@ on (%a).@ You@ are@ doomed."
-    text reason
-
 (* Appending *)
 
 let append pp_v0 pp_v1 ppf (v0, v1) = pp_v0 ppf v0 ; pp_v1 ppf v1
