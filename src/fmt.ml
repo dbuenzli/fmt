@@ -315,7 +315,7 @@ let set_style_renderer ppf renderer =
   let style_renderer = style_renderer_to_raw renderer in
   set_meta ppf store ~utf_8 ~style_renderer
 
-let of_buffer ?like buf =
+let with_buffer ?like buf =
   let ppf = Format.formatter_of_buffer buf in
   match like with
   | None -> ppf
@@ -323,7 +323,7 @@ let of_buffer ?like buf =
 
 let strf_like ppf fmt =
   let buf = Buffer.create 17 in
-  let bppf = of_buffer ~like:ppf buf in
+  let bppf = with_buffer ~like:ppf buf in
   let flush ppf = Format.pp_print_flush ppf () ; (Buffer.contents buf) in
   Format.kfprintf flush bppf fmt
 

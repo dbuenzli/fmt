@@ -40,8 +40,8 @@ val strf_like : Format.formatter ->
 
 (** {1:fmt Formatting to buffers and standard outputs} *)
 
-val of_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
-(** [of_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
+val with_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
+(** [with_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
     settings are copied from those of {!like} (if provided). *)
 
 val stdout : Format.formatter
