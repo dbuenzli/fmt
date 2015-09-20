@@ -95,10 +95,7 @@ val bool : bool t
 (** [bool] is {!Format.pp_print_bool}. *)
 
 val int : int t
-(** [int] is [pf ppf "%ud"]. *)
-
-val int : int t
-(** [uint ppf] is [pf ppf "%ud"] *)
+(** [int] is [pf ppf "%d"]. *)
 
 val nativeint : nativeint t
 (** [nativeint ppf] is [pf ppf "%nd"]. *)
