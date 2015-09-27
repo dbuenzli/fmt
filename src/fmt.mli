@@ -288,7 +288,7 @@ val brackets : 'a t -> 'a t
 (** [brackets pp_v ppf] is [pf "@[<1>[%a]@]" pp_v]. *)
 
 val braces : 'a t -> 'a t
-(** [brackets pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
+(** [braces pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
 
 (** {1:text Text and lines} *)
 
@@ -423,7 +423,7 @@ val to_to_string : 'a t -> 'a -> string
     Given a type [ty] use:
 
     {ul
-    {- [pp_ty] for a pretty printer that provide full control to the
+    {- [pp_ty] for a pretty printer that provides full control to the
        client and does not wrap the formatted value in an enclosing
        box. See {{!polytypes}these examples}.}
     {- [dump_ty] for a pretty printer that provides little control
@@ -434,7 +434,7 @@ val to_to_string : 'a t -> 'a -> string
        mainly used for quick printf debugging and/or toplevel interaction.
        See {{!Dump.polytypes} these examples}.}}
 
-    If you are in a situation were making a difference between [dump_ty]
+    If you are in a situation where making a difference between [dump_ty]
     and [pp_ty] doesn't make sense then use [pp_ty].
 
     For a type [ty] that is the main type of the module (the "[M.t]"
