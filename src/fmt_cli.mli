@@ -4,7 +4,9 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** {!Cmdliner} support for [Fmt]. *)
+(** {!Cmdliner} support for [Fmt].
+
+    {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
 (** {1 Color option} *)
 
