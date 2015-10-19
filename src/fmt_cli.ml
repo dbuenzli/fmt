@@ -15,9 +15,6 @@ let color ?env ?docs () =
   let doc = strf "Colorize the output. $(docv) must be %s." enum_alts in
   Arg.(value & opt color None & info ["color"] ?env ~doc ~docv:"WHEN" ?docs)
 
-
-
-
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
    All rights reserved.

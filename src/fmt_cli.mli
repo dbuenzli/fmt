@@ -27,7 +27,7 @@ val color : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
        takes place.}}
 
     If [env] is provided, the option default value ([None]) can be
-    overriden by the corresponding environment variable. *)
+    overridden by the corresponding environment variable. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
