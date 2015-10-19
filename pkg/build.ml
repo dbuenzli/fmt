@@ -6,7 +6,7 @@ let unix = Env.bool "unix"
 let cmdliner = Env.bool "cmdliner"
 
 let () =
-  Pkg.describe "fmt" ~builder:`OCamlbuild [
+  Pkg.describe "fmt" ~builder:(`OCamlbuild []) [
     Pkg.lib "pkg/META";
     Pkg.lib ~exts:Exts.module_library "src/fmt";
     Pkg.lib ~cond:unix ~exts:Exts.module_library "src/fmt_tty";
