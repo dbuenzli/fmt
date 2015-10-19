@@ -4,10 +4,14 @@ Release %%VERSION%%
 
 Fmt exposes combinators to devise `Format` pretty-printing functions.
 
-Fmt depends only on the OCaml standard library. The optional Fmt_tty
+Fmt depends only on the OCaml standard library. The optional `Fmt_tty`
 library that allows to setup formatters for terminal color output
-depends on the Unix library. Fmt is distributed under the BSD3
-license.
+depends on the Unix library. The optional `Fmt_cli` library that
+provides command line support for Fmt depends on [`Cmdliner`][1].
+
+Fmt is distributed under the BSD3 license.
+
+[1]: http://erratique.ch/software/cmdliner
 
 Home page: http://erratique.ch/software/fmt  
 Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
@@ -17,6 +21,7 @@ Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
 Fmt can be installed with `opam`:
 
     opam install fmt
+    opam install base-unix cmdliner fmt # Install all optional libraries
 
 If you don't use `opam` consult the [`opam`](opam) file for build
 instructions.

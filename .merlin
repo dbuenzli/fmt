@@ -1,3 +1,4 @@
+PKG cmdliner
 S src
 S test
 B _build/**

@@ -18,6 +18,17 @@ package "tty" (
   exists_if = "fmt_tty.cma"
 )
 
+package "cli" (
+  description = "Cmdliner support for Fmt"
+  version = "%%VERSION%%"
+  requires = "cmdliner fmt"
+  archive(byte) = "fmt_cli.cma"
+  archive(byte, plugin) = "fmt_cli.cma"
+  archive(native) = "fmt_cli.cmxa"
+  archive(native, plugin) = "fmt_cli.cmxs"
+  exists_if = "fmt_cli.cma"
+)
+
 package "top" (
   description = "Fmt toplevel support"
   version = "%%VERSION%%"

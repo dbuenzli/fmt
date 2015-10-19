@@ -2,5 +2,6 @@ true : bin_annot, safe_string
 
 <src> : include
 <src/fmt_tty*> : package(unix)
+<src/fmt_cli*> : package(cmdliner)
 <src/fmt_top*> : package(compiler-libs.toplevel)
 <test> : include

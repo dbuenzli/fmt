@@ -4,36 +4,19 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** [Fmt] TTY setup.
+let strf = Format.asprintf
 
-    [Fmt_tty] provides simple automatic setup on channel formatters for:
-    {ul
-    {- {!Fmt.set_style_renderer}. [`Ansi_tty] is used if the channel
-       {{!Unix.isatty}is a tty} and the environment variable
-       [TERM] is defined and its value is not ["dumb"]. [`None] is
-       used otherwise.}
-    {- {!Fmt.set_utf_8}. [true] is used if one of the following
-       environment variables has ["UTF-8"] as a case insensitive
-       substring: [LANG], [LC_ALL], [LC_CTYPE].}}
+open Cmdliner
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+let color ?env ?docs () =
+  let enum = ["auto", None; "always", Some `Ansi_tty; "never", Some `None] in
+  let color = Arg.enum enum in
+  let enum_alts = Arg.doc_alts_enum enum in
+  let doc = strf "Colorize the output. $(docv) must be %s." enum_alts in
+  Arg.(value & opt color None & info ["color"] ?env ~doc ~docv:"WHEN" ?docs)
 
-(** {1:tty_setup TTY setup}. *)
 
-val setup : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool ->
-  out_channel -> Format.formatter
-(** [setup ?style_renderer ?utf_8 outc] is a formatter for [outc] with
-    {!Fmt.set_style_renderer} and {!Fmt.set_utf_8} correctly setup. If
-    [style_renderer] or [utf_8] are specified they override the automatic
-    setup.
 
-    If [outc] is {!stdout}, {!Fmt.stdout} is returned. If [outc] is
-    {!stderr}, {!Fmt.stderr} is returned. *)
-
-val setup_std_outputs : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool ->
-  unit -> unit
-(** [setup_std_outputs ?style_renderer ?utf_8 ()] applies {!setup}
-    on {!stdout} and {!stderr}. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

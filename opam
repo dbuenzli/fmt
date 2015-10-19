@@ -9,11 +9,13 @@ tags: [ "string" "format" "pretty-print" "org:erratique" ]
 license: "BSD-3-Clause"
 available: [ ocaml-version >= "4.01.0"]
 depends: [ "ocamlfind" ]
-depopts: [ "base-unix" ]
+depopts: [ "base-unix" "cmdliner" ]
+conflicts: [ "cmdliner" {< "0.9.8"} ]
 build:
 [
   [ "ocaml" "pkg/git.ml" ]
   [ "ocaml" "pkg/build.ml" "native=%{ocaml-native}%"
                            "native-dynlink=%{ocaml-native-dynlink}%"
-                           "unix=%{base-unix:installed}%" ]
+                           "unix=%{base-unix:installed}%"
+                           "cmdliner=%{cmdliner:installed}%" ]
 ]

@@ -4,36 +4,28 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** [Fmt] TTY setup.
+(** {!Cmdliner} support for [Fmt]. *)
 
-    [Fmt_tty] provides simple automatic setup on channel formatters for:
+(** {1 Color option} *)
+
+val color : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
+  Fmt.style_renderer option Cmdliner.Term.t
+(** [color ?env ?docs ()] is a {!Cmdliner} option [--color] that can
+    be directly used with the optional arguments of
+    {{!Fmt_tty.tty_setup}TTY setup} or to control
+    {{!Fmt.set_style_renderer}style rendering}.  The option is
+    documented under [docs] (defaults to ["OPTIONS"]).
+
+    The option is a tri-state enumerated value that when used with
+    {{!Fmt_tty.tty_setup}TTY setup} takes over the automatic setup:
     {ul
-    {- {!Fmt.set_style_renderer}. [`Ansi_tty] is used if the channel
-       {{!Unix.isatty}is a tty} and the environment variable
-       [TERM] is defined and its value is not ["dumb"]. [`None] is
-       used otherwise.}
-    {- {!Fmt.set_utf_8}. [true] is used if one of the following
-       environment variables has ["UTF-8"] as a case insensitive
-       substring: [LANG], [LC_ALL], [LC_CTYPE].}}
+    {- [--color=never], the value is [Some `None], forces no styling.}
+    {- [--color=always], the value is [Some `Ansi], forces ANSI styling.}
+    {- [--color=auto] or absent, the value is [None], automatic setup
+       takes place.}}
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
-
-(** {1:tty_setup TTY setup}. *)
-
-val setup : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool ->
-  out_channel -> Format.formatter
-(** [setup ?style_renderer ?utf_8 outc] is a formatter for [outc] with
-    {!Fmt.set_style_renderer} and {!Fmt.set_utf_8} correctly setup. If
-    [style_renderer] or [utf_8] are specified they override the automatic
-    setup.
-
-    If [outc] is {!stdout}, {!Fmt.stdout} is returned. If [outc] is
-    {!stderr}, {!Fmt.stderr} is returned. *)
-
-val setup_std_outputs : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool ->
-  unit -> unit
-(** [setup_std_outputs ?style_renderer ?utf_8 ()] applies {!setup}
-    on {!stdout} and {!stderr}. *)
+    If [env] is provided, the option default value ([None]) can be
+    overriden by the corresponding environment variable. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
