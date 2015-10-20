@@ -16,7 +16,8 @@ val color : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     be directly used with the optional arguments of
     {{!Fmt_tty.tty_setup}TTY setup} or to control
     {{!Fmt.set_style_renderer}style rendering}.  The option is
-    documented under [docs] (defaults to ["OPTIONS"]).
+    documented under [docs] (defaults to the default in
+    {!Cmdliner.Arg.info}).
 
     The option is a tri-state enumerated value that when used with
     {{!Fmt_tty.tty_setup}TTY setup} takes over the automatic setup:
