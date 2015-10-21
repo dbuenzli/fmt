@@ -8,7 +8,7 @@ let strf = Format.asprintf
 
 open Cmdliner
 
-let color ?env ?docs () =
+let style_renderer ?env ?docs () =
   let enum = ["auto", None; "always", Some `Ansi_tty; "never", Some `None] in
   let color = Arg.enum enum in
   let enum_alts = Arg.doc_alts_enum enum in

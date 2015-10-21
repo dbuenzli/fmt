@@ -8,11 +8,11 @@
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
-(** {1 Color option} *)
+(** {1 Option for setting the style renderer} *)
 
-val color : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
+val style_renderer : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
   Fmt.style_renderer option Cmdliner.Term.t
-(** [color ?env ?docs ()] is a {!Cmdliner} option [--color] that can
+(** [style_renderer ?env ?docs ()] is a {!Cmdliner} option [--color] that can
     be directly used with the optional arguments of
     {{!Fmt_tty.tty_setup}TTY setup} or to control
     {{!Fmt.set_style_renderer}style rendering}.  The option is
