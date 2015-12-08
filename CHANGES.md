@@ -1,8 +1,3 @@
-
-
-* Change the types of `Fmt.[styled_]unit` to take a string
-  rather than a unit format.
-
 v0.7.1 2015-12-03 Cambridge (UK)
 --------------------------------
 

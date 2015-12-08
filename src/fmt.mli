@@ -77,8 +77,8 @@ val sp : unit t
 val const : 'a t -> 'a -> unit t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
-val unit : string -> unit t
-(** [unit s] formats a unit value with the string [s]. *)
+val unit : (unit, Format.formatter, unit) Pervasives.format -> unit t
+(** [unit fmt] formats a unit value with the format [fmt]. *)
 
 val fmt : ('a, Format.formatter, unit) Pervasives.format ->
   Format.formatter -> 'a
@@ -382,8 +382,9 @@ type style =
 val styled : style -> 'a t -> 'a t
 (** [styled s pp] formats like [pp] but styled with [s]. *)
 
-val styled_unit : style -> string -> unit t
-(** [styled_unit s str] is [style s (unit str)]. *)
+val styled_unit : style -> (unit, Format.formatter, unit) Pervasives.format ->
+  unit t
+(** [styled_unit s fmt] is [style s (unit fmt)]. *)
 
 (** {2 Style rendering control} *)
 
