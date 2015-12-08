@@ -33,7 +33,7 @@ let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
 let const pp_v v ppf () = pf ppf "%a" pp_v v
-let unit fmt ppf () = pf ppf fmt
+let unit s ppf () = Format.pp_print_string ppf s
 let fmt fmt ppf = pf ppf fmt
 let always fmt ppf v = pf ppf fmt
 
@@ -354,7 +354,7 @@ let styled style pp_v ppf = match style_renderer ppf with
     let reset ppf = pf ppf "@<0>%s" ansi_style_reset in
     kpf reset ppf "@<0>%s%a" (ansi_style_code style) pp_v
 
-let styled_unit style fmt = styled style (unit fmt)
+let styled_unit style s = styled style (unit s)
 
 (* Converting with string converters. *)
 
