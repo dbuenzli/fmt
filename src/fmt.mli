@@ -146,6 +146,12 @@ val string : string t
 val buffer : Buffer.t t
 (** [buffer] formats a {!Buffer.t} value's current contents. *)
 
+val exn : exn t
+(** [exn] formats an exception. *)
+
+val exn_backtrace : (exn * Printexc.raw_backtrace) t
+(** [exn_backtrace] formats an exception backtrace. *)
+
 (** {1:polytypes Polymorphic type formatters}
 
     These formatters give full control to the client over the

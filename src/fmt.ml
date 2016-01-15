@@ -53,6 +53,24 @@ let char = Format.pp_print_char
 let string = Format.pp_print_string
 let buffer ppf b = string ppf (Buffer.contents b)
 
+let exn ppf e = string ppf (Printexc.to_string e)
+let exn_backtrace ppf (e, bt) =
+  let pp_backtrace_str ppf s =
+    let stop = String.length s - 2 (* there's a newline at the end *) in
+    let rec loop left right =
+      if right = stop then string ppf (String.sub s left (right - left)) else
+      if s.[right] <> '\n' then loop left (right + 1) else
+      begin
+        string ppf (String.sub s left (right - left));
+        cut ppf ();
+        loop (right + 1) (right + 1)
+      end
+    in
+    loop 0 0
+  in
+  pf ppf "@[<v>Exception: %a@,%a@]"
+    exn e pp_backtrace_str (Printexc.raw_backtrace_to_string bt)
+
 (* Floats *)
 
 let float ppf v = pf ppf "%g" v

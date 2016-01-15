@@ -1,4 +1,5 @@
 
+* Add `Fmt.exn[_backtrace]`. Thanks to Edwin Török for suggesting.
 * Add `Fmt.quote`.
 
 v0.7.1 2015-12-03 Cambridge (UK)
