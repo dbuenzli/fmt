@@ -290,6 +290,10 @@ val brackets : 'a t -> 'a t
 val braces : 'a t -> 'a t
 (** [braces pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
 
+val quote : ?mark:char -> 'a t -> 'a t
+(** [quote ~mark pp_v ppf] is [pf "@[<1>%c%a%c@]" mark pp_v mark], [mark]
+    defaults to ['"']. *)
+
 (** {1:text Text and lines} *)
 
 val text : string t
