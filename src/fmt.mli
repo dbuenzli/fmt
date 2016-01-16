@@ -319,8 +319,8 @@ val lines : string t
     kinds of line endings you should use the pretty-printers from
     {!Uuseg_string}. *)
 
-val text_range : ((int * int) * (int * int)) t
-(** [text_range] formats a line-column text range according to
+val text_loc : ((int * int) * (int * int)) t
+(** [text_loc] formats a line-column text range according to
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 

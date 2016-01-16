@@ -213,7 +213,10 @@ let white_str ~spaces ppf s =
 
 let text = white_str ~spaces:true
 let lines = white_str ~spaces:false
-let text_range ppf ((l0, c0), (l1, c1)) = pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
+let text_loc ppf ((l0, c0), (l1, c1)) =
+  if (l0 : int) == (l1 : int) && (c0 : int) == (c1 : int)
+  then pf ppf "%d.%d" l0 c0
+  else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 
 (* Appending *)
 

@@ -1,6 +1,8 @@
 
 * Add `Fmt.exn[_backtrace]`. Thanks to Edwin Török for suggesting.
 * Add `Fmt.quote`.
+* Rename `Fmt.text_range` to `Fmt.text_loc` and simplify output
+  when range is a position.
 
 v0.7.1 2015-12-03 Cambridge (UK)
 --------------------------------
