@@ -194,7 +194,8 @@ let hvbox ?(indent = 0) pp ppf =
 let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
 let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
 let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
-let quote ?(mark = '"') pp_v ppf v = pf ppf "@[<1>%c%a%c@]" mark pp_v v mark
+let quote ?(mark = "\"") pp_v ppf v =
+  pf ppf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v v mark
 
 (* Text and lines *)
 

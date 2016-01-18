@@ -296,9 +296,10 @@ val brackets : 'a t -> 'a t
 val braces : 'a t -> 'a t
 (** [braces pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
 
-val quote : ?mark:char -> 'a t -> 'a t
-(** [quote ~mark pp_v ppf] is [pf "@[<1>%c%a%c@]" mark pp_v mark], [mark]
-    defaults to ['"']. *)
+val quote : ?mark:string -> 'a t -> 'a t
+(** [quote ~mark pp_v ppf] is [pf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v mark],
+    [mark] defaults to ["\""], it is always counted as spanning as single
+    column (this allows for UTF-8 encoded marks). *)
 
 (** {1:text Text and lines} *)
 
