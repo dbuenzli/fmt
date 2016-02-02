@@ -239,14 +239,17 @@ let paragraphs ppf s =
       | stop ->
           if s.[stop] <> '\n'
           then (Format.pp_print_space ppf (); loop stop s) else
-          match stop_at not_white_or_nl ~start:stop ~max s with
+          match stop_at not_white_or_nl ~start:(stop + 1) ~max s with
           | stop when stop > max -> ()
           | stop ->
               if s.[stop] <> '\n'
               then (Format.pp_print_space ppf (); loop stop s) else
-              match stop_at not_white ~start:stop ~max s with
+              match stop_at not_white ~start:(stop + 1) ~max s with
               | stop when stop > max -> ()
-              | stop -> Format.pp_force_newline ppf (); loop stop s
+              | stop ->
+                  Format.pp_force_newline ppf ();
+                  Format.pp_force_newline ppf ();
+                  loop stop s
   in
   let start = stop_at not_white ~start:0 ~max s in
   if start > max then () else loop start s

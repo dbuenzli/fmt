@@ -321,7 +321,7 @@ val words : string t
 val paragraphs : string t
 (** [paragraphs] formats paragraphs by suppressing initial and trailing
     spaces and newlines, replacing blank lines (a line made only
-    of white space) by a single {!Format.pp_force_newline} and remaining
+    of white space) by a two {!Format.pp_force_newline} and remaining
     consecutive white space with a single {!Format.pp_print_space}. *)
 
 val text : string t
