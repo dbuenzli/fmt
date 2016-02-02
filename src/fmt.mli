@@ -301,24 +301,36 @@ val quote : ?mark:string -> 'a t -> 'a t
     [mark] defaults to ["\""], it is always counted as spanning as single
     column (this allows for UTF-8 encoded marks). *)
 
-(** {1:text Text and lines} *)
+(** {1:text Words, paragraphs, text and lines}
+
+    {b Note.} These functions only work on US-ASCII strings and/or
+    with newlines (['\n']). If you are dealing with UTF-8 strings or
+    different kinds of line endings you should use the pretty-printers
+    from {!Uuseg_string}.
+
+    {b White space.} White space is one of the following US-ASCII
+    characters: space [' '] ([0x20]), tab ['\t'] ([0x09]), newline
+    ['\n'] ([0x0A]), vertical tab ([0x0B]), form feed ([0x0C]),
+    carriage return ['\r'] ([0x0D]). *)
+
+val words : string t
+(** [words] formats words by suppressing initial and trailing
+    white space and replacing consecutive white space with
+    a single {!Format.pp_print_space}. *)
+
+val paragraphs : string t
+(** [paragraphs] formats paragraphs by suppressing initial and trailing
+    spaces and newlines, replacing blank lines (a line made only
+    of white space) by a single {!Format.pp_force_newline} and remaining
+    consecutive white space with a single {!Format.pp_print_space}. *)
 
 val text : string t
-(** [text] formats text by replacing spaces and newlines in the string
-    with calls to {!Format.pp_print_space} and {!Format.pp_force_newline}.
-
-    {b Note.} This function will only work on US-ASCII strings. If you
-    are dealing with UTF-8 text you should use the pretty-printers
-    from {!Uuseg_string}. *)
+(** [text] formats text by respectively replacing spaces and newlines in
+    the string with {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
 
 val lines : string t
 (** [lines] formats lines by replacing newlines (['\n']) in the string
-    with calls to {!Format.pp_force_newline}.
-
-    {b Note.} This function will only work on US-ASCII string and with
-    newlines. If you are dealing with UTF-8 strings and different
-    kinds of line endings you should use the pretty-printers from
-    {!Uuseg_string}. *)
+    with calls to {!Format.pp_force_newline}. *)
 
 val text_loc : ((int * int) * (int * int)) t
 (** [text_loc] formats a line-column text range according to

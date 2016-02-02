@@ -199,21 +199,84 @@ let quote ?(mark = "\"") pp_v ppf v =
 
 (* Text and lines *)
 
-let white_str ~spaces ppf s =
-  let left = ref 0 and right = ref 0 and len = String.length s in
-  let flush () =
-    Format.pp_print_string ppf (String.sub s !left (!right - !left));
-    incr right; left := !right;
-  in
-  while (!right <> len) do
-    if s.[!right] = '\n' then (flush (); Format.pp_force_newline ppf ()) else
-    if spaces && s.[!right] = ' ' then (flush (); Format.pp_print_space ppf ())
-    else incr right;
-  done;
-  if !left <> len then flush ()
+let is_nl c = c = '\n'
+let is_nl_or_sp c = is_nl c || c = ' '
+let is_white = function ' ' | '\t' .. '\r'  -> true | _ -> false
+let not_white c = not (is_white c)
+let not_white_or_nl c = is_nl c || not_white c
 
-let text = white_str ~spaces:true
-let lines = white_str ~spaces:false
+let rec stop_at sat ~start ~max s =
+  if start > max then start else
+  if sat s.[start] then start else
+  stop_at sat ~start:(start + 1) ~max s
+
+let sub s start stop ~max =
+  if start = stop then "" else
+  if start = 0 && stop > max then s else
+  String.sub s start (stop - start)
+
+let words ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_white ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      match stop_at not_white ~start:stop ~max s with
+      | stop when stop > max -> ()
+      | stop -> Format.pp_print_space ppf (); loop stop s
+  in
+  let start = stop_at not_white ~start:0 ~max s in
+  if start > max then () else loop start s
+
+let paragraphs ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_white ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      match stop_at not_white_or_nl ~start:stop ~max s with
+      | stop when stop > max -> ()
+      | stop ->
+          if s.[stop] <> '\n'
+          then (Format.pp_print_space ppf (); loop stop s) else
+          match stop_at not_white_or_nl ~start:stop ~max s with
+          | stop when stop > max -> ()
+          | stop ->
+              if s.[stop] <> '\n'
+              then (Format.pp_print_space ppf (); loop stop s) else
+              match stop_at not_white ~start:stop ~max s with
+              | stop when stop > max -> ()
+              | stop -> Format.pp_force_newline ppf (); loop stop s
+  in
+  let start = stop_at not_white ~start:0 ~max s in
+  if start > max then () else loop start s
+
+let text ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_nl_or_sp ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      begin match s.[stop] with
+      | ' ' -> Format.pp_print_space ppf ()
+      | '\n' -> Format.pp_force_newline ppf ()
+      | _ -> assert false
+      end;
+      loop (stop + 1) s
+  in
+  loop 0 s
+
+let lines ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_nl ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      Format.pp_force_newline ppf ();
+      loop (stop + 1) s
+  in
+  loop 0 s
+
 let text_loc ppf ((l0, c0), (l1, c1)) =
   if (l0 : int) == (l1 : int) && (c0 : int) == (c1 : int)
   then pf ppf "%d.%d" l0 c0

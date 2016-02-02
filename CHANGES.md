@@ -1,4 +1,6 @@
 
+
+* Add `Fmt.{words,paragraphs}` formatters on US-ASCII strings.
 * Add `Fmt.exn[_backtrace]`. Thanks to Edwin Török for suggesting.
 * Add `Fmt.quote`.
 * Rename `Fmt.text_range` to `Fmt.text_loc` and simplify output
