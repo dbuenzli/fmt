@@ -219,6 +219,14 @@ val using : ('a -> 'b) -> 'b t -> 'a t
     whenever possible, using OCaml syntax. *)
 module Dump : sig
 
+  (** {1:base Base types formatters} *)
+
+  val signal : int t
+  (** [signal] formats an OCaml {{!Sys.sigabrt}signal number} as a C
+      POSIX
+      {{:http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html}
+      constant} or ["SIG(%d)"] the signal number is unknown. *)
+
   (** {1:polytypes Polymorphic type formatters} *)
 
   val pair : 'a t -> 'b t -> ('a * 'b) t

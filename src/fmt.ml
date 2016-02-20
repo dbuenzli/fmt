@@ -124,6 +124,30 @@ let using f pp ppf v = pp ppf (f v)
 
 module Dump = struct
 
+  let signal ppf s = match s with
+  | s when s = Sys.sigabrt -> string ppf "SIGABRT"
+  | s when s = Sys.sigalrm -> string ppf "SIGALRM"
+  | s when s = Sys.sigfpe -> string ppf "SIGFPE"
+  | s when s = Sys.sighup -> string ppf "SIGHUP"
+  | s when s = Sys.sigill -> string ppf "SIGILL"
+  | s when s = Sys.sigint -> string ppf "SIGINT"
+  | s when s = Sys.sigkill -> string ppf "SIGKILL"
+  | s when s = Sys.sigpipe -> string ppf "SIGPIPE"
+  | s when s = Sys.sigquit -> string ppf "SIGQUIT"
+  | s when s = Sys.sigsegv -> string ppf "SIGSEGV"
+  | s when s = Sys.sigterm -> string ppf "SIGTERM"
+  | s when s = Sys.sigusr1 -> string ppf "SIGUSR1"
+  | s when s = Sys.sigusr2 -> string ppf "SIGUSR2"
+  | s when s = Sys.sigchld -> string ppf "SIGCHLD"
+  | s when s = Sys.sigcont -> string ppf "SIGCONT"
+  | s when s = Sys.sigstop -> string ppf "SIGSTOP"
+  | s when s = Sys.sigtstp -> string ppf "SIGTSTP"
+  | s when s = Sys.sigttin -> string ppf "SIGTTIN"
+  | s when s = Sys.sigttou -> string ppf "SIGTTOU"
+  | s when s = Sys.sigvtalrm -> string ppf "SIGVTALRM"
+  | s when s = Sys.sigprof -> string ppf "SIGPROF"
+  | unknown -> pf ppf "SIG(%d)" unknown
+
   let pair pp_fst pp_snd ppf (fst, snd) =
     pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
 
