@@ -1,5 +1,5 @@
 
-
+* Relicense from BSD3 to ISC.
 * Add `Fmt.Dump.signal` formatter for `Sys` signal numbers.
 * Add `Fmt.{words,paragraphs}` formatters on US-ASCII strings.
 * Add `Fmt.exn[_backtrace]`. Thanks to Edwin Török for suggesting.

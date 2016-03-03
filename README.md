@@ -9,7 +9,7 @@ library that allows to setup formatters for terminal color output
 depends on the Unix library. The optional `Fmt_cli` library that
 provides command line support for Fmt depends on [`Cmdliner`][1].
 
-Fmt is distributed under the BSD3 license.
+Fmt is distributed under the ISC license.
 
 [1]: http://erratique.ch/software/cmdliner
 
