@@ -98,6 +98,10 @@ let option ?none:(pp_none = nop) pp_v ppf = function
 | None -> pp_none ppf ()
 | Some v -> pp_v ppf v
 
+let result ~ok ~error ppf = function
+| Result.Ok v -> ok ppf v
+| Result.Error e -> error ppf e
+
 let iter ?sep:(pp_sep = cut) iter pp_elt ppf v =
   let is_first = ref true in
   let pp_elt v =
@@ -154,6 +158,10 @@ module Dump = struct
   let option pp_v ppf = function
   | None -> pf ppf "None"
   | Some v -> pf ppf "@[<1>Some@ @[%a@]@]" pp_v v
+
+  let result ~ok ~error ppf = function
+  | Result.Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
+  | Result.Error e -> pf ppf "@[<2>Error@ @[%a@]@]" error e
 
   let list pp_elt ppf vs =
     let rec loop = function

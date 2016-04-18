@@ -168,6 +168,10 @@ val option : ?none:unit t -> 'a t -> 'a option t
 (** [option ~none pp_v] formats an optional value. The [Some] case
     uses [pp_v] and [None] uses [none] (defaults to {!nop}). *)
 
+val result : ok:'a t -> error:'b t -> ('a, 'b) Result.result t
+(** [result ~ok ~error] formats a result value using [ok] for the [Ok]
+    case and [error] for the [Error] case. *)
+
 val list : ?sep:unit t -> 'a t -> 'a list t
 (** [list sep pp_v] formats list elements. Each element of the list is
     formatted in order with [pp_v]. Elements are separated by [sep]
@@ -236,6 +240,11 @@ module Dump : sig
   val option : 'a t -> 'a option t
   (** [option pp_v] formats an OCaml option using [pp_v] for the [Some]
       case. No parentheses are added. *)
+
+  val result : ok:'a t -> error:'b t -> ('a, 'b) Result.result t
+  (** [result ~ok ~error] formats an OCaml result using [ok] for the [Ok]
+      case value and [error] for the [Error] case value. No parentheses
+      are added. *)
 
   val list : 'a t -> 'a list t
   (** [list pp_v] formats an OCaml list using [pp_v] for the list
