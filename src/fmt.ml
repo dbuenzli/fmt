@@ -157,7 +157,7 @@ module Dump = struct
 
   let option pp_v ppf = function
   | None -> pf ppf "None"
-  | Some v -> pf ppf "@[<1>Some@ @[%a@]@]" pp_v v
+  | Some v -> pf ppf "@[<2>Some@ @[%a@]@]" pp_v v
 
   let result ~ok ~error ppf = function
   | Result.Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
