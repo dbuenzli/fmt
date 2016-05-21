@@ -1,41 +1,40 @@
 description = "OCaml Format pretty-printer combinators"
-version = "%%VERSION%%"
-
+version = "%%VERSION_NUM%%"
+requires = ""
 archive(byte) = "fmt.cma"
-archive(byte, plugin) = "fmt.cma"
 archive(native) = "fmt.cmxa"
-archive(native, plugin) = "fmt.cmxs"
-exists_if = "fmt.cma"
+plugin(byte) = "fmt.cma"
+plugin(native) = "fmt.cmxs"
 
 package "tty" (
   description = "Fmt TTY setup"
-  version = "%%VERSION%%"
+  version = "%%VERSION_NUM%%"
   requires = "unix fmt"
   archive(byte) = "fmt_tty.cma"
-  archive(byte, plugin) = "fmt_tty.cma"
   archive(native) = "fmt_tty.cmxa"
-  archive(native, plugin) = "fmt_tty.cmxs"
+  plugin(byte) = "fmt_tty.cma"
+  plugin(native) = "fmt_tty.cmxs"
   exists_if = "fmt_tty.cma"
 )
 
 package "cli" (
   description = "Cmdliner support for Fmt"
-  version = "%%VERSION%%"
+  version = "%%VERSION_NUM%%"
   requires = "cmdliner fmt"
   archive(byte) = "fmt_cli.cma"
-  archive(byte, plugin) = "fmt_cli.cma"
   archive(native) = "fmt_cli.cmxa"
-  archive(native, plugin) = "fmt_cli.cmxs"
+  plugin(byte) = "fmt_cli.cma"
+  plugin(native) = "fmt_cli.cmxs"
   exists_if = "fmt_cli.cma"
 )
 
 package "top" (
   description = "Fmt toplevel support"
-  version = "%%VERSION%%"
+  version = "%%VERSION_NUM%%"
   requires = "fmt fmt.tty"
   archive(byte) = "fmt_top.cma"
-  archive(byte, plugin) = "fmt_top.cma"
   archive(native) = "fmt_top.cmxa"
-  archive(native, plugin) = "fmt_top.cmxs"
+  plugin(byte) = "fmt_top.cma"
+  plugin(native) = "fmt_top.cmxs"
   exists_if = "fmt_top.cma"
 )

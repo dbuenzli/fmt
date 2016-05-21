@@ -11,15 +11,13 @@ available: [ ocaml-version >= "4.01.0"]
 depends: [
   "ocamlfind" {build}
   "ocamlbuild" {build}
+  "topkg" {build}
   "result"
 ]
 depopts: [ "base-unix" "cmdliner" ]
 conflicts: [ "cmdliner" {< "0.9.8"} ]
-build:
-[
-  [ "ocaml" "pkg/git.ml" ]
-  [ "ocaml" "pkg/build.ml" "native=%{ocaml-native}%"
-                           "native-dynlink=%{ocaml-native-dynlink}%"
-                           "unix=%{base-unix:installed}%"
-                           "cmdliner=%{cmdliner:installed}%" ]
-]
+build: [[
+  "ocaml" "pkg/pkg.ml" "build"
+          "--installer" "true"
+          "--with-base-unix" "%{base-unix:installed}%"
+          "--with-cmdliner" "%{cmdliner:installed}%" ]]
