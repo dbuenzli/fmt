@@ -1,6 +1,10 @@
 
+v0.8.0 2016-05-23 La Forclaz (VS)
+---------------------------------
+
 * Build depend on topkg.
 * Relicense from BSD3 to ISC.
+* Tweak `Fmt.Dump.option` to indent like in sources.
 * Add `Fmt.Dump.signal` formatter for `Sys` signal numbers.
 * Add `Fmt[.Dump].result`, formatter for `result` values.
 * Add `Fmt.{words,paragraphs}` formatters on US-ASCII strings.
