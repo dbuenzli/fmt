@@ -1,7 +1,7 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% v%%VERSION%%
+   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 (** {!Format} pretty-printer combinators.
@@ -14,7 +14,7 @@
     {- The required reading {!Format} module
        {{:https://ocaml.org/learn/tutorials/format.html}tutorial}.}}
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
 (** {1:formatting Formatting} *)
 

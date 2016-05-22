@@ -17,7 +17,7 @@ action ()
             $OCAMLBUILD test/tests.otarget
             ;;
         doc)     shift; topkg doc --dev $* ;;
-        api-doc) shift; topkg doc doc $* ;;
+        api-doc) shift; topkg doc $* ;;
         clean)   $OCAMLBUILD -clean ;;
         *)       $OCAMLBUILD $* ;;
     esac
