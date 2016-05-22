@@ -16,7 +16,7 @@
        environment variables has ["UTF-8"] as a case insensitive
        substring: [LANG], [LC_ALL], [LC_CTYPE].}}
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
 (** {1:tty_setup TTY setup}. *)
 

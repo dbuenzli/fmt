@@ -6,7 +6,7 @@
 
 (** {!Cmdliner} support for [Fmt].
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
 (** {1 Option for setting the style renderer} *)
 
