@@ -18,6 +18,6 @@ depopts: [ "base-unix" "cmdliner" ]
 conflicts: [ "cmdliner" {< "0.9.8"} ]
 build: [[
   "ocaml" "pkg/pkg.ml" "build"
-          "--installer" "true"
+          "--pinned" "%{pinned}%"
           "--with-base-unix" "%{base-unix:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%" ]]
