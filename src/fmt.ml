@@ -409,7 +409,7 @@ let set_meta ppf store ~utf_8 ~style_renderer =
   let meta = function
   | "fmt.utf8" -> utf_8
   | "fmt.style_renderer" -> style_renderer
-  | _ -> "Fmt: do not use the tags mecanism, it is a broken idea"
+  | _ -> "Fmt: do not use the tags mechanism, it is a broken idea"
   in
   let store = { store with Format.mark_open_tag = meta } in
   set_meta_store ppf store
