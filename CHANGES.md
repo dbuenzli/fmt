@@ -1,4 +1,6 @@
 
+* Add `Fmt.Dump.uchar` formatter for inspecting `Uchar.t` values.
+
 v0.8.0 2016-05-23 La Forclaz (VS)
 ---------------------------------
 

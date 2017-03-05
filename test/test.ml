@@ -4,6 +4,16 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+let test_dump_uchar () =
+ let str u = Format.asprintf "%a" Fmt.Dump.uchar u in
+ assert (str Uchar.min = "U+0000");
+ assert (str Uchar.(succ min) = "U+0001");
+ assert (str Uchar.(of_int 0xFFFF) = "U+FFFF");
+ assert (str Uchar.(succ (of_int 0xFFFF)) = "U+10000");
+ assert (str Uchar.(pred max) = "U+10FFFE");
+ assert (str Uchar.max = "U+10FFFF");
+ ()
+
 let test_utf_8 () =
   let ppf = Format.formatter_of_buffer (Buffer.create 23) in
   assert (Fmt.utf_8 ppf = true);
@@ -23,6 +33,7 @@ let test_style_renderer () =
   ()
 
 let tests () =
+  test_dump_uchar ();
   test_utf_8 ();
   test_style_renderer ();
   Printf.printf "Done.\n";

@@ -231,6 +231,12 @@ module Dump : sig
       {{:http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html}
       constant} or ["SIG(%d)"] the signal number is unknown. *)
 
+  val uchar : Uchar.t t
+  (** [uchar] formats an OCaml {!Uchar.t} value using only US-ASCII
+      encoded characters according to the Unicode
+      {{:http://www.unicode.org/versions/latest/appA.pdf}notational
+      convention} for code points. *)
+
   (** {1:polytypes Polymorphic type formatters} *)
 
   val pair : 'a t -> 'b t -> ('a * 'b) t

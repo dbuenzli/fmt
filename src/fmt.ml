@@ -152,6 +152,8 @@ module Dump = struct
   | s when s = Sys.sigprof -> string ppf "SIGPROF"
   | unknown -> pf ppf "SIG(%d)" unknown
 
+  let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
+
   let pair pp_fst pp_snd ppf (fst, snd) =
     pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
 
