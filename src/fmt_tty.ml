@@ -31,8 +31,12 @@ let setup ?style_renderer ?utf_8 oc =
   let style_renderer = match style_renderer with
   | Some r -> r
   | None ->
-      let dumb = try Sys.getenv "TERM" = "dumb" with
-      | Not_found -> true
+      let dumb =
+        try match Sys.getenv "TERM" with
+        | "dumb" | "" -> true
+        | _ -> false
+        with
+        Not_found -> true
       in
       let isatty = try Unix.(isatty (descr_of_out_channel oc)) with
       | Unix.Unix_error _ -> false

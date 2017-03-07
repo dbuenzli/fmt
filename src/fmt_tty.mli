@@ -18,7 +18,7 @@
 
     {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
-(** {1:tty_setup TTY setup}. *)
+(** {1:tty_setup TTY setup} *)
 
 val setup : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool ->
   out_channel -> Format.formatter
