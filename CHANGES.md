@@ -1,3 +1,5 @@
+v0.8.1 2017-03-15 La Forclaz (VS)
+---------------------------------
 
 * `Fmt_tty.setup`, treat empty `TERM` env var as dumb.
 * Add `Fmt.Dump.uchar` formatter for inspecting `Uchar.t` values.
