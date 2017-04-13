@@ -56,7 +56,7 @@ let buffer ppf b = string ppf (Buffer.contents b)
 let exn ppf e = string ppf (Printexc.to_string e)
 let exn_backtrace ppf (e, bt) =
   let pp_backtrace_str ppf s =
-    let stop = String.length s - 2 (* there's a newline at the end *) in
+    let stop = String.length s - 1 (* there's a newline at the end *) in
     let rec loop left right =
       if right = stop then string ppf (String.sub s left (right - left)) else
       if s.[right] <> '\n' then loop left (right + 1) else
@@ -66,6 +66,7 @@ let exn_backtrace ppf (e, bt) =
         loop (right + 1) (right + 1)
       end
     in
+    if s = "" then (string ppf "No backtrace available.") else
     loop 0 0
   in
   pf ppf "@[<v>Exception: %a@,%a@]"

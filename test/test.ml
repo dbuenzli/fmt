@@ -4,6 +4,19 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+let test_exn_backtrace () = (* Don't move this test in the file. *)
+  try failwith "Test" with
+  | ex ->
+      let bt = Printexc.get_raw_backtrace () in
+      let fmt = Fmt.strf "%a" Fmt.exn_backtrace (ex,bt) in
+      assert begin match Printexc.backtrace_status () with
+      | false -> fmt = "Exception: Failure(\"Test\")\nNo backtrace available."
+      | true ->
+          fmt = "Exception: Failure(\"Test\")\n\
+                 Raised at file \"pervasives.ml\", line 32, characters 22-33\n\
+                 Called from file \"test/test.ml\", line 8, characters 6-21"
+      end
+
 let test_dump_uchar () =
  let str u = Format.asprintf "%a" Fmt.Dump.uchar u in
  assert (str Uchar.min = "U+0000");
@@ -33,6 +46,7 @@ let test_style_renderer () =
   ()
 
 let tests () =
+  test_exn_backtrace ();
   test_dump_uchar ();
   test_utf_8 ();
   test_style_renderer ();
