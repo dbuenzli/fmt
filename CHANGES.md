@@ -1,4 +1,5 @@
-
+v0.8.3 2017-04-13 La Forclaz (VS)
+---------------------------------
 
 * Fix `Fmt.exn_backtrace`. Thanks to Thomas Leonard for the report.
 
