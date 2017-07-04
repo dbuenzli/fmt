@@ -63,11 +63,11 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 (** {1:fmt_exns Formatting exceptions} *)
 
 val failwith : ('a, Format.formatter, unit, unit) format4 -> 'a
-(** [failwith] is [kstrf failwith], used for raising {!Pervasives.Failure} with
+(** [failwith] is [kstrf failwith], raises {!Pervasives.Failure} with
     a pretty-printed string argument. *)
 
 val invalid_arg : ('a, Format.formatter, unit, unit) format4 -> 'a
-(** [invalid_arg] is [kstrf invalid_arg], used for raising
+(** [invalid_arg] is [kstrf invalid_arg], raises
     {!Pervasives.Invalid_argument} with a pretty-printed string argument. *)
 
 (** {1 Formatters} *)
