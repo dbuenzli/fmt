@@ -60,6 +60,16 @@ val pr : ('a, Format.formatter, unit) format -> 'a
 val epr : ('a, Format.formatter, unit) format -> 'a
 (** [epr] is [pf stderr]. *)
 
+(** {1:fmt_exns Formatting exceptions} *)
+
+val failwith : ('a, Format.formatter, unit, unit) format4 -> 'a
+(** [failwith] is [kstrf failwith], used for raising {!Pervasives.Failure} with
+    a pretty-printed string argument. *)
+
+val invalid_arg : ('a, Format.formatter, unit, unit) format4 -> 'a
+(** [invalid_arg] is [kstrf invalid_arg], used for raising
+    {!Pervasives.Invalid_argument} with a pretty-printed string argument. *)
+
 (** {1 Formatters} *)
 
 type 'a t = Format.formatter -> 'a -> unit
