@@ -25,6 +25,13 @@ let stderr = Format.err_formatter
 let pr = Format.printf
 let epr = Format.eprintf
 
+(* Exception formatting *)
+
+let invalid_arg' = invalid_arg
+
+let failwith fmt = kstrf failwith fmt
+let invalid_arg fmt = kstrf invalid_arg fmt
+
 (* Formatters *)
 
 type 'a t = Format.formatter -> 'a -> unit
@@ -419,7 +426,7 @@ let set_meta ppf store ~utf_8 ~style_renderer =
 
 let utf_8 ppf = utf_8_of_raw (meta_raw (meta_store ppf) utf_8_tag)
 let set_utf_8 ppf utf_8 =
-  if ppf == Format.str_formatter then invalid_arg err_str_formatter else
+  if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
   let store = meta_store ppf in
   let style_renderer = meta_raw store style_renderer_tag in
   let utf_8 = utf_8_to_raw utf_8 in
@@ -429,7 +436,7 @@ let style_renderer ppf =
   style_renderer_of_raw (meta_raw (meta_store ppf) style_renderer_tag)
 
 let set_style_renderer ppf renderer =
-  if ppf == Format.str_formatter then invalid_arg err_str_formatter else
+  if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
   let store = meta_store ppf in
   let utf_8 = meta_raw store utf_8_tag in
   let style_renderer = style_renderer_to_raw renderer in
