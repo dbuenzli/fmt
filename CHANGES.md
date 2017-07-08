@@ -1,3 +1,9 @@
+v0.8.4 2017-07-08 Zagreb
+------------------------
+
+* Add `Fmt.{invalid_arg,failwith}. Thanks to Hezekiah M. Carty for the patch.
+
+
 v0.8.3 2017-04-13 La Forclaz (VS)
 ---------------------------------
 
