@@ -45,6 +45,11 @@ let test_style_renderer () =
   assert (Fmt.style_renderer ppf = `None);
   ()
 
+let test_exn_typechecks () =
+  let (_ : bool) = true || Fmt.failwith "%s" "" in
+  let (_ : bool) = true || Fmt.invalid_arg "%s" "" in
+  ()
+
 let tests () =
   test_exn_backtrace ();
   test_dump_uchar ();
