@@ -14,8 +14,12 @@ let pf = Format.fprintf
 let kpf = Format.kfprintf
 let strf = Format.asprintf
 let kstrf f fmt =
-  let buf = Buffer.create 17 in
-  let f fmt = Format.pp_print_flush fmt () ; f (Buffer.contents buf) in
+  let buf = Buffer.create 64 in
+  let f fmt =
+    Format.pp_print_flush fmt ();
+    let s = Buffer.contents buf in
+    Buffer.reset buf; f s
+  in
   Format.kfprintf f (Format.formatter_of_buffer buf) fmt
 
 (* Standard output formatting *)
@@ -450,9 +454,13 @@ let with_buffer ?like buf =
   | Some like ->  set_meta_store ppf (meta_store like); ppf
 
 let strf_like ppf fmt =
-  let buf = Buffer.create 17 in
+  let buf = Buffer.create 64 in
   let bppf = with_buffer ~like:ppf buf in
-  let flush ppf = Format.pp_print_flush ppf () ; (Buffer.contents buf) in
+  let flush ppf =
+    Format.pp_print_flush ppf ();
+    let s = Buffer.contents buf in
+    Buffer.reset buf; s
+  in
   Format.kfprintf flush bppf fmt
 
 (* Conditional UTF-8 formatting *)

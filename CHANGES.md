@@ -1,4 +1,7 @@
 
+
+* Fix `Fmt.{kstrf,strf_like}` when they are partially applied
+  and repeatedly called. Thanks to Thomas Gazagnaire for the report.
 * Add `Fmt.comma`.
 * Relax the `Fmt.(invalid_arg, failwith)` type signature. Thanks to
   Hezekiah M. Carty for the patch.

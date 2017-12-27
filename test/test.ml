@@ -50,11 +50,21 @@ let test_exn_typechecks () =
   let (_ : bool) = true || Fmt.invalid_arg "%s" "" in
   ()
 
+let test_kstrf_strf_like_partial_app () =
+  let assertf f = assert (f "X" = f "X") in
+  let test_kstrf fmt = Fmt.kstrf (fun x -> x) fmt in
+  let test_strf_like fmt = Fmt.strf_like Fmt.stderr fmt in
+  assertf (test_strf_like "%s");
+  assertf (test_kstrf "%s");
+  ()
+
+
 let tests () =
   test_exn_backtrace ();
   test_dump_uchar ();
   test_utf_8 ();
   test_style_renderer ();
+  test_kstrf_strf_like_partial_app ();
   Printf.printf "Done.\n";
   ()
 
