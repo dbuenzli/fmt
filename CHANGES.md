@@ -1,4 +1,5 @@
-
+v0.8.5 2017-12-27 La Forclaz (VS)
+---------------------------------
 
 * Fix `Fmt.{kstrf,strf_like}` when they are partially applied
   and repeatedly called. Thanks to Thomas Gazagnaire for the report.
