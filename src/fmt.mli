@@ -84,6 +84,9 @@ val cut : unit t
 val sp : unit t
 (** [sp] is {!Format.pp_print_space}. *)
 
+val comma : unit t
+(** [comma] is {!Fmt.unit}[ ",@ "]. *)
+
 val const : 'a t -> 'a -> unit t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 

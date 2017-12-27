@@ -1,3 +1,8 @@
+
+* Add `Fmt.comma`.
+* Relax the `Fmt.(invalid_arg, failwith)` type signature. Thanks to
+  Hezekiah M. Carty for the patch.
+
 v0.8.4 2017-07-08 Zagreb
 ------------------------
 

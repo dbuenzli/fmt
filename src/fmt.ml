@@ -39,6 +39,7 @@ type 'a t = Format.formatter -> 'a -> unit
 let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
+let comma ppf () = pf ppf ",@ "
 let const pp_v v ppf () = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
