@@ -4,45 +4,29 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(* Errors *)
+(* Formatters *)
 
-let err_str_formatter = "Format.str_formatter can't be set."
+module type S = sig
+  type formatter
+  val kfprintf :
+    (formatter -> 'a) -> formatter ->
+    ('b, formatter, unit, 'a) format4 -> 'b
+end
+
+module Make (F : S) = struct
+
+type formatter = F.formatter
 
 (* Formatting *)
 
-let pf = Format.fprintf
-let kpf = Format.kfprintf
-let strf = Format.asprintf
-let kstrf f fmt =
-  let buf = Buffer.create 64 in
-  let f fmt =
-    Format.pp_print_flush fmt ();
-    let s = Buffer.contents buf in
-    Buffer.reset buf; f s
-  in
-  Format.kfprintf f (Format.formatter_of_buffer buf) fmt
+let kpf = F.kfprintf
+let pf x = kpf ignore x
 
-(* Standard output formatting *)
-
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
-let pr = Format.printf
-let epr = Format.eprintf
-
-(* Exception formatting *)
-
-let invalid_arg' = invalid_arg
-
-let failwith fmt = kstrf failwith fmt
-let invalid_arg fmt = kstrf invalid_arg fmt
-
-(* Formatters *)
-
-type 'a t = Format.formatter -> 'a -> unit
+type 'a t = F.formatter -> 'a -> unit
 
 let nop fmt ppf = ()
-let cut = Format.pp_print_cut
-let sp = Format.pp_print_space
+let cut ppf () = pf ppf "@,"
+let sp ppf () = pf ppf "@ "
 let comma ppf () = pf ppf ",@ "
 let const pp_v v ppf () = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
@@ -51,8 +35,8 @@ let always fmt ppf v = pf ppf fmt
 
 (* Base type formatters *)
 
-let bool = Format.pp_print_bool
-let int = Format.pp_print_int
+let bool ppf v = pf ppf "%b" v
+let int ppf v = pf ppf "%d" v
 let nativeint ppf v = pf ppf "%nd" v
 let int32 ppf v = pf ppf "%ld" v
 let int64 ppf v = pf ppf "%Ld" v
@@ -61,8 +45,8 @@ let uint32 ppf v = pf ppf "%lu" v
 let uint64 ppf v = pf ppf "%Lu" v
 let unativeint ppf v = pf ppf "%nu" v
 
-let char = Format.pp_print_char
-let string = Format.pp_print_string
+let char ppf v = pf ppf "%c" v
+let string ppf v = pf ppf "%s" v
 let buffer ppf b = string ppf (Buffer.contents b)
 
 let exn ppf e = string ppf (Printexc.to_string e)
@@ -225,16 +209,16 @@ end
 (* Boxes *)
 
 let box ?(indent = 0) pp ppf =
-  Format.pp_open_hovbox ppf indent; pf ppf "%a@]" pp
+  pf ppf "@[<hov %i>%a@]" indent pp
 
 let hbox pp ppf =
-  Format.pp_open_hbox ppf (); pf ppf "%a@]" pp
+  pf ppf "@[<h>%a@]" pp
 
 let vbox ?(indent = 0) pp ppf =
-  Format.pp_open_vbox ppf indent; pf ppf "%a@]" pp
+  pf ppf "@[<v %i>%a@]" indent pp
 
 let hvbox ?(indent = 0) pp ppf =
-  Format.pp_open_hvbox ppf indent; pf ppf "%a@]" pp
+  pf ppf "@[<hv %i>%a@]" indent pp
 
 (* Brackets *)
 
@@ -265,12 +249,12 @@ let sub s start stop ~max =
 let words ppf s =
   let max = String.length s - 1 in
   let rec loop start s = match stop_at is_white ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop when stop > max -> string ppf (sub s start stop ~max)
   | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
+      string ppf (sub s start stop ~max);
       match stop_at not_white ~start:stop ~max s with
       | stop when stop > max -> ()
-      | stop -> Format.pp_print_space ppf (); loop stop s
+      | stop -> sp ppf (); loop stop s
   in
   let start = stop_at not_white ~start:0 ~max s in
   if start > max then () else loop start s
@@ -278,24 +262,23 @@ let words ppf s =
 let paragraphs ppf s =
   let max = String.length s - 1 in
   let rec loop start s = match stop_at is_white ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop when stop > max -> string ppf (sub s start stop ~max)
   | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
+      string ppf (sub s start stop ~max);
       match stop_at not_white_or_nl ~start:stop ~max s with
       | stop when stop > max -> ()
       | stop ->
           if s.[stop] <> '\n'
-          then (Format.pp_print_space ppf (); loop stop s) else
+          then (sp ppf (); loop stop s) else
           match stop_at not_white_or_nl ~start:(stop + 1) ~max s with
           | stop when stop > max -> ()
           | stop ->
               if s.[stop] <> '\n'
-              then (Format.pp_print_space ppf (); loop stop s) else
+              then (sp ppf (); loop stop s) else
               match stop_at not_white ~start:(stop + 1) ~max s with
               | stop when stop > max -> ()
               | stop ->
-                  Format.pp_force_newline ppf ();
-                  Format.pp_force_newline ppf ();
+                  pf ppf "@\n@\n" ;
                   loop stop s
   in
   let start = stop_at not_white ~start:0 ~max s in
@@ -304,12 +287,12 @@ let paragraphs ppf s =
 let text ppf s =
   let max = String.length s - 1 in
   let rec loop start s = match stop_at is_nl_or_sp ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop when stop > max -> string ppf (sub s start stop ~max)
   | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
+      string ppf (sub s start stop ~max);
       begin match s.[stop] with
-      | ' ' -> Format.pp_print_space ppf ()
-      | '\n' -> Format.pp_force_newline ppf ()
+      | ' ' -> sp ppf ()
+      | '\n' -> pf ppf "@\n"
       | _ -> assert false
       end;
       loop (stop + 1) s
@@ -319,10 +302,10 @@ let text ppf s =
 let lines ppf s =
   let max = String.length s - 1 in
   let rec loop start s = match stop_at is_nl ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop when stop > max -> string ppf (sub s start stop ~max)
   | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
-      Format.pp_force_newline ppf ();
+      string ppf (sub s start stop ~max);
+      pf ppf "@\n";
       loop (stop + 1) s
   in
   loop 0 s
@@ -382,6 +365,40 @@ let _pp_byte_size k i ppf s =
 
 let byte_size ppf s = _pp_byte_size 1000 "" ppf s
 let bi_byte_size ppf s = _pp_byte_size 1024 "i" ppf s
+
+end
+
+include Make(Format)
+
+(* Errors *)
+
+let err_str_formatter = "Format.str_formatter can't be set."
+
+(* String formatting *)
+
+let kstrf f fmt =
+  let buf = Buffer.create 64 in
+  let f fmt =
+    Format.pp_print_flush fmt ();
+    let s = Buffer.contents buf in
+    Buffer.reset buf; f s
+  in
+  Format.kfprintf f (Format.formatter_of_buffer buf) fmt
+let strf fmt = kstrf (fun x -> x) fmt
+
+(* Standard output formatting *)
+
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
+let pr = Format.printf
+let epr = Format.eprintf
+
+(* Exception formatting *)
+
+let invalid_arg' = invalid_arg
+
+let failwith fmt = kstrf failwith fmt
+let invalid_arg fmt = kstrf invalid_arg fmt
 
 (* Conditional UTF-8 and styled formatting.
 
