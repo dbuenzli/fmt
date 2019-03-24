@@ -195,6 +195,11 @@ val array : ?sep:unit t -> 'a t -> 'a array t
     is formatted in order with [pp_v]. Elements are separated by [sep]
     (defaults to {!cut}). If the array is empty, this is {!nop}. *)
 
+val seq : ?sep:unit t -> 'a t -> 'a Seq.t t
+(** [seq sep pp_v] formats sequence elements. Each element of the sequence
+    is formatted in order with [pp_v]. Elements are separated by [sep]
+    (defaults to {!cut}). If the sequence is empty, this is {!nop}. *)
+
 val hashtbl : ?sep:unit t -> ('a * 'b) t -> ('a, 'b) Hashtbl.t t
 (** [hashtbl ~sep pp_binding] formats the bindings of a hash
     table. Each binding is formatted with [pp_binding] and bindings
@@ -271,6 +276,10 @@ module Dump : sig
 
   val array : 'a t -> 'a array t
   (** [array pp_v] formats an OCaml array using [pp_v] for the array
+      elements. *)
+
+  val seq : 'a t -> 'a Seq.t t
+  (** [seq pp_v] formats an OCaml sequence using [pp_v] for the sequence
       elements. *)
 
   val hashtbl : 'a t -> 'b t -> ('a, 'b) Hashtbl.t t
