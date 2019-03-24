@@ -133,6 +133,7 @@ let iter_bindings ?sep:(pp_sep = cut) iter pp_binding ppf v =
 
 let list ?sep pp_elt = iter ?sep List.iter pp_elt
 let array ?sep pp_elt = iter ?sep Array.iter pp_elt
+let seq ?sep pp_elt = iter ?sep Seq.iter pp_elt
 let hashtbl ?sep pp_binding = iter_bindings ?sep Hashtbl.iter pp_binding
 let queue ?sep pp_elt = iter Queue.iter pp_elt
 let stack ?sep pp_elt = iter Stack.iter pp_elt
@@ -201,6 +202,16 @@ module Dump = struct
       pf ppf ";@ @[%a@]" pp_elt a.(i)
     done;
     pf ppf "|]@]"
+
+  let seq pp_elt ppf s =
+    let rec loop = function
+    | Seq.Nil -> ()
+    | Seq.Cons (v, vs) ->
+        match vs () with
+        | Seq.Nil -> pf ppf "@[%a@]" pp_elt v
+        | Seq.Cons _ as next -> pf ppf "@[%a@];@ " pp_elt v; loop next
+    in
+    pf ppf "@[<1>["; loop (s ()); pf ppf "]@]"
 
   let iter iter pp_name pp_elt ppf v =
     let is_first = ref true in

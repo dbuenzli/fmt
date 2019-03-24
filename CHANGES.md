@@ -1,5 +1,7 @@
 
 
+* Add `Fmt.{seq,Dump.seq}` to format `'a Seq.t` values. Thanks to
+  Hezekiah M. Carty for the patch.
 * `Fmt.Dump.signal` format signals added in 4.03.
 * Fix toplevel initialization for omod (#33).
 * Require at least OCaml 4.03.
