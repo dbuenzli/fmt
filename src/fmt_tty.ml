@@ -24,8 +24,8 @@ let is_infix ~affix s =
 
 let setup ?style_renderer ?utf_8 oc =
   let ppf =
-    if oc == Pervasives.stdout then Fmt.stdout else
-    if oc == Pervasives.stderr then Fmt.stderr else
+    if oc == Stdlib.stdout then Fmt.stdout else
+    if oc == Stdlib.stderr then Fmt.stderr else
     Format.formatter_of_out_channel oc
   in
   let style_renderer = match style_renderer with

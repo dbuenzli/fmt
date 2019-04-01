@@ -18,12 +18,11 @@
 
 (** {1:formatting Formatting} *)
 
-val pf : Format.formatter ->
-  ('a, Format.formatter, unit) Pervasives.format -> 'a
+val pf : Format.formatter -> ('a, Format.formatter, unit) Stdlib.format -> 'a
 (** [pf] is {!Format.fprintf}. *)
 
 val kpf : (Format.formatter -> 'a) -> Format.formatter ->
-  ('b, Format.formatter, unit, 'a) format4 -> 'b
+  ('b, Format.formatter, unit, 'a) Stdlib.format4 -> 'b
 (** [kpf] is {!Format.kfprintf}. *)
 
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
@@ -63,12 +62,12 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 (** {1:fmt_exns Formatting exceptions} *)
 
 val failwith : ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** [failwith] is [kstrf failwith], raises {!Pervasives.Failure} with
+(** [failwith] is [kstrf failwith], raises {!Stdlib.Failure} with
     a pretty-printed string argument. *)
 
 val invalid_arg : ('a, Format.formatter, unit, 'b) format4 -> 'a
 (** [invalid_arg] is [kstrf invalid_arg], raises
-    {!Pervasives.Invalid_argument} with a pretty-printed string argument. *)
+    {!Stdlib.Invalid_argument} with a pretty-printed string argument. *)
 
 (** {1 Formatters} *)
 
@@ -90,16 +89,15 @@ val comma : unit t
 val const : 'a t -> 'a -> unit t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
-val unit : (unit, Format.formatter, unit) Pervasives.format -> unit t
+val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
 (** [unit fmt] formats a unit value with the format [fmt]. *)
 
-val fmt : ('a, Format.formatter, unit) Pervasives.format ->
-  Format.formatter -> 'a
+val fmt : ('a, Format.formatter, unit) Stdlib.format -> Format.formatter -> 'a
 (** [fmt fmt ppf] is [pf ppf fmt]. If [fmt] is used with a single
     non-constant formatting directive, generates a value of type
     {!t}. *)
 
-val always : (unit, Format.formatter, unit) Pervasives.format -> 'a t
+val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 (** [always fmt ppf v] formats any value with the constant format [fmt]. *)
 
 (** {1:basetypes Base type formatters} *)
@@ -450,8 +448,8 @@ type style =
 val styled : style -> 'a t -> 'a t
 (** [styled s pp] formats like [pp] but styled with [s]. *)
 
-val styled_unit : style -> (unit, Format.formatter, unit) Pervasives.format ->
-  unit t
+val styled_unit :
+  style -> (unit, Format.formatter, unit) Stdlib.format -> unit t
 (** [styled_unit s fmt] is [style s (unit fmt)]. *)
 
 (** {2 Style rendering control} *)

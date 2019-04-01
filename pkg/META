@@ -1,6 +1,6 @@
 description = "OCaml Format pretty-printer combinators"
 version = "%%VERSION_NUM%%"
-requires = "uchar result"
+requires = "seq stdlib-shims"
 archive(byte) = "fmt.cma"
 archive(native) = "fmt.cmxa"
 plugin(byte) = "fmt.cma"
