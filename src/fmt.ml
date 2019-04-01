@@ -163,6 +163,13 @@ module Dump = struct
   | s when s = Sys.sigttou -> string ppf "SIGTTOU"
   | s when s = Sys.sigvtalrm -> string ppf "SIGVTALRM"
   | s when s = Sys.sigprof -> string ppf "SIGPROF"
+  | s when s = Sys.sigbus -> string ppf "SIGBUS"
+  | s when s = Sys.sigpoll -> string ppf "SIGPOLL"
+  | s when s = Sys.sigsys -> string ppf "SIGSYS"
+  | s when s = Sys.sigtrap -> string ppf "SIGTRAP"
+  | s when s = Sys.sigurg -> string ppf "SIGURG"
+  | s when s = Sys.sigxcpu -> string ppf "SIGXCPU"
+  | s when s = Sys.sigxfsz -> string ppf "SIGXFSZ"
   | unknown -> pf ppf "SIG(%d)" unknown
 
   let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
