@@ -1,5 +1,5 @@
-v0.8.6 2019-04-01
------------------
+v0.8.6 2019-04-01 La Forclaz (VS)
+---------------------------------
 
 * Add `Fmt.{seq,Dump.seq}` to format `'a Seq.t` values. Thanks to
   Hezekiah M. Carty for the patch.
