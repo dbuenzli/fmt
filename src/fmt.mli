@@ -16,14 +16,24 @@
 
     {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
+(** {1:stdos Standard outputs} *)
+
+val stdout : Format.formatter
+(** [stdout] is the standard output formatter. *)
+
+val stderr : Format.formatter
+(** [stderr] is the standard error formatter. *)
+
 (** {1:formatting Formatting} *)
 
 val pf : Format.formatter -> ('a, Format.formatter, unit) Stdlib.format -> 'a
 (** [pf] is {!Format.fprintf}. *)
 
-val kpf : (Format.formatter -> 'a) -> Format.formatter ->
-  ('b, Format.formatter, unit, 'a) Stdlib.format4 -> 'b
-(** [kpf] is {!Format.kfprintf}. *)
+val pr : ('a, Format.formatter, unit) format -> 'a
+(** [pr] is [pf stdout]. *)
+
+val epr : ('a, Format.formatter, unit) format -> 'a
+(** [epr] is [pf stderr]. *)
 
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [strf] is {!Format.asprintf}.
@@ -31,6 +41,10 @@ val strf : ('a, Format.formatter, unit, string) format4 -> 'a
     {b Note.} When using [strf] {!utf_8} and {!style_renderer} are
     always respectively set to [true] and [`None]. See also
     {!strf_like}. *)
+
+val kpf : (Format.formatter -> 'a) -> Format.formatter ->
+  ('b, Format.formatter, unit, 'a) Stdlib.format4 -> 'b
+(** [kpf] is {!Format.kfprintf}. *)
 
 val kstrf : (string -> 'a) ->
   ('b, Format.formatter, unit, 'a) format4 -> 'b
@@ -44,20 +58,6 @@ val strf_like : Format.formatter ->
 val with_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
 (** [with_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
     settings are copied from those of {!like} (if provided). *)
-
-(** {1:fmt Formatting to standard outputs} *)
-
-val stdout : Format.formatter
-(** [stdout] is the standard output formatter. *)
-
-val stderr : Format.formatter
-(** [stderr] is the standard error formatter. *)
-
-val pr : ('a, Format.formatter, unit) format -> 'a
-(** [pr] is [pf stdout]. *)
-
-val epr : ('a, Format.formatter, unit) format -> 'a
-(** [epr] is [pf stderr]. *)
 
 (** {1:fmt_exns Formatting exceptions} *)
 

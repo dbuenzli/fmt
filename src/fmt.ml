@@ -8,11 +8,16 @@
 
 let err_str_formatter = "Format.str_formatter can't be set."
 
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
+
 (* Formatting *)
 
 let pf = Format.fprintf
-let kpf = Format.kfprintf
+let pr = Format.printf
+let epr = Format.eprintf
 let strf = Format.asprintf
+let kpf = Format.kfprintf
 let kstrf f fmt =
   let buf = Buffer.create 64 in
   let f fmt =
@@ -24,10 +29,6 @@ let kstrf f fmt =
 
 (* Standard output formatting *)
 
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
-let pr = Format.printf
-let epr = Format.eprintf
 
 (* Exception formatting *)
 
