@@ -181,7 +181,7 @@ val option : ?none:unit t -> 'a t -> 'a option t
 (** [option ~none pp_v] formats an optional value. The [Some] case
     uses [pp_v] and [None] uses [none] (defaults to {!nop}). *)
 
-val result : ok:'a t -> error:'b t -> ('a, 'b) Result.result t
+val result : ok:'a t -> error:'b t -> ('a, 'b) result t
 (** [result ~ok ~error] formats a result value using [ok] for the [Ok]
     case and [error] for the [Error] case. *)
 
@@ -265,7 +265,7 @@ module Dump : sig
   (** [option pp_v] formats an OCaml option using [pp_v] for the [Some]
       case. No parentheses are added. *)
 
-  val result : ok:'a t -> error:'b t -> ('a, 'b) Result.result t
+  val result : ok:'a t -> error:'b t -> ('a, 'b) result t
   (** [result ~ok ~error] formats an OCaml result using [ok] for the [Ok]
       case value and [error] for the [Error] case value. No parentheses
       are added. *)
