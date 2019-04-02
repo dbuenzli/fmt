@@ -407,7 +407,7 @@ let bi_byte_size ppf s = _pp_byte_size 1024 "i" ppf s
    This is very ugly, formally what we would like is to be able to
    store arbitrary typed metadata in formatters for clients to consult
    (tried to provide an API for doing that but dismissed it for
-   uglyness and lack of an efficient implementation). In the following
+   ugliness and lack of an efficient implementation). In the following
    we are using the tags functions (but not the tags mechanism itself)
    as a way to store two metadata keys, one for formatter UTF-8
    awareness and the other for the formatter style renderer. *)
