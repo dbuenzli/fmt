@@ -467,19 +467,25 @@ val set_utf_8 : Format.formatter -> bool -> unit
 
 (** {1:styled Styled formatting} *)
 
+type colour =
+  [ `Black | `Red | `Green | `Yellow | `Blue | `Magenta | `Cyan | `White ]
+(** The type of colours. *)
+
 type style =
-  [ `Bold
-  | `Underline
-  | `Black
-  | `Red
-  | `Green
-  | `Yellow
-  | `Blue
-  | `Magenta
-  | `Cyan
-  | `White
+  [ `Bold | `Italic | `Underline | `Reverse
+  | colour | `Hi of colour
+  | `Bg of [ colour | `Hi of colour ]
   | `None ]
-(** The type for styles. *)
+(** The type of styles:
+
+    {ul
+    {- [`None] resets the styling;}
+    {- [`Bold], [`Italic], [`Underline] and [`Reverse] are display attributes;}
+    {- [#colour] is the foreground colour;}
+    {- [`Hi #colour] is the high-intensity foreground colour;}
+    {- [`Bg #colour] is the background colour; and}
+    {- [`Bg (`Hi #colour)] is the high-intensity background colour.}
+    *)
 
 val styled : style -> 'a t -> 'a t
 (** [styled s pp] formats like [pp] but styled with [s]. *)

@@ -526,13 +526,19 @@ let if_utf_8 pp_u pp = fun ppf v -> (if utf_8 ppf then pp_u else pp) ppf v
 
 (* Styled formatting *)
 
+type colour =
+  [ `Black | `Red | `Green | `Yellow | `Blue | `Magenta | `Cyan | `White ]
+
 type style =
-  [ `Bold | `Underline | `Black | `Red | `Green | `Yellow | `Blue | `Magenta
-  | `Cyan | `White | `None ]
+  [ `Bold | `Italic | `Underline | `Reverse
+  | colour | `Hi of colour | `Bg of [ colour | `Hi of colour ]
+  | `None ]
 
 let ansi_style_code = function
 | `Bold -> "1"
+| `Italic -> "3"
 | `Underline -> "4"
+| `Reverse -> "7"
 | `Black -> "30"
 | `Red -> "31"
 | `Green -> "32"
@@ -541,6 +547,30 @@ let ansi_style_code = function
 | `Magenta -> "35"
 | `Cyan -> "36"
 | `White -> "37"
+| `Bg `Black -> "40"
+| `Bg `Red -> "41"
+| `Bg `Green -> "42"
+| `Bg `Yellow -> "43"
+| `Bg `Blue -> "44"
+| `Bg `Magenta -> "45"
+| `Bg `Cyan -> "46"
+| `Bg `White -> "47"
+| `Hi `Black -> "90"
+| `Hi `Red -> "91"
+| `Hi `Green -> "92"
+| `Hi `Yellow -> "93"
+| `Hi `Blue -> "94"
+| `Hi `Magenta -> "95"
+| `Hi `Cyan -> "96"
+| `Hi `White -> "97"
+| `Bg (`Hi `Black) -> "100"
+| `Bg (`Hi `Red) -> "101"
+| `Bg (`Hi `Green) -> "102"
+| `Bg (`Hi `Yellow) -> "103"
+| `Bg (`Hi `Blue) -> "104"
+| `Bg (`Hi `Magenta) -> "105"
+| `Bg (`Hi `Cyan) -> "106"
+| `Bg (`Hi `White) -> "107"
 | `None -> "0"
 
 let pp_sgr ppf style =
