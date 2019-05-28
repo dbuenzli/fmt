@@ -403,6 +403,45 @@ val bi_byte_size : int t
     using {{:https://en.wikipedia.org/wiki/Binary_prefix}binary prefixes}
     up to pebi bytes (2{^15}). *)
 
+(** {1:binary Formatting binary data} *)
+
+type 'a vec = int * (int -> 'a)
+(** Random addressable, sized sequences. Each [(n, f)] represents the
+    sequence [f 0, ..., f (n - 1)]. *)
+
+val on_bytes : char vec t -> bytes t
+(** [on_bytes pp] is [pp] adapted to format (entire) [bytes]. *)
+
+val on_string : char vec t -> string t
+(** [on_string pp] is [pp] adapted to format (entire) [string]s. *)
+
+val ascii : ?w:int -> ?subst:unit t -> unit -> char vec t
+(** [ascii ()] formats character sequences by printing characters in
+    the {e printable ASCII range} (['\x20'] to ['\x7f'] inclusive) as is, and
+    replacing the rest with [subst] (defaults to printing ['.']).
+
+    If specified, [w] causes the output to be right padded to the size of
+    formatting at least [w] characters. *)
+
+val octets : ?w:int -> ?sep:unit t -> unit -> char vec t
+(** [octets ()] formats character sequences as hexadecimal digits.
+    It prints groups of successive characters of unspecified length together,
+    separated by [sep] (defaults to {!sp}).
+
+    If specified, [w] causes the output to be right padded to the size of
+    formatting at least [w] characters. *)
+
+val addresses : ?addr:int t -> ?w:int -> 'a vec t -> 'a vec t
+(** [addresses pp] formats sequences by applying [pp] to consecutive
+    subsequences of length [w] (defaults to 16). [addr] formats subsequence
+    offsets (defaults to an unspecified hexadecimal format).  *)
+
+val hex : ?w:int -> unit -> char vec t
+(** [hex ()] formats character sequences as traditional hex dumps, mimicking the
+    output of {e xxd}.
+
+    Line breaks are forced after every [w] characters (defaults to 16).  *)
+
 (** {1:utf8_cond Conditional UTF-8 formatting}
 
     {b Note.} Since {!Format} is not UTF-8 aware using UTF-8 output

@@ -402,6 +402,61 @@ let _pp_byte_size k i ppf s =
 let byte_size ppf s = _pp_byte_size 1000 "" ppf s
 let bi_byte_size ppf s = _pp_byte_size 1024 "i" ppf s
 
+(* Binary formatting *)
+
+type 'a vec = int * (int -> 'a)
+
+let iter_vec f (n, get) = for i = 0 to n - 1 do f i (get i) done
+let vec ?sep = iter_bindings ?sep iter_vec
+
+let on_string = using String.(fun s -> length s, get s)
+let on_bytes = using Bytes.(fun b -> length b, get b)
+
+let sub_vecs w (n, get) =
+  (n - 1) / w + 1, fun j ->
+    let off = w * j in
+    min w (n - off), fun i -> get (i + off)
+
+let prefix0x = [
+  0xf       , fmt "%01x";
+  0xff      , fmt "%02x";
+  0xfff     , fmt "%03x";
+  0xffff    , fmt "%04x";
+  0xfffff   , fmt "%05x";
+  0xffffff  , fmt "%06x";
+  0xfffffff , fmt "%07x";
+  0xffffffff, fmt "%08x"; ]
+
+let padded0x ~max = match List.find_opt (fun (x, _) -> max <= x) prefix0x with
+| Some (_, pp) -> pp
+| None -> fmt "%x"
+
+let ascii ?(w = 0) ?(subst = const char '.') () ppf (n, _ as v) =
+  let pp_char ppf (_, c) =
+    if '\x20' <= c && c < '\x7f' then char ppf c else subst ppf () in
+  vec pp_char ppf v;
+  if n < w then Format.pp_print_break ppf (w - n) 0
+
+let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
+  let pp_char ppf (i, c) =
+    if i > 0 && i mod 2 = 0 then sep ppf ();
+    pf ppf "%02x" (Char.code c) in
+  vec ~sep:nop pp_char ppf v;
+  if n < w then
+    Format.pp_print_break ppf (2 * (w - n) + (w - 1) / 2 - (n - 1) / 2) 0
+
+let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
+  let addr = match addr with
+  | Some pp -> pp
+  | _ -> let pp = padded0x ~max:(((n - 1) / w) * w) in
+         fun ppf -> pf ppf "%a: " pp in
+  let pp_sub ppf (i, sub) = pf ppf "%a@[%a@]" addr (i * w) pp_vec sub in
+  vbox (vec pp_sub) ppf (sub_vecs w v)
+
+let hex ?(w = 16) () =
+  let octets = octets ~w () and ascii = ascii ~w () in
+  addresses ~w (fun ppf v -> pf ppf "@[%a@]@ @ @[%a@]" octets v ascii v)
+
 (* Conditional UTF-8 and styled formatting.
 
    This is very ugly, formally what we would like is to be able to
