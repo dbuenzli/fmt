@@ -531,25 +531,36 @@ type style =
   | `Cyan | `White | `None ]
 
 let ansi_style_code = function
-| `Bold -> "\027[01m"
-| `Underline -> "\027[04m"
-| `Black -> "\027[30m"
-| `Red -> "\027[31m"
-| `Green -> "\027[32m"
-| `Yellow -> "\027[33m"
-| `Blue -> "\027[34m"
-| `Magenta -> "\027[35m"
-| `Cyan -> "\027[36m"
-| `White -> "\027[37m"
-| `None -> "\027[m"
+| `Bold -> "1"
+| `Underline -> "4"
+| `Black -> "30"
+| `Red -> "31"
+| `Green -> "32"
+| `Yellow -> "33"
+| `Blue -> "34"
+| `Magenta -> "35"
+| `Cyan -> "36"
+| `White -> "37"
+| `None -> "0"
 
-let ansi_style_reset = "\027[m"
+let pp_sgr ppf style =
+  Format.pp_print_as ppf 0 "\027[";
+  Format.pp_print_as ppf 0 style;
+  Format.pp_print_as ppf 0 "m"
 
-let styled style pp_v ppf = match style_renderer ppf with
-| `None -> pp_v ppf
+let curr_style = attr ()
+
+let styled style pp_v ppf v = match style_renderer ppf with
+| `None -> pp_v ppf v
 | `Ansi_tty ->
-    let reset ppf = pf ppf "@<0>%s" ansi_style_reset in
-    kpf reset ppf "@<0>%s%a" (ansi_style_code style) pp_v
+    let curr = match get curr_style ppf with
+    | None -> let s = ref "0" in set curr_style s ppf; s
+    | Some s -> s in
+    let prev = !curr and here = ansi_style_code style in
+    curr := (match style with `None -> here | _ -> prev ^ ";" ^ here);
+    try
+      pf ppf "%a%a%a" pp_sgr here pp_v v pp_sgr prev; curr := prev
+    with e -> curr := prev; raise e
 
 let styled_unit style fmt = styled style (unit fmt)
 
