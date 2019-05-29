@@ -459,73 +459,63 @@ let hex ?(w = 16) () =
 
 (* Conditional UTF-8 and styled formatting.
 
-   This is very ugly, formally what we would like is to be able to
-   store arbitrary typed metadata in formatters for clients to consult
-   (tried to provide an API for doing that but dismissed it for
-   uglyness and lack of an efficient implementation). In the following
-   we are using the tags functions (but not the tags mechanism itself)
-   as a way to store two metadata keys, one for formatter UTF-8
-   awareness and the other for the formatter style renderer. *)
+   This is moderately ugly. We abuse the tag functions to store additional
+   formatter attributes in the closure. *)
 
-let utf_8_tag = "fmt.utf8"
+type any = ..
+type 'a attr = int * ('a -> any) * (any -> 'a)
 
-let utf_8_of_raw = function
-| "\x00" -> false
-| "\x01" -> true
-| _ -> true
+let id = ref 0
+let attr (type a) () =
+  incr id;
+  let module M = struct type any += K of a end in
+  !id, (fun x -> M.K x), (function M.K x -> x | _ -> assert false)
 
-let utf_8_to_raw = function
-| false -> "\x00"
-| true -> "\x01"
+module Int = struct type t = int let compare a b = compare (a: int) b end
+module IMap = Map.Make (Int)
+
+let shibboleth = "Alakazam!!"
+let stash = ref None
+let get_store ppf =
+  assert (!stash = None);
+  let tag_funs = Format.pp_get_formatter_tag_functions ppf () in
+  let _ = tag_funs.Format.mark_open_tag shibboleth in
+  let s = !stash in
+  stash := None; s
+let set_store ppf s =
+  let get tag =
+    if tag == shibboleth then ( stash := Some s; "¯\\_(ツ)_/¯" )
+    else "Fmt: I thought this was clever so you can't use tags now." in
+  let tag_funs = Format.pp_get_formatter_tag_functions ppf () in
+  let tag_funs = { tag_funs with Format.mark_open_tag = get } in
+  Format.pp_set_formatter_tag_functions ppf tag_funs
+
+let get (k, _, prj) ppf = match get_store ppf with
+| None -> None
+| Some s -> match IMap.find_opt k !s with Some x -> Some (prj x) | _ -> None
+let set (k, inj, _) v ppf =
+  if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
+  match get_store ppf with
+  | Some s -> s := IMap.add k (inj v) !s
+  | None -> ref (IMap.singleton k (inj v)) |> set_store ppf
+let def x = function Some y -> y | _ -> x
+
+let utf_8_attr = attr ()
+let utf_8 ppf = get utf_8_attr ppf |> def true
+let set_utf_8 ppf x = set utf_8_attr x ppf
 
 type style_renderer = [ `Ansi_tty | `None ]
-
-let style_renderer_tag = "fmt.style_renderer"
-
-let style_renderer_of_raw = function
-| "\x00" -> `None
-| "\x01" -> `Ansi_tty
-| _ -> `None
-
-let style_renderer_to_raw = function
-| `None -> "\x00"
-| `Ansi_tty -> "\x01"
-
-let meta_store ppf = Format.pp_get_formatter_tag_functions ppf ()
-let set_meta_store ppf store = Format.pp_set_formatter_tag_functions ppf store
-let meta_raw store tag = store.Format.mark_open_tag tag
-let set_meta ppf store ~utf_8 ~style_renderer =
-  let meta = function
-  | "fmt.utf8" -> utf_8
-  | "fmt.style_renderer" -> style_renderer
-  | _ -> "Fmt: do not use the tags mechanism, it is a broken idea"
-  in
-  let store = { store with Format.mark_open_tag = meta } in
-  set_meta_store ppf store
-
-let utf_8 ppf = utf_8_of_raw (meta_raw (meta_store ppf) utf_8_tag)
-let set_utf_8 ppf utf_8 =
-  if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
-  let store = meta_store ppf in
-  let style_renderer = meta_raw store style_renderer_tag in
-  let utf_8 = utf_8_to_raw utf_8 in
-  set_meta ppf store ~utf_8 ~style_renderer
-
-let style_renderer ppf =
-  style_renderer_of_raw (meta_raw (meta_store ppf) style_renderer_tag)
-
-let set_style_renderer ppf renderer =
-  if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
-  let store = meta_store ppf in
-  let utf_8 = meta_raw store utf_8_tag in
-  let style_renderer = style_renderer_to_raw renderer in
-  set_meta ppf store ~utf_8 ~style_renderer
+let style_renderer_attr = attr ()
+let style_renderer ppf = get style_renderer_attr ppf |> def `None
+let set_style_renderer ppf x = set style_renderer_attr x ppf
 
 let with_buffer ?like buf =
   let ppf = Format.formatter_of_buffer buf in
   match like with
   | None -> ppf
-  | Some like ->  set_meta_store ppf (meta_store like); ppf
+  | Some like -> match get_store like with
+    | None -> ppf
+    | Some s -> set_store ppf (ref !s); ppf
 
 let strf_like ppf fmt =
   let buf = Buffer.create 64 in
