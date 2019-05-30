@@ -457,10 +457,7 @@ let hex ?(w = 16) () =
   let octets = octets ~w () and ascii = ascii ~w () in
   addresses ~w (fun ppf v -> pf ppf "@[%a@]@ @ @[%a@]" octets v ascii v)
 
-(* Conditional UTF-8 and styled formatting.
-
-   This is moderately ugly. We abuse the tag functions to store additional
-   formatter attributes in the closure. *)
+(* Conditional UTF-8 and styled formatting. *)
 
 type any = ..
 type 'a attr = int * ('a -> any) * (any -> 'a)
@@ -474,30 +471,29 @@ let attr (type a) () =
 module Int = struct type t = int let compare a b = compare (a: int) b end
 module IMap = Map.Make (Int)
 
-let shibboleth = "Alakazam!!"
-let stash = ref None
-let get_store ppf =
-  assert (!stash = None);
-  let tag_funs = Format.pp_get_formatter_tag_functions ppf () in
-  let _ = tag_funs.Format.mark_open_tag shibboleth in
-  let s = !stash in
-  stash := None; s
-let set_store ppf s =
-  let get tag =
-    if tag == shibboleth then ( stash := Some s; "¯\\_(ツ)_/¯" )
-    else "Fmt: I thought this was clever so you can't use tags now." in
-  let tag_funs = Format.pp_get_formatter_tag_functions ppf () in
-  let tag_funs = { tag_funs with Format.mark_open_tag = get } in
-  Format.pp_set_formatter_tag_functions ppf tag_funs
+let attrs = ref []
+let store ppf =
+  let open Ephemeron.K1 in
+  let rec go ppf top = function
+  | [] ->
+      let e = create () and v = ref IMap.empty in
+      attrs := e :: List.rev top; set_key e ppf; set_data e v; v
+  | e::es ->
+      match get_key e with
+      | None -> go ppf top es
+      | Some k when not (k == ppf) -> go ppf (e::top) es
+      | Some k ->
+          let v = match get_data e with Some v -> v | _ -> assert false in
+          if not (top == []) then attrs := e :: List.rev_append top es;
+          ignore (Sys.opaque_identity k); v in
+  go ppf [] !attrs
 
-let get (k, _, prj) ppf = match get_store ppf with
-| None -> None
-| Some s -> match IMap.find_opt k !s with Some x -> Some (prj x) | _ -> None
+let get (k, _, prj) ppf =
+  match IMap.find_opt k !(store ppf) with Some x -> Some (prj x) | _ -> None
 let set (k, inj, _) v ppf =
   if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
-  match get_store ppf with
-  | Some s -> s := IMap.add k (inj v) !s
-  | None -> ref (IMap.singleton k (inj v)) |> set_store ppf
+  let s = store ppf in
+  s := IMap.add k (inj v) !s
 let def x = function Some y -> y | _ -> x
 
 let utf_8_attr = attr ()
@@ -511,11 +507,8 @@ let set_style_renderer ppf x = set style_renderer_attr x ppf
 
 let with_buffer ?like buf =
   let ppf = Format.formatter_of_buffer buf in
-  match like with
-  | None -> ppf
-  | Some like -> match get_store like with
-    | None -> ppf
-    | Some s -> set_store ppf (ref !s); ppf
+  (match like with Some like -> store ppf := !(store like) | _ -> ());
+  ppf
 
 let strf_like ppf fmt =
   let buf = Buffer.create 64 in

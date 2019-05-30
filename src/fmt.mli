@@ -462,9 +462,6 @@ val set_utf_8 : Format.formatter -> bool -> unit
 (** [set_utf_8 ppf b] enables or disables conditional UTF-8 formatting
     on [ppf].
 
-    {b Warning.} Using this function replaces any {!Format.tag} functions
-    that may be in place.
-
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: it is
     is always UTF-8 enabled. *)
 
@@ -508,9 +505,6 @@ val style_renderer : Format.formatter  -> style_renderer
 
 val set_style_renderer : Format.formatter -> style_renderer -> unit
 (** [set_style_renderer ppf r] sets the style renderer of [ppf] to [r].
-
-    {b Warning.} Using this function replaces any {!Format.tag} functions
-    that may be in place.
 
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: its
     renderer is always [`None]. *)
