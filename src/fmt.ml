@@ -45,6 +45,7 @@ let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
 let comma ppf () = pf ppf ",@ "
+let semicolon ppf () = pf ppf ";@ "
 let const pp_v v ppf () = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
@@ -141,106 +142,6 @@ let stack ?sep pp_elt = iter Stack.iter pp_elt
 
 let using f pp ppf v = pp ppf (f v)
 
-module Dump = struct
-
-  let signal ppf s = match s with
-  | s when s = Sys.sigabrt -> string ppf "SIGABRT"
-  | s when s = Sys.sigalrm -> string ppf "SIGALRM"
-  | s when s = Sys.sigfpe -> string ppf "SIGFPE"
-  | s when s = Sys.sighup -> string ppf "SIGHUP"
-  | s when s = Sys.sigill -> string ppf "SIGILL"
-  | s when s = Sys.sigint -> string ppf "SIGINT"
-  | s when s = Sys.sigkill -> string ppf "SIGKILL"
-  | s when s = Sys.sigpipe -> string ppf "SIGPIPE"
-  | s when s = Sys.sigquit -> string ppf "SIGQUIT"
-  | s when s = Sys.sigsegv -> string ppf "SIGSEGV"
-  | s when s = Sys.sigterm -> string ppf "SIGTERM"
-  | s when s = Sys.sigusr1 -> string ppf "SIGUSR1"
-  | s when s = Sys.sigusr2 -> string ppf "SIGUSR2"
-  | s when s = Sys.sigchld -> string ppf "SIGCHLD"
-  | s when s = Sys.sigcont -> string ppf "SIGCONT"
-  | s when s = Sys.sigstop -> string ppf "SIGSTOP"
-  | s when s = Sys.sigtstp -> string ppf "SIGTSTP"
-  | s when s = Sys.sigttin -> string ppf "SIGTTIN"
-  | s when s = Sys.sigttou -> string ppf "SIGTTOU"
-  | s when s = Sys.sigvtalrm -> string ppf "SIGVTALRM"
-  | s when s = Sys.sigprof -> string ppf "SIGPROF"
-  | s when s = Sys.sigbus -> string ppf "SIGBUS"
-  | s when s = Sys.sigpoll -> string ppf "SIGPOLL"
-  | s when s = Sys.sigsys -> string ppf "SIGSYS"
-  | s when s = Sys.sigtrap -> string ppf "SIGTRAP"
-  | s when s = Sys.sigurg -> string ppf "SIGURG"
-  | s when s = Sys.sigxcpu -> string ppf "SIGXCPU"
-  | s when s = Sys.sigxfsz -> string ppf "SIGXFSZ"
-  | unknown -> pf ppf "SIG(%d)" unknown
-
-  let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
-
-  let pair pp_fst pp_snd ppf (fst, snd) =
-    pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
-
-  let option pp_v ppf = function
-  | None -> pf ppf "None"
-  | Some v -> pf ppf "@[<2>Some@ @[%a@]@]" pp_v v
-
-  let result ~ok ~error ppf = function
-  | Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
-  | Error e -> pf ppf "@[<2>Error@ @[%a@]@]" error e
-
-  let list pp_elt ppf vs =
-    let rec loop = function
-    | [] -> ()
-    | v :: vs ->
-        if vs = [] then (pf ppf "@[%a@]" pp_elt v) else
-        (pf ppf "@[%a@];@ " pp_elt v; loop vs)
-    in
-    pf ppf "@[<1>["; loop vs; pf ppf "]@]"
-
-  let array pp_elt ppf a =
-    pf ppf "@[<2>[|";
-    for i = 0 to Array.length a - 1 do
-      if i = 0 then pf ppf "@[%a@]" pp_elt a.(i) else
-      pf ppf ";@ @[%a@]" pp_elt a.(i)
-    done;
-    pf ppf "|]@]"
-
-  let seq pp_elt ppf s =
-    let rec loop = function
-    | Seq.Nil -> ()
-    | Seq.Cons (v, vs) ->
-        match vs () with
-        | Seq.Nil -> pf ppf "@[%a@]" pp_elt v
-        | Seq.Cons _ as next -> pf ppf "@[%a@];@ " pp_elt v; loop next
-    in
-    pf ppf "@[<1>["; loop (s ()); pf ppf "]@]"
-
-  let iter iter pp_name pp_elt ppf v =
-    let is_first = ref true in
-    let pp_elt v =
-      if !is_first then (is_first := false) else pf ppf "@ ";
-      pf ppf "@[%a@]" pp_elt v
-    in
-    pf ppf "@[<1>(%a@ " pp_name v;
-    iter pp_elt v;
-    pf ppf ")@]"
-
-  let iter_bindings iter pp_name pp_k pp_v ppf bs =
-    let is_first = ref true in
-    let pp_binding k v =
-      if !is_first then () else pf ppf "@ ";
-      pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_k k pp_v v
-    in
-    pf ppf "@[<1>(%a@ " pp_name bs;
-    iter pp_binding bs;
-    pf ppf ")@]"
-
-  let hashtbl pp_k pp_v =
-    iter_bindings Hashtbl.iter (always "hashtbl") pp_k pp_v
-
-  let stack pp_elt = iter Stack.iter (always "stack") pp_elt
-  let queue pp_elt = iter Queue.iter (always "queue") pp_elt
-end
-
 (* Boxes *)
 
 let box ?(indent = 0) pp ppf =
@@ -259,9 +160,80 @@ let hvbox ?(indent = 0) pp ppf =
 
 let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
 let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
+let oxford_brackets pp_v ppf v = pf ppf "@[<2>[|%a|]@]" pp_v v
 let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
 let quote ?(mark = "\"") pp_v ppf v =
   pf ppf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v v mark
+
+module Dump = struct
+
+  let sig_names = Sys.[
+    sigabrt, "SIGABRT";
+    sigalrm, "SIGALRM";
+    sigfpe, "SIGFPE";
+    sighup, "SIGHUP";
+    sigill, "SIGILL";
+    sigint, "SIGINT";
+    sigkill, "SIGKILL";
+    sigpipe, "SIGPIPE";
+    sigquit, "SIGQUIT";
+    sigsegv, "SIGSEGV";
+    sigterm, "SIGTERM";
+    sigusr1, "SIGUSR1";
+    sigusr2, "SIGUSR2";
+    sigchld, "SIGCHLD";
+    sigcont, "SIGCONT";
+    sigstop, "SIGSTOP";
+    sigtstp, "SIGTSTP";
+    sigttin, "SIGTTIN";
+    sigttou, "SIGTTOU";
+    sigvtalrm, "SIGVTALRM";
+    sigprof, "SIGPROF";
+    sigbus, "SIGBUS";
+    sigpoll, "SIGPOLL";
+    sigsys, "SIGSYS";
+    sigtrap, "SIGTRAP";
+    sigurg, "SIGURG";
+    sigxcpu, "SIGXCPU";
+    sigxfsz, "SIGXFSZ"; ]
+
+  let signal ppf s = match List.assq_opt s sig_names with
+  | Some name -> string ppf name
+  | None -> pf ppf "SIG(%d)" s
+
+  let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
+
+  let pair pp_fst pp_snd ppf (fst, snd) =
+    pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
+
+  let option pp_v ppf = function
+  | None -> pf ppf "None"
+  | Some v -> pf ppf "@[<2>Some@ @[%a@]@]" pp_v v
+
+  let result ~ok ~error ppf = function
+  | Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
+  | Error e -> pf ppf "@[<2>Error@ @[%a@]@]" error e
+
+  let list pp_elt = list ~sep:semicolon (box pp_elt) |> brackets
+  let array pp_elt = array ~sep:semicolon (box pp_elt) |> oxford_brackets
+  let seq pp_elt = seq ~sep:semicolon (box pp_elt) |> brackets
+
+  let named pp1 pp2 ppf v = pf ppf "%a@ %a" pp1 v pp2 v
+
+  let iter iter_f pp_name pp_elt =
+    let pp_v = iter ~sep:sp iter_f (box pp_elt) in
+    named pp_name pp_v |> parens
+
+  let iter_bindings iter_f pp_name pp_k pp_v =
+    let pp_v = iter_bindings ~sep:sp iter_f (pair pp_k pp_v) in
+    named pp_name pp_v |> parens
+
+  let hashtbl pp_k pp_v =
+    iter_bindings Hashtbl.iter (always "hashtbl") pp_k pp_v
+
+  let stack pp_elt = iter Stack.iter (always "stack") pp_elt
+  let queue pp_elt = iter Queue.iter (always "queue") pp_elt
+end
 
 (* Text and lines *)
 
