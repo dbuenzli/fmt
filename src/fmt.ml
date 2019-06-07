@@ -410,13 +410,10 @@ let ascii ?(w = 0) ?(subst = const char '.') () ppf (n, _ as v) =
   if n < w then Format.pp_print_break ppf (w - n) 0
 
 let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
-  let pp_char ppf (i, c) =
-    if i > 0 && i mod 2 = 0 then sep ppf ();
-    pf ppf "%02x" (Char.code c)
-  in
+  let pp_sep ppf i = if i > 0 && i mod 2 = 0 then sep ppf () in
+  let pp_char ppf (i, c) = pf ppf "%a%02x" pp_sep i (Char.code c) in
   vec ~sep:nop pp_char ppf v;
-  if n < w then
-    Format.pp_print_break ppf (2 * (w - n) + (w - 1) / 2 - (n - 1) / 2) 0
+  for i = n to w - 1 do pf ppf "%a@ @ " pp_sep i done
 
 let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
   let addr = match addr with
