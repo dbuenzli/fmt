@@ -8,9 +8,6 @@
 
 let err_str_formatter = "Format.str_formatter can't be set."
 
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
-
 (* Formatting *)
 
 let pf = Format.fprintf
@@ -29,11 +26,12 @@ let kstrf f fmt =
 
 (* Standard output formatting *)
 
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
 
 (* Exception formatting *)
 
 let invalid_arg' = invalid_arg
-
 let failwith fmt = kstrf failwith fmt
 let invalid_arg fmt = kstrf invalid_arg fmt
 
@@ -385,7 +383,8 @@ let on_string = using String.(fun s -> length s, get s)
 let on_bytes = using Bytes.(fun b -> length b, get b)
 
 let sub_vecs w (n, get) =
-  (n - 1) / w + 1, fun j ->
+  (n - 1) / w + 1,
+  fun j ->
     let off = w * j in
     min w (n - off), fun i -> get (i + off)
 
@@ -405,14 +404,16 @@ let padded0x ~max = match List.find_opt (fun (x, _) -> max <= x) prefix0x with
 
 let ascii ?(w = 0) ?(subst = const char '.') () ppf (n, _ as v) =
   let pp_char ppf (_, c) =
-    if '\x20' <= c && c < '\x7f' then char ppf c else subst ppf () in
+    if '\x20' <= c && c < '\x7f' then char ppf c else subst ppf ()
+  in
   vec pp_char ppf v;
   if n < w then Format.pp_print_break ppf (w - n) 0
 
 let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
   let pp_char ppf (i, c) =
     if i > 0 && i mod 2 = 0 then sep ppf ();
-    pf ppf "%02x" (Char.code c) in
+    pf ppf "%02x" (Char.code c)
+  in
   vec ~sep:nop pp_char ppf v;
   if n < w then
     Format.pp_print_break ppf (2 * (w - n) + (w - 1) / 2 - (n - 1) / 2) 0
@@ -420,8 +421,10 @@ let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
 let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
   let addr = match addr with
   | Some pp -> pp
-  | _ -> let pp = padded0x ~max:(((n - 1) / w) * w) in
-         fun ppf -> pf ppf "%a: " pp in
+  | _ ->
+      let pp = padded0x ~max:(((n - 1) / w) * w) in
+      fun ppf -> pf ppf "%a: " pp
+  in
   let pp_sub ppf (i, sub) = pf ppf "%a@[%a@]" addr (i * w) pp_vec sub in
   vbox (vec pp_sub) ppf (sub_vecs w v)
 
@@ -441,14 +444,14 @@ let attr (type a) () =
   !id, (fun x -> M.K x), (function M.K x -> x | _ -> assert false)
 
 module Int = struct type t = int let compare a b = compare (a: int) b end
-module IMap = Map.Make (Int)
+module Imap = Map.Make (Int)
 
 let attrs = ref []
 let store ppf =
   let open Ephemeron.K1 in
   let rec go ppf top = function
   | [] ->
-      let e = create () and v = ref IMap.empty in
+      let e = create () and v = ref Imap.empty in
       attrs := e :: List.rev top; set_key e ppf; set_data e v; v
   | e::es ->
       match get_key e with
@@ -457,15 +460,18 @@ let store ppf =
       | Some k ->
           let v = match get_data e with Some v -> v | _ -> assert false in
           if not (top == []) then attrs := e :: List.rev_append top es;
-          ignore (Sys.opaque_identity k); v in
+          ignore (Sys.opaque_identity k); v
+  in
   go ppf [] !attrs
 
 let get (k, _, prj) ppf =
-  match IMap.find_opt k !(store ppf) with Some x -> Some (prj x) | _ -> None
+  match Imap.find_opt k !(store ppf) with Some x -> Some (prj x) | _ -> None
+
 let set (k, inj, _) v ppf =
   if ppf == Format.str_formatter then invalid_arg' err_str_formatter else
   let s = store ppf in
-  s := IMap.add k (inj v) !s
+  s := Imap.add k (inj v) !s
+
 let def x = function Some y -> y | _ -> x
 
 let utf_8_attr = attr ()
