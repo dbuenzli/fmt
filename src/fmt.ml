@@ -40,14 +40,17 @@ let invalid_arg fmt = kstrf invalid_arg fmt
 type 'a t = Format.formatter -> 'a -> unit
 
 let nop fmt ppf = ()
-let cut = Format.pp_print_cut
-let sp = Format.pp_print_space
-let comma ppf () = pf ppf ",@ "
-let semi ppf () = pf ppf ";@ "
 let const pp_v v ppf _ = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
 let always fmt ppf v = pf ppf fmt
+
+(* Separators *)
+
+let cut ppf _ = Format.pp_print_cut ppf ()
+let sp ppf _ = Format.pp_print_space ppf ()
+let comma ppf _ = pf ppf ",@ "
+let semi ppf _ = pf ppf ";@ "
 
 (* Base type formatters *)
 

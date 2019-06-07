@@ -77,18 +77,6 @@ type 'a t = Format.formatter -> 'a -> unit
 val nop : 'a t
 (** [nop] formats nothing. *)
 
-val cut : unit t
-(** [cut] is {!Format.pp_print_cut}. *)
-
-val sp : unit t
-(** [sp] is {!Format.pp_print_space}. *)
-
-val comma : unit t
-(** [comma] is {!Fmt.unit}[ ",@ "]. *)
-
-val semi : unit t
-(** [semi] is {!Fmt.unit}[ ";@ "]. *)
-
 val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
@@ -102,6 +90,20 @@ val fmt : ('a, Format.formatter, unit) Stdlib.format -> Format.formatter -> 'a
 
 val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 (** [always fmt ppf v] formats any value with the constant format [fmt]. *)
+
+(** {1:seps Separators} *)
+
+val cut : 'a t
+(** [cut] has the effect of {!Format.pp_print_cut}. *)
+
+val sp : 'a t
+(** [sp] has the effect of {!Format.pp_print_space}. *)
+
+val comma : 'a t
+(** [comma] is {!Fmt.always}[ ",@ "]. *)
+
+val semi : 'a t
+(** [semi] is {!Fmt.always}[ ";@ "]. *)
 
 (** {1:basetypes Base type formatters} *)
 
