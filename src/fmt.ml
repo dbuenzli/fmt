@@ -323,7 +323,7 @@ let text_loc ppf ((l0, c0), (l1, c1)) =
 
 (* Appending *)
 
-let append pp_v0 pp_v1 ppf (v0, v1) = pp_v0 ppf v0 ; pp_v1 ppf v1
+let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
 let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
 let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
 

@@ -382,8 +382,8 @@ val text_loc : ((int * int) * (int * int)) t
 
 (** {1:combi Appending} *)
 
-val append : 'a t -> 'b t -> ('a * 'b) t
-(** [append pp_v0 pp_v1 ppf (v0, v1)] is [pp_v0 ppf v0; pp_v1 ppf v1]. *)
+val append : 'a t -> 'a t -> 'a t
+(** [append pp_v0 pp_v1 ppf v] is [pp_v0 ppf v; pp_v1 ppf v]. *)
 
 val prefix : unit t -> 'a t -> 'a t
 (** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)

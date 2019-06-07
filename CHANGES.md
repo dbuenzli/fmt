@@ -1,3 +1,7 @@
+
+* Change signature of `Fmt.append`. Use `Fmt.(pair ~sep:nop)` if you
+  were using it (backward compatible with earlier versions of `Fmt`).
+
 v0.8.6 2019-04-01 La Forclaz (VS)
 ---------------------------------
 
