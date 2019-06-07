@@ -1,8 +1,9 @@
 
+* Add `Fmt.concat` to apply a list of formatters to a value.
 * Add `Fmt.semi` for semicolon separators.
-* `Fmt.{const,comma,cut,sp}` generalize signature.
-* Change signature of `Fmt.append`. Use `Fmt.(pair ~sep:nop)` if you
-  were using it (backward compatible with earlier versions of `Fmt`).
+* `Fmt.{const,comma,cut,sp}`: generalize signature.
+* `Fmt.append`: change signature. Use `Fmt.(pair ~sep:nop)` if you
+   were using it (backward compatible with earlier versions of `Fmt`).
 
 v0.8.6 2019-04-01 La Forclaz (VS)
 ---------------------------------

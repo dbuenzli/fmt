@@ -52,6 +52,29 @@ let sp ppf _ = Format.pp_print_space ppf ()
 let comma ppf _ = pf ppf ",@ "
 let semi ppf _ = pf ppf ";@ "
 
+(* Sequencing *)
+
+let iter ?sep:(pp_sep = cut) iter pp_elt ppf v =
+  let is_first = ref true in
+  let pp_elt v =
+    if !is_first then (is_first := false) else pp_sep ppf ();
+    pp_elt ppf v
+  in
+  iter pp_elt v
+
+let iter_bindings ?sep:(pp_sep = cut) iter pp_binding ppf v =
+  let is_first = ref true in
+  let pp_binding k v =
+    if !is_first then (is_first := false) else pp_sep ppf ();
+    pp_binding ppf (k, v)
+  in
+  iter pp_binding v
+
+let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
+let concat ?sep pps ppf v = iter ?sep List.iter (fun ppf pp -> pp ppf v) ppf pps
+let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
+let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
+
 (* Base type formatters *)
 
 let bool = Format.pp_print_bool
@@ -117,22 +140,6 @@ let option ?none:(pp_none = nop) pp_v ppf = function
 let result ~ok ~error ppf = function
 | Ok v -> ok ppf v
 | Error e -> error ppf e
-
-let iter ?sep:(pp_sep = cut) iter pp_elt ppf v =
-  let is_first = ref true in
-  let pp_elt v =
-    if !is_first then (is_first := false) else pp_sep ppf ();
-    pp_elt ppf v
-  in
-  iter pp_elt v
-
-let iter_bindings ?sep:(pp_sep = cut) iter pp_binding ppf v =
-  let is_first = ref true in
-  let pp_binding k v =
-    if !is_first then (is_first := false) else pp_sep ppf ();
-    pp_binding ppf (k, v)
-  in
-  iter pp_binding v
 
 let list ?sep pp_elt = iter ?sep List.iter pp_elt
 let array ?sep pp_elt = iter ?sep Array.iter pp_elt
@@ -323,12 +330,6 @@ let text_loc ppf ((l0, c0), (l1, c1)) =
   if (l0 : int) == (l1 : int) && (c0 : int) == (c1 : int)
   then pf ppf "%d.%d" l0 c0
   else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
-
-(* Appending *)
-
-let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
-let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
-let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
 
 (* Byte sizes *)
 

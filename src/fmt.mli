@@ -105,6 +105,32 @@ val comma : 'a t
 val semi : 'a t
 (** [semi] is {!Fmt.always}[ ";@ "]. *)
 
+(** {1:seq Sequencing} *)
+
+val append : 'a t -> 'a t -> 'a t
+(** [append pp_v0 pp_v1 ppf v] is [pp_v0 ppf v; pp_v1 ppf v]. *)
+
+val concat : ?sep:unit t -> 'a t list -> 'a t
+(** [concat ~sep pps] formats a value using the formaters [pps]
+    and separting each format with [sep] (defaults to {!cut}). *)
+
+val iter : ?sep:unit t -> (('a -> unit) -> 'b -> unit) -> 'a t -> 'b t
+(** [iter ~sep iter pp_elt] formats the iterations of [iter] over a
+    value using [pp_elt]. Iterations are separated by [sep] (defaults to
+    {!cut}). *)
+
+val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
+  ('a * 'b) t -> 'c t
+(** [iter_bindings ~sep iter pp_binding] formats the iterations of
+    [iter] over a value using [pp_binding]. Iterations are separated
+    by [sep] (defaults to {!cut}). *)
+
+val prefix : unit t -> 'a t -> 'a t
+(** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
+
+val suffix : unit t -> 'a t -> 'a t
+(** [suffix pp_suf pp] suffixes [pp] by [pp_suf]. *)
+
 (** {1:basetypes Base type formatters} *)
 
 val bool : bool t
@@ -222,17 +248,6 @@ val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
     stack is formatted from top to bottom order with [pp_v].  Elements
     are separated by [sep] (defaults to {!cut}). If the stack is
     empty, this is {!nop}. *)
-
-val iter : ?sep:unit t -> (('a -> unit) -> 'b -> unit) -> 'a t -> 'b t
-(** [iter ~sep iter pp_elt] formats the iterations of [iter] over a
-    value using [pp_elt]. Iterations are separated by [sep] (defaults to
-    {!cut}). *)
-
-val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
-  ('a * 'b) t -> 'c t
-(** [iter_bindings ~sep iter pp_binding] formats the iterations of
-    [iter] over a value using [pp_binding]. Iterations are separated
-    by [sep] (defaults to {!cut}). *)
 
 val using : ('a -> 'b) -> 'b t -> 'a t
 (** [using f pp] maps values using [f] and formats them with [pp]. *)
@@ -384,17 +399,6 @@ val text_loc : ((int * int) * (int * int)) t
 (** [text_loc] formats a line-column text range according to
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
-
-(** {1:combi Appending} *)
-
-val append : 'a t -> 'a t -> 'a t
-(** [append pp_v0 pp_v1 ppf v] is [pp_v0 ppf v; pp_v1 ppf v]. *)
-
-val prefix : unit t -> 'a t -> 'a t
-(** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
-
-val suffix : unit t -> 'a t -> 'a t
-(** [suffix pp_suf pp] suffixes [pp] by [pp_suf]. *)
 
 (** {1 Byte sizes} *)
 
