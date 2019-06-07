@@ -110,6 +110,9 @@ val semi : 'a t
 val append : 'a t -> 'a t -> 'a t
 (** [append pp_v0 pp_v1 ppf v] is [pp_v0 ppf v; pp_v1 ppf v]. *)
 
+val ( ++ ) : 'a t -> 'a t -> 'a t
+(** [( ++ )] is {!append}. *)
+
 val concat : ?sep:unit t -> 'a t list -> 'a t
 (** [concat ~sep pps] formats a value using the formaters [pps]
     and separting each format with [sep] (defaults to {!cut}). *)
