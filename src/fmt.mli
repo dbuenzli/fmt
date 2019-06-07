@@ -86,7 +86,7 @@ val sp : unit t
 val comma : unit t
 (** [comma] is {!Fmt.unit}[ ",@ "]. *)
 
-val const : 'a t -> 'a -> unit t
+val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
 val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t

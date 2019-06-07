@@ -1,4 +1,5 @@
 
+* `Fmt.const` generalize signature.
 * Change signature of `Fmt.append`. Use `Fmt.(pair ~sep:nop)` if you
   were using it (backward compatible with earlier versions of `Fmt`).
 
