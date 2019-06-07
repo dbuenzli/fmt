@@ -43,7 +43,7 @@ let nop fmt ppf = ()
 let cut = Format.pp_print_cut
 let sp = Format.pp_print_space
 let comma ppf () = pf ppf ",@ "
-let semicolon ppf () = pf ppf ";@ "
+let semi ppf () = pf ppf ";@ "
 let const pp_v v ppf _ = pf ppf "%a" pp_v v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
@@ -212,9 +212,9 @@ module Dump = struct
   | Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
   | Error e -> pf ppf "@[<2>Error@ @[%a@]@]" error e
 
-  let list pp_elt = list ~sep:semicolon (box pp_elt) |> brackets
-  let array pp_elt = array ~sep:semicolon (box pp_elt) |> oxford_brackets
-  let seq pp_elt = seq ~sep:semicolon (box pp_elt) |> brackets
+  let list pp_elt = list ~sep:semi (box pp_elt) |> brackets
+  let array pp_elt = array ~sep:semi (box pp_elt) |> oxford_brackets
+  let seq pp_elt = seq ~sep:semi (box pp_elt) |> brackets
 
   let named pp1 pp2 ppf v = pf ppf "%a@ %a" pp1 v pp2 v
 
