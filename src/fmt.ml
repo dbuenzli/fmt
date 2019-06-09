@@ -40,17 +40,18 @@ let invalid_arg fmt = kstrf invalid_arg fmt
 type 'a t = Format.formatter -> 'a -> unit
 
 let nop fmt ppf = ()
-let const pp_v v ppf _ = pf ppf "%a" pp_v v
+let const pp_v v ppf _ = pp_v ppf v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
-let always fmt ppf v = pf ppf fmt
+let always fmt ppf _ = pf ppf fmt
 
 (* Separators *)
 
 let cut ppf _ = Format.pp_print_cut ppf ()
 let sp ppf _ = Format.pp_print_space ppf ()
-let comma ppf _ = pf ppf ",@ "
-let semi ppf _ = pf ppf ";@ "
+let nsp n ppf _ = Format.pp_print_break ppf n 0
+let comma ppf _ = Format.pp_print_string ppf ","; sp ppf ()
+let semi ppf _ = Format.pp_print_string ppf ";"; sp ppf ()
 
 (* Sequencing *)
 
@@ -153,26 +154,30 @@ let using f pp ppf v = pp ppf (f v)
 
 (* Boxes *)
 
-let box ?(indent = 0) pp ppf =
-  Format.pp_open_hovbox ppf indent; pf ppf "%a@]" pp
+let box ?(indent = 0) pp_v ppf v = Format.(
+  pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
-let hbox pp ppf =
-  Format.pp_open_hbox ppf (); pf ppf "%a@]" pp
+let hbox pp_v ppf v = Format.(
+  pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
 
-let vbox ?(indent = 0) pp ppf =
-  Format.pp_open_vbox ppf indent; pf ppf "%a@]" pp
+let vbox ?(indent = 0) pp_v ppf v = Format.(
+  pp_open_vbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
-let hvbox ?(indent = 0) pp ppf =
-  Format.pp_open_hvbox ppf indent; pf ppf "%a@]" pp
+let hvbox ?(indent = 0) pp_v ppf v = Format.(
+  pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
 (* Brackets *)
 
-let parens pp_v ppf v = pf ppf "@[<1>(%a)@]" pp_v v
-let brackets pp_v ppf v = pf ppf "@[<1>[%a]@]" pp_v v
-let oxford_brackets pp_v ppf v = pf ppf "@[<2>[|%a|]@]" pp_v v
-let braces pp_v ppf v = pf ppf "@[<1>{%a}@]" pp_v v
-let quote ?(mark = "\"") pp_v ppf v =
-  pf ppf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v v mark
+let surround s1 s2 pp_v ppf v = Format.(
+  pp_print_string ppf s1; pp_v ppf v; pp_print_string ppf s2)
+
+let parens pp_v = box ~indent:1 (surround "(" ")" pp_v)
+let brackets pp_v = box ~indent:1 (surround "[" "]" pp_v)
+let oxford_brackets pp_v = box ~indent:2 (surround "[|" "|]" pp_v)
+let braces pp_v = box ~indent:1 (surround "{" "}" pp_v)
+let quote ?(mark = "\"") pp_v =
+  let pp_mark ppf _ = Format.pp_print_as ppf 1 mark in
+  box ~indent:1 (pp_mark ++ pp_v ++ pp_mark)
 
 module Dump = struct
 
@@ -212,8 +217,8 @@ module Dump = struct
 
   let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
 
-  let pair pp_fst pp_snd ppf (fst, snd) =
-    pf ppf "@[<1>(@[%a@],@ @[%a@])@]" pp_fst fst pp_snd snd
+  let pair pp_fst pp_snd =
+    parens (using fst (box pp_fst) ++ comma ++ using snd (box pp_snd))
 
   let option pp_v ppf = function
   | None -> pf ppf "None"
@@ -223,19 +228,17 @@ module Dump = struct
   | Ok v -> pf ppf "@[<2>Ok@ @[%a@]@]" ok v
   | Error e -> pf ppf "@[<2>Error@ @[%a@]@]" error e
 
-  let list pp_elt = list ~sep:semi (box pp_elt) |> brackets
-  let array pp_elt = array ~sep:semi (box pp_elt) |> oxford_brackets
-  let seq pp_elt = seq ~sep:semi (box pp_elt) |> brackets
-
-  let named pp1 pp2 ppf v = pf ppf "%a@ %a" pp1 v pp2 v
+  let list pp_elt = brackets (list ~sep:semi (box pp_elt))
+  let array pp_elt = oxford_brackets (array ~sep:semi (box pp_elt))
+  let seq pp_elt = brackets (seq ~sep:semi (box pp_elt))
 
   let iter iter_f pp_name pp_elt =
     let pp_v = iter ~sep:sp iter_f (box pp_elt) in
-    named pp_name pp_v |> parens
+    parens (pp_name ++ sp ++ pp_v)
 
   let iter_bindings iter_f pp_name pp_k pp_v =
     let pp_v = iter_bindings ~sep:sp iter_f (pair pp_k pp_v) in
-    named pp_name pp_v |> parens
+    parens (pp_name ++ sp ++ pp_v)
 
   let hashtbl pp_k pp_v =
     iter_bindings Hashtbl.iter (always "hashtbl") pp_k pp_v
@@ -412,27 +415,24 @@ let ascii ?(w = 0) ?(subst = const char '.') () ppf (n, _ as v) =
     if '\x20' <= c && c < '\x7f' then char ppf c else subst ppf ()
   in
   vec pp_char ppf v;
-  if n < w then Format.pp_print_break ppf (w - n) 0
+  if n < w then nsp (w - n) ppf ()
 
 let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
   let pp_sep ppf i = if i > 0 && i mod 2 = 0 then sep ppf () in
-  let pp_char ppf (i, c) = pf ppf "%a%02x" pp_sep i (Char.code c) in
+  let pp_char ppf (i, c) = pp_sep ppf i; pf ppf "%02x" (Char.code c) in
   vec ~sep:nop pp_char ppf v;
-  for i = n to w - 1 do pf ppf "%a@ @ " pp_sep i done
+  for i = n to w - 1 do pp_sep ppf i; nsp 2 ppf () done
 
 let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
   let addr = match addr with
   | Some pp -> pp
-  | _ ->
-      let pp = padded0x ~max:(((n - 1) / w) * w) in
-      fun ppf -> pf ppf "%a: " pp
+  | _ -> padded0x ~max:(((n - 1) / w) * w) ++ const string ": "
   in
-  let pp_sub ppf (i, sub) = pf ppf "%a@[%a@]" addr (i * w) pp_vec sub in
+  let pp_sub ppf (i, sub) = addr ppf (i * w); box pp_vec ppf sub in
   vbox (vec pp_sub) ppf (sub_vecs w v)
 
 let hex ?(w = 16) () =
-  let octets = octets ~w () and ascii = ascii ~w () in
-  addresses ~w (fun ppf v -> pf ppf "@[%a@]@ @ @[%a@]" octets v ascii v)
+  addresses ~w ((octets ~w () |> box) ++ nsp 2 ++ (ascii ~w () |> box))
 
 (* Conditional UTF-8 and styled formatting. *)
 
@@ -569,7 +569,7 @@ let styled style pp_v ppf v = match style_renderer ppf with
     let prev = !curr and here = ansi_style_code style in
     curr := (match style with `None -> here | _ -> prev ^ ";" ^ here);
     try
-      pf ppf "%a%a%a" pp_sgr here pp_v v pp_sgr prev; curr := prev
+      pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev; curr := prev
     with e -> curr := prev; raise e
 
 let styled_unit style fmt = styled style (unit fmt)
