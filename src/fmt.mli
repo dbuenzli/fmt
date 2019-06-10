@@ -338,22 +338,26 @@ module Dump : sig
 (** {1:boxes Boxes} *)
 
 val box : ?indent:int -> 'a t -> 'a t
-(** [box ~indent pp ppf] wraps [pp] in a horizontal or vertical box. Break
-    hints that lead to a new line add [indent] to the current indentation
-    (defaults to [0]). *)
+(** [box ~indent pp ppf] wraps [pp] in a pretty-printing box. The box tries to
+    print as much as possible on every line, while emphasizing the box structure
+    (see {!Format.pp_open_box}). Break hints that lead to a new line add
+    [indent] to the current indentation (defaults to [0]). *)
 
 val hbox : 'a t -> 'a t
 (** [hbox] is like {!box} but is a horizontal box: the line is not split
-    in this box (but may be in sub-boxes). *)
+    in this box (but may be in sub-boxes). See {!Format.pp_open_hbox}. *)
 
 val vbox : ?indent:int -> 'a t -> 'a t
 (** [vbox] is like {!box} but is a vertical box: every break hint leads
     to a new line which adds [indent] to the current indentation
-    (default to [0]). *)
+    (defaults to [0]). See {!Format.pp_open_vbox}. *)
 
 val hvbox : ?indent:int -> 'a t -> 'a t
-(** [hvbox] is like {!box} but is either {!hbox} if its fits on
-    a single line or {!vbox} otherwise. *)
+(** [hvbox] is like {!hbox} if it fits on a single line, or like {!vbox}
+    otherwise. See {!Format.pp_open_hvbox}. *)
+
+val hovbox : ?indent:int -> 'a t -> 'a t
+(** [hovbox] is a condensed {!box}. See {!Format.pp_open_hovbox}. *)
 
 (** {1:bracks Brackets} *)
 

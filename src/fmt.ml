@@ -155,7 +155,7 @@ let using f pp ppf v = pp ppf (f v)
 (* Boxes *)
 
 let box ?(indent = 0) pp_v ppf v = Format.(
-  pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+  pp_open_box ppf indent; pp_v ppf v; pp_close_box ppf ())
 
 let hbox pp_v ppf v = Format.(
   pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
@@ -166,10 +166,12 @@ let vbox ?(indent = 0) pp_v ppf v = Format.(
 let hvbox ?(indent = 0) pp_v ppf v = Format.(
   pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
+let hovbox ?(indent = 0) pp_v ppf v = Format.(
+  pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+
 (* Brackets *)
 
-let surround s1 s2 pp_v ppf v = Format.(
-  pp_print_string ppf s1; pp_v ppf v; pp_print_string ppf s2)
+let surround s1 s2 pp_v ppf v = string ppf s1; pp_v ppf v; string ppf s2
 
 let parens pp_v = box ~indent:1 (surround "(" ")" pp_v)
 let brackets pp_v = box ~indent:1 (surround "[" "]" pp_v)
