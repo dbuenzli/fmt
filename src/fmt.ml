@@ -39,6 +39,7 @@ let invalid_arg fmt = kstrf invalid_arg fmt
 
 type 'a t = Format.formatter -> 'a -> unit
 
+let flush ppf _ = Format.pp_print_flush ppf ()
 let nop fmt ppf = ()
 let const pp_v v ppf _ = pp_v ppf v
 let unit fmt ppf () = pf ppf fmt

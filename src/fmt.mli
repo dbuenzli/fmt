@@ -74,6 +74,9 @@ val invalid_arg : ('a, Format.formatter, unit, 'b) format4 -> 'a
 type 'a t = Format.formatter -> 'a -> unit
 (** The type for formatters of values of type ['a]. *)
 
+val flush : 'a t
+(** [flush] has the effect of {!Format.pp_print_flush} *)
+
 val nop : 'a t
 (** [nop] formats nothing. *)
 
