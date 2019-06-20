@@ -4,36 +4,30 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+let invalid_arg' = invalid_arg
+
 (* Errors *)
 
 let err_str_formatter = "Format.str_formatter can't be set."
+
+(* Standard outputs *)
+
+let stdout = Format.std_formatter
+let stderr = Format.err_formatter
 
 (* Formatting *)
 
 let pf = Format.fprintf
 let pr = Format.printf
 let epr = Format.eprintf
-let strf = Format.asprintf
+let str = Format.asprintf
 let kpf = Format.kfprintf
-let kstrf f fmt =
-  let buf = Buffer.create 64 in
-  let f fmt =
-    Format.pp_print_flush fmt ();
-    let s = Buffer.contents buf in
-    Buffer.reset buf; f s
-  in
-  Format.kfprintf f (Format.formatter_of_buffer buf) fmt
-
-(* Standard output formatting *)
-
-let stdout = Format.std_formatter
-let stderr = Format.err_formatter
-
-(* Exception formatting *)
-
-let invalid_arg' = invalid_arg
-let failwith fmt = kstrf failwith fmt
-let invalid_arg fmt = kstrf invalid_arg fmt
+let kstr = Format.kasprintf
+let failwith fmt = kstr failwith fmt
+let failwith_notrace fmt = kstr (fun s -> raise_notrace (Failure s)) fmt
+let invalid_arg fmt = kstr invalid_arg fmt
+let error fmt = kstr (fun s -> Error s) fmt
+let error_msg fmt = kstr (fun s -> Error (`Msg s)) fmt
 
 (* Formatters *)
 
@@ -493,7 +487,7 @@ let with_buffer ?like buf =
   (match like with Some like -> store ppf := !(store like) | _ -> ());
   ppf
 
-let strf_like ppf fmt =
+let str_like ppf fmt =
   let buf = Buffer.create 64 in
   let bppf = with_buffer ~like:ppf buf in
   let flush ppf =
@@ -580,7 +574,13 @@ let styled_unit style fmt = styled style (unit fmt)
 (* Converting with string converters. *)
 
 let of_to_string f ppf v = string ppf (f v)
-let to_to_string pp_v v = strf "%a" pp_v v
+let to_to_string pp_v v = str "%a" pp_v v
+
+(* Deprecated *)
+
+let strf = str
+let kstrf = kstr
+let strf_like = str_like
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers

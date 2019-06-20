@@ -35,7 +35,7 @@ val pr : ('a, Format.formatter, unit) format -> 'a
 val epr : ('a, Format.formatter, unit) format -> 'a
 (** [epr] is [pf stderr]. *)
 
-val strf : ('a, Format.formatter, unit, string) format4 -> 'a
+val str : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [strf] is {!Format.asprintf}.
 
     {b Note.} When using [strf] {!utf_8} and {!style_renderer} are
@@ -46,28 +46,36 @@ val kpf : (Format.formatter -> 'a) -> Format.formatter ->
   ('b, Format.formatter, unit, 'a) Stdlib.format4 -> 'b
 (** [kpf] is {!Format.kfprintf}. *)
 
-val kstrf : (string -> 'a) ->
-  ('b, Format.formatter, unit, 'a) format4 -> 'b
-(** [kstrf] is like {!strf} but continuation based. *)
+val kstr :
+  (string -> 'a) -> ('b, Format.formatter, unit, 'a) format4 -> 'b
+(** [kstr] is like {!str} but continuation based. *)
 
-val strf_like : Format.formatter ->
-  ('a, Format.formatter, unit, string) format4 -> 'a
-(** [strf_like ppf] is like {!strf} except its {!utf_8} and {!style_renderer}
+val str_like :
+  Format.formatter -> ('a, Format.formatter, unit, string) format4 -> 'a
+(** [str_like ppf] is like {!str} except its {!utf_8} and {!style_renderer}
     settings are those of [ppf]. *)
 
 val with_buffer : ?like:Format.formatter -> Buffer.t -> Format.formatter
 (** [with_buffer ~like b] is a formatter whose {!utf_8} and {!style_renderer}
     settings are copied from those of {!like} (if provided). *)
 
-(** {1:fmt_exns Formatting exceptions} *)
-
 val failwith : ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** [failwith] is [kstrf failwith], raises {!Stdlib.Failure} with
+(** [failwith] is [kstr failwith], raises {!Stdlib.Failure} with
     a pretty-printed string argument. *)
 
+val failwith_notrace : ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** [failwith_notrace] is like {!failwith} but raises with {!raise_notrace}. *)
+
 val invalid_arg : ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** [invalid_arg] is [kstrf invalid_arg], raises
+(** [invalid_arg] is [kstr invalid_arg], raises
     {!Stdlib.Invalid_argument} with a pretty-printed string argument. *)
+
+val error : ('b, Format.formatter , unit, ('a, string) result) format4 -> 'b
+(** [error fmt ...] is [kstr (fun s -> Error s) fmt ...] *)
+
+val error_msg :
+  ('b, Format.formatter , unit, ('a, [`Msg of string]) result) format4 -> 'b
+(** [error_msg fmt ...] is [kstr (fun s -> Error (`Msg s)) fmt ...] *)
 
 (** {1 Formatters} *)
 
@@ -541,6 +549,18 @@ val of_to_string : ('a -> string) -> 'a t
 
 val to_to_string : 'a t -> 'a -> string
 (** [to_to_string pp_v v] is [strf "%a" pp_v v]. *)
+
+(** {1:deprecated Deprecated} *)
+
+val strf : ('a, Format.formatter, unit, string) format4 -> 'a
+(** @deprecated use {!str} instead. *)
+
+val kstr : (string -> 'a) -> ('b, Format.formatter, unit, 'a) format4 -> 'b
+(** @deprecated use {!kstr} instead. *)
+
+val str_like :
+  Format.formatter -> ('a, Format.formatter, unit, string) format4 -> 'a
+(** @deprecated use {!str_like} instead. *)
 
 (** {1:nameconv Naming conventions}
 
