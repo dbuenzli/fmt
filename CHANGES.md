@@ -1,14 +1,15 @@
 
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.concat` to apply a list of formatters to a value.
-* Add `Fmt.semi` for semicolon separators.
+* Add `Fmt.{semi,dot,nsp}`, separators.
 * Add `Fmt.{error,error_msg}` to format `result` values.
 * Add `Fmt.failwith_notrace`.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
 * Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if 
   you were using it (backward compatible with earlier versions of `Fmt`).
 * Add `Fmt.( ++ )`, alias for `Fmt.append`.
-* Deprecate `Fmt.{strf,kstrf,strf_like,}` in favor of `Fmt.{str,kstr,str_like}`.
+* Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
+* Deprecate `Fmt.always` in favor of `Fmt.any`.
 
 v0.8.6 2019-04-01 La Forclaz (VS)
 ---------------------------------

@@ -88,19 +88,22 @@ val flush : 'a t
 val nop : 'a t
 (** [nop] formats nothing. *)
 
-val const : 'a t -> 'a -> 'b t
-(** [const pp_v v] always formats [v] using [pp_v]. *)
+val any : (unit, Format.formatter, unit) Stdlib.format -> 'a t
+(** [any fmt ppf v] formats any value with the constant format [fmt]. *)
+
+val using : ('a -> 'b) -> 'b t -> 'a t
+(** [using f pp ppf v] ppf ppf [(f v)]. *)
 
 val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
 (** [unit fmt] formats a unit value with the format [fmt]. *)
+
+val const : 'a t -> 'a -> 'b t
+(** [const pp_v v] always formats [v] using [pp_v]. *)
 
 val fmt : ('a, Format.formatter, unit) Stdlib.format -> Format.formatter -> 'a
 (** [fmt fmt ppf] is [pf ppf fmt]. If [fmt] is used with a single
     non-constant formatting directive, generates a value of type
     {!t}. *)
-
-val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
-(** [always fmt ppf v] formats any value with the constant format [fmt]. *)
 
 (** {1:seps Separators} *)
 
@@ -115,10 +118,13 @@ val nsp : int -> 'a t
     with [offset] [0]. *)
 
 val comma : 'a t
-(** [comma] is {!Fmt.always}[ ",@ "]. *)
+(** [comma] is {!Fmt.any}[ ",@ "]. *)
 
 val semi : 'a t
-(** [semi] is {!Fmt.always}[ ";@ "]. *)
+(** [semi] is {!Fmt.any}[ ";@ "]. *)
+
+val dot : 'a t
+(** [dot] is {!Fmt.any}[ ";@ "]. *)
 
 (** {1:seq Sequencing} *)
 
@@ -266,9 +272,6 @@ val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
     stack is formatted from top to bottom order with [pp_v].  Elements
     are separated by [sep] (defaults to {!cut}). If the stack is
     empty, this is {!nop}. *)
-
-val using : ('a -> 'b) -> 'b t -> 'a t
-(** [using f pp] maps values using [f] and formats them with [pp]. *)
 
 (** Formatters for inspecting OCaml values.
 
@@ -561,6 +564,9 @@ val kstr : (string -> 'a) -> ('b, Format.formatter, unit, 'a) format4 -> 'b
 val str_like :
   Format.formatter -> ('a, Format.formatter, unit, string) format4 -> 'a
 (** @deprecated use {!str_like} instead. *)
+
+val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
+(** @deprecated use {!any} instead. *)
 
 (** {1:nameconv Naming conventions}
 

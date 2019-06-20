@@ -35,10 +35,11 @@ type 'a t = Format.formatter -> 'a -> unit
 
 let flush ppf _ = Format.pp_print_flush ppf ()
 let nop fmt ppf = ()
+let any fmt ppf _ = pf ppf fmt
+let using f pp ppf v = pp ppf (f v)
 let const pp_v v ppf _ = pp_v ppf v
 let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
-let always fmt ppf _ = pf ppf fmt
 
 (* Separators *)
 
@@ -47,6 +48,7 @@ let sp ppf _ = Format.pp_print_space ppf ()
 let nsp n ppf _ = Format.pp_print_break ppf n 0
 let comma ppf _ = Format.pp_print_string ppf ","; sp ppf ()
 let semi ppf _ = Format.pp_print_string ppf ";"; sp ppf ()
+let dot ppf _ = Format.pp_print_string ppf "."; sp ppf ()
 
 (* Sequencing *)
 
@@ -144,8 +146,6 @@ let seq ?sep pp_elt = iter ?sep Seq.iter pp_elt
 let hashtbl ?sep pp_binding = iter_bindings ?sep Hashtbl.iter pp_binding
 let queue ?sep pp_elt = iter Queue.iter pp_elt
 let stack ?sep pp_elt = iter Stack.iter pp_elt
-
-let using f pp ppf v = pp ppf (f v)
 
 (* Boxes *)
 
