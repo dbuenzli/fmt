@@ -91,8 +91,8 @@ val nop : 'a t
 val any : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 (** [any fmt ppf v] formats any value with the constant format [fmt]. *)
 
-val pam : ('a -> 'b) -> 'b t -> 'a t
-(** [pam f pp ppf v] is [pp ppf (f v)]. *)
+val using : ('a -> 'b) -> 'b t -> 'a t
+(** [using f pp ppf v] ppf ppf [(f v)]. *)
 
 val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
@@ -627,9 +627,6 @@ val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 
 val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
 (** @deprecated use {!any}. *)
-
-val using : ('a -> 'b) -> 'b t -> 'a t
-(** @deprecated use {!pam}. *)
 
 (** {1:nameconv Naming conventions}
 

@@ -36,7 +36,7 @@ type 'a t = Format.formatter -> 'a -> unit
 let flush ppf _ = Format.pp_print_flush ppf ()
 let nop fmt ppf = ()
 let any fmt ppf _ = pf ppf fmt
-let pam f pp ppf v = pp ppf (f v)
+let using f pp ppf v = pp ppf (f v)
 let const pp_v v ppf _ = pp_v ppf v
 let fmt fmt ppf = pf ppf fmt
 
@@ -193,7 +193,7 @@ module Dump = struct
   let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
 
   let pair pp_fst pp_snd =
-    parens (pam fst (box pp_fst) ++ comma ++ pam snd (box pp_snd))
+    parens (using fst (box pp_fst) ++ comma ++ using snd (box pp_snd))
 
   let option pp_v ppf = function
   | None -> pf ppf "None"
@@ -536,8 +536,8 @@ type 'a vec = int * (int -> 'a)
 let iter_vec f (n, get) = for i = 0 to n - 1 do f i (get i) done
 let vec ?sep = iter_bindings ?sep iter_vec
 
-let on_string = pam String.(fun s -> length s, get s)
-let on_bytes = pam Bytes.(fun b -> length b, get b)
+let on_string = using String.(fun s -> length s, get s)
+let on_bytes = using Bytes.(fun b -> length b, get b)
 
 let sub_vecs w (n, get) =
   (n - 1) / w + 1,
@@ -742,7 +742,7 @@ let kstrf = kstr
 let strf_like = str_like
 let always = any
 let unit = any
-let using = pam
+
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers
 
