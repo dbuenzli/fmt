@@ -238,10 +238,10 @@ module Dump = struct
     parens (pp_name ++ sp ++ pp_v)
 
   let hashtbl pp_k pp_v =
-    iter_bindings Hashtbl.iter (always "hashtbl") pp_k pp_v
+    iter_bindings Hashtbl.iter (any "hashtbl") pp_k pp_v
 
-  let stack pp_elt = iter Stack.iter (always "stack") pp_elt
-  let queue pp_elt = iter Queue.iter (always "queue") pp_elt
+  let stack pp_elt = iter Stack.iter (any "stack") pp_elt
+  let queue pp_elt = iter Queue.iter (any "queue") pp_elt
 end
 
 (* Text and lines *)
@@ -581,6 +581,7 @@ let to_to_string pp_v v = str "%a" pp_v v
 let strf = str
 let kstrf = kstr
 let strf_like = str_like
+let always = any
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers
