@@ -147,20 +147,20 @@ let stack ?sep pp_elt = iter Stack.iter pp_elt
 
 (* Boxes *)
 
-let box ?(indent = 0) pp_v ppf v = Format.(
-  pp_open_box ppf indent; pp_v ppf v; pp_close_box ppf ())
+let box ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_box ppf indent; pp_v ppf v; pp_close_box ppf ())
 
-let hbox pp_v ppf v = Format.(
-  pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
+let hbox pp_v ppf v =
+  Format.(pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
 
-let vbox ?(indent = 0) pp_v ppf v = Format.(
-  pp_open_vbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+let vbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_vbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
-let hvbox ?(indent = 0) pp_v ppf v = Format.(
-  pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+let hvbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
-let hovbox ?(indent = 0) pp_v ppf v = Format.(
-  pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+let hovbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
 
 (* Brackets *)
 
