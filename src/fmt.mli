@@ -145,7 +145,12 @@ val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
     [iter] over a value using [pp_binding]. Iterations are separated
     by [sep] (defaults to {!cut}). *)
 
-(** {1:basetypes Base type formatters} *)
+(** {1:stdlib Stdlib types}
+
+    Formatters for structures give full control to the client over the
+    formatting process and do not wrap the formatted structures with
+    boxes. Use the {!Dump} module to quickly format values for
+    inspection.  *)
 
 val bool : bool t
 (** [bool] is {!Format.pp_print_bool}. *)
@@ -208,13 +213,6 @@ val exn : exn t
 val exn_backtrace : (exn * Printexc.raw_backtrace) t
 (** [exn_backtrace] formats an exception backtrace. *)
 
-(** {1:polytypes Polymorphic type formatters}
-
-    These formatters give full control to the client over the
-    formatting process and do not wrap the formatted structures with
-    boxes. Use the {!Dump} module to quickly format values for
-    inspection.  *)
-
 val pair : ?sep:unit t -> 'a t -> 'b t -> ('a * 'b) t
 (** [pair ~sep pp_fst pp_snd] formats a pair. The first and second
     projection are formatted using [pp_fst] and [pp_snd] and are
@@ -270,7 +268,7 @@ val stack : ?sep:unit t -> 'a t -> 'a Stack.t t
     whenever possible, using OCaml syntax. *)
 module Dump : sig
 
-  (** {1:base Base types formatters} *)
+  (** {1:stdlib Stdlib types} *)
 
   val signal : int t
   (** [signal] formats an OCaml {{!Sys.sigabrt}signal number} as a C
@@ -283,8 +281,6 @@ module Dump : sig
       encoded characters according to the Unicode
       {{:http://www.unicode.org/versions/latest/appA.pdf}notational
       convention} for code points. *)
-
-  (** {1:polytypes Polymorphic type formatters} *)
 
   val pair : 'a t -> 'b t -> ('a * 'b) t
   (** [pair pp_fst pp_snd] formats an OCaml pair using [pp_fst] and [pp_snd]
@@ -327,6 +323,11 @@ module Dump : sig
   (** [stack pp_v] formats an unspecified representation of an OCaml
       stack using [pp_v] to format its elements in top to bottom order. *)
 
+  (** {1:seq Sequencing}
+
+      These are akin to {!iter} and {!iter_bindings} but
+      delimit the sequences with {!parens}. *)
+
   val iter : (('a -> unit) -> 'b -> unit) -> 'b t -> 'a t -> 'b t
   (** [iter iter pp_name pp_elt] formats an unspecified representation
       of the iterations of [iter] over a value using [pp_elt]. The
@@ -337,7 +338,8 @@ module Dump : sig
   (** [iter_bindings ~sep iter pp_name pp_k pp_v] formats an
       unspecified representation of the iterations of [iter] over a
       value using [pp_k] and [pp_v]. The iteration is named by
-      [pp_name]. *) end
+      [pp_name]. *)
+end
 
 (** {1:boxes Boxes} *)
 

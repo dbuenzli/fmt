@@ -1,4 +1,7 @@
 
+
+* Add support for hex dumping, see `Fmt.hex` and friends.
+  Thanks to David Kaloper Meršinjak for the work.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.concat` to apply a list of formatters to a value.
 * Add `Fmt.{semi,dot,sps}`, separators.
@@ -11,6 +14,8 @@
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
 * Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
 * Remove `Fmt.{prefix,suffix}` (specializes Fmt.( ++ )).
+* No longer subvert the `Format` tag system to do dirty things.
+  Thanks to David Kaloper Meršinjak for the work.
 
 v0.8.6 2019-04-01 La Forclaz (VS)
 ---------------------------------

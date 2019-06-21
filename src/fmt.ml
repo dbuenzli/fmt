@@ -71,7 +71,7 @@ let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
 let ( ++ ) = append
 let concat ?sep pps ppf v = iter ?sep List.iter (fun ppf pp -> pp ppf v) ppf pps
 
-(* Base type formatters *)
+(* Stdlib types formatters *)
 
 let bool = Format.pp_print_bool
 let int = Format.pp_print_int
@@ -82,11 +82,9 @@ let uint ppf v = pf ppf "%u" v
 let uint32 ppf v = pf ppf "%lu" v
 let uint64 ppf v = pf ppf "%Lu" v
 let unativeint ppf v = pf ppf "%nu" v
-
 let char = Format.pp_print_char
 let string = Format.pp_print_string
 let buffer ppf b = string ppf (Buffer.contents b)
-
 let exn ppf e = string ppf (Printexc.to_string e)
 let exn_backtrace ppf (e, bt) =
   let pp_backtrace_str ppf s =
@@ -106,10 +104,7 @@ let exn_backtrace ppf (e, bt) =
   pf ppf "@[<v>Exception: %a@,%a@]"
     exn e pp_backtrace_str (Printexc.raw_backtrace_to_string bt)
 
-(* Floats *)
-
 let float ppf v = pf ppf "%g" v
-
 let round x = floor (x +. 0.5)
 let round_dfrac d x =
   if x -. (round x) = 0. then x else                   (* x is an integer. *)
@@ -123,8 +118,6 @@ let round_dsig d x =
 
 let float_dfrac d ppf f = pf ppf "%g" (round_dfrac d f)
 let float_dsig d ppf f = pf ppf "%g" (round_dsig d f)
-
-(* Polymorphic type formatters *)
 
 let pair ?sep:(pp_sep = cut) pp_fst pp_snd ppf (fst, snd) =
   pp_fst ppf fst; pp_sep ppf (); pp_snd ppf snd
@@ -164,7 +157,6 @@ let hovbox ?(indent = 0) pp_v ppf v =
 (* Brackets *)
 
 let surround s1 s2 pp_v ppf v = string ppf s1; pp_v ppf v; string ppf s2
-
 let parens pp_v = box ~indent:1 (surround "(" ")" pp_v)
 let brackets pp_v = box ~indent:1 (surround "[" "]" pp_v)
 let oxford_brackets pp_v = box ~indent:2 (surround "[|" "|]" pp_v)
@@ -173,37 +165,20 @@ let quote ?(mark = "\"") pp_v =
   let pp_mark ppf _ = Format.pp_print_as ppf 1 mark in
   box ~indent:1 (pp_mark ++ pp_v ++ pp_mark)
 
-module Dump = struct
+(* Stdlib type dumpers *)
 
-  let sig_names = Sys.[
-    sigabrt, "SIGABRT";
-    sigalrm, "SIGALRM";
-    sigfpe, "SIGFPE";
-    sighup, "SIGHUP";
-    sigill, "SIGILL";
-    sigint, "SIGINT";
-    sigkill, "SIGKILL";
-    sigpipe, "SIGPIPE";
-    sigquit, "SIGQUIT";
-    sigsegv, "SIGSEGV";
-    sigterm, "SIGTERM";
-    sigusr1, "SIGUSR1";
-    sigusr2, "SIGUSR2";
-    sigchld, "SIGCHLD";
-    sigcont, "SIGCONT";
-    sigstop, "SIGSTOP";
-    sigtstp, "SIGTSTP";
-    sigttin, "SIGTTIN";
-    sigttou, "SIGTTOU";
-    sigvtalrm, "SIGVTALRM";
-    sigprof, "SIGPROF";
-    sigbus, "SIGBUS";
-    sigpoll, "SIGPOLL";
-    sigsys, "SIGSYS";
-    sigtrap, "SIGTRAP";
-    sigurg, "SIGURG";
-    sigxcpu, "SIGXCPU";
-    sigxfsz, "SIGXFSZ"; ]
+module Dump = struct
+  let sig_names =
+    Sys.[ sigabrt, "SIGABRT"; sigalrm, "SIGALRM"; sigfpe, "SIGFPE";
+          sighup, "SIGHUP"; sigill, "SIGILL"; sigint, "SIGINT";
+          sigkill, "SIGKILL"; sigpipe, "SIGPIPE"; sigquit, "SIGQUIT";
+          sigsegv, "SIGSEGV"; sigterm, "SIGTERM"; sigusr1, "SIGUSR1";
+          sigusr2, "SIGUSR2"; sigchld, "SIGCHLD"; sigcont, "SIGCONT";
+          sigstop, "SIGSTOP"; sigtstp, "SIGTSTP"; sigttin, "SIGTTIN";
+          sigttou, "SIGTTOU"; sigvtalrm, "SIGVTALRM"; sigprof, "SIGPROF";
+          sigbus, "SIGBUS"; sigpoll, "SIGPOLL"; sigsys, "SIGSYS";
+          sigtrap, "SIGTRAP"; sigurg, "SIGURG"; sigxcpu, "SIGXCPU";
+          sigxfsz, "SIGXFSZ"; ]
 
   let signal ppf s = match List.assq_opt s sig_names with
   | Some name -> string ppf name
