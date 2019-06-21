@@ -71,8 +71,6 @@ let iter_bindings ?sep:(pp_sep = cut) iter pp_binding ppf v =
 let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
 let ( ++ ) = append
 let concat ?sep pps ppf v = iter ?sep List.iter (fun ppf pp -> pp ppf v) ppf pps
-let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
-let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
 
 (* Base type formatters *)
 

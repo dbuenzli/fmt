@@ -148,12 +148,6 @@ val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
     [iter] over a value using [pp_binding]. Iterations are separated
     by [sep] (defaults to {!cut}). *)
 
-val prefix : unit t -> 'a t -> 'a t
-(** [prefix pp_pre pp] prefixes [pp] by [pp_pre]. *)
-
-val suffix : unit t -> 'a t -> 'a t
-(** [suffix pp_suf pp] suffixes [pp] by [pp_suf]. *)
-
 (** {1:basetypes Base type formatters} *)
 
 val bool : bool t
