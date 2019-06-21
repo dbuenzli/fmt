@@ -174,6 +174,19 @@ let quote ?(mark = "\"") pp_v =
 (* Stdlib type dumpers *)
 
 module Dump = struct
+
+  (* Sequencing *)
+
+  let iter iter_f pp_name pp_elt =
+    let pp_v = iter ~sep:sp iter_f (box pp_elt) in
+    parens (pp_name ++ sp ++ pp_v)
+
+  let iter_bindings iter_f pp_name pp_k pp_v =
+    let pp_v = iter_bindings ~sep:sp iter_f (pair pp_k pp_v) in
+    parens (pp_name ++ sp ++ pp_v)
+
+  (* Stlib types *)
+
   let sig_names =
     Sys.[ sigabrt, "SIGABRT"; sigalrm, "SIGALRM"; sigfpe, "SIGFPE";
           sighup, "SIGHUP"; sigill, "SIGILL"; sigint, "SIGINT";
@@ -207,19 +220,19 @@ module Dump = struct
   let array pp_elt = oxford_brackets (array ~sep:semi (box pp_elt))
   let seq pp_elt = brackets (seq ~sep:semi (box pp_elt))
 
-  let iter iter_f pp_name pp_elt =
-    let pp_v = iter ~sep:sp iter_f (box pp_elt) in
-    parens (pp_name ++ sp ++ pp_v)
-
-  let iter_bindings iter_f pp_name pp_k pp_v =
-    let pp_v = iter_bindings ~sep:sp iter_f (pair pp_k pp_v) in
-    parens (pp_name ++ sp ++ pp_v)
-
   let hashtbl pp_k pp_v =
     iter_bindings Hashtbl.iter (any "hashtbl") pp_k pp_v
 
   let stack pp_elt = iter Stack.iter (any "stack") pp_elt
   let queue pp_elt = iter Queue.iter (any "queue") pp_elt
+
+  (* Records *)
+
+  let field ?(label = string) l prj pp_v ppf v =
+    pf ppf "@[<1>%a =@ %a@]" label l pp_v (prj v)
+
+  let record pps =
+    box ~indent:2 (surround "{ " " }" @@ vbox (concat ~sep:(any ";@,") pps))
 end
 
 (* Text and lines *)
@@ -723,7 +736,7 @@ let styled style pp_v ppf v = match style_renderer ppf with
 
 let styled_unit style fmt = styled style (any fmt)
 
-(* Field *)
+(* Records *)
 
 let field ?(label = styled `Yellow string) l prj pp_v ppf v =
   pf ppf "@[<1>%a:@ %a@]" label l pp_v (prj v)

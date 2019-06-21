@@ -328,6 +328,18 @@ module Dump : sig
   (** [stack pp_v] formats an unspecified representation of an OCaml
       stack using [pp_v] to format its elements in top to bottom order. *)
 
+  (** {1:record Records} *)
+
+  val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
+  (** [field ~label l prj pp_v] pretty prints a named field using [label]
+      (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
+      for the field value. *)
+
+  val record : 'a t list -> 'a t
+  (** [record fields] pretty-prints a value using the concatenation of
+      [fields], separated by [";@,"], framed in a vertical
+      box and surrounded by {!braces}. *)
+
   (** {1:seq Sequencing}
 
       These are akin to {!iter} and {!iter_bindings} but
@@ -590,7 +602,7 @@ val set_style_renderer : Format.formatter -> style_renderer -> unit
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: its
     renderer is always [`None]. *)
 
-(** {1:fields Fields} *)
+(** {1:records Records} *)
 
 val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
 (** [field ~label l prj pp_v] pretty prints a named field using [label]
