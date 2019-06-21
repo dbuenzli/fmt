@@ -11,6 +11,7 @@
 * Add `Fmt.{error,error_msg}` to format `result` values.
 * Add `Fmt.failwith_notrace`.
 * Add `Fmt.( ++ )`, alias for `Fmt.append`.
+* Add `Fmt.Dump.string`.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
 * Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if 
   you were using it (backward compatible with earlier versions of `Fmt`).

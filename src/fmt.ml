@@ -204,7 +204,7 @@ module Dump = struct
   | None -> pf ppf "SIG(%d)" s
 
   let uchar ppf u = pf ppf "U+%04X" (Uchar.to_int u)
-
+  let string ppf s = pf ppf "%S" s
   let pair pp_fst pp_snd =
     parens (using fst (box pp_fst) ++ comma ++ using snd (box pp_snd))
 

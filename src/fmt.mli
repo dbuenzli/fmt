@@ -287,6 +287,9 @@ module Dump : sig
       {{:http://www.unicode.org/versions/latest/appA.pdf}notational
       convention} for code points. *)
 
+  val string : string t
+  (** [string] is [pf ppf "%S"]. *)
+
   val pair : 'a t -> 'b t -> ('a * 'b) t
   (** [pair pp_fst pp_snd] formats an OCaml pair using [pp_fst] and [pp_snd]
       for the first and second projection. *)
