@@ -119,9 +119,6 @@ val comma : 'a t
 val semi : 'a t
 (** [semi] is {!Fmt.any}[ ";@ "]. *)
 
-val dot : 'a t
-(** [dot] is {!Fmt.any}[ ".@ "]. *)
-
 (** {1:seq Sequencing} *)
 
 val append : 'a t -> 'a t -> 'a t

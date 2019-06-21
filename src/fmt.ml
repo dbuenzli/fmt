@@ -47,7 +47,6 @@ let sp ppf _ = Format.pp_print_space ppf ()
 let sps n ppf _ = Format.pp_print_break ppf n 0
 let comma ppf _ = Format.pp_print_string ppf ","; sp ppf ()
 let semi ppf _ = Format.pp_print_string ppf ";"; sp ppf ()
-let dot ppf _ = Format.pp_print_string ppf "."; sp ppf ()
 
 (* Sequencing *)
 

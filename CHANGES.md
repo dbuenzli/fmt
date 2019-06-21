@@ -7,7 +7,7 @@
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.[Dump.]{field,record}` for records (#9).
 * Add `Fmt.concat` to apply a list of formatters to a value.
-* Add `Fmt.{semi,dot,sps}`, separators.
+* Add `Fmt.{semi,sps}`, separators.
 * Add `Fmt.{error,error_msg}` to format `result` values.
 * Add `Fmt.failwith_notrace`.
 * Add `Fmt.( ++ )`, alias for `Fmt.append`.
