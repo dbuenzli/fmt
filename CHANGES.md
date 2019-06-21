@@ -9,7 +9,7 @@
   you were using it (backward compatible with earlier versions of `Fmt`).
 * Add `Fmt.( ++ )`, alias for `Fmt.append`.
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
-* Deprecate `Fmt.always` in favor of `Fmt.any`.
+* Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
 * Remove `Fmt.{prefix,suffix}` (specializes Fmt.( ++ )).
 
 v0.8.6 2019-04-01 La Forclaz (VS)

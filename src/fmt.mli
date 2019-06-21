@@ -94,9 +94,6 @@ val any : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 val using : ('a -> 'b) -> 'b t -> 'a t
 (** [using f pp ppf v] ppf ppf [(f v)]. *)
 
-val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
-(** [unit fmt] formats a unit value with the format [fmt]. *)
-
 val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
@@ -560,6 +557,9 @@ val str_like :
 
 val always : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 (** @deprecated use {!any} instead. *)
+
+val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
+(** @deprecated use {!any}. *)
 
 (** {1:nameconv Naming conventions}
 

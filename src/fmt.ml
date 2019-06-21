@@ -38,7 +38,6 @@ let nop fmt ppf = ()
 let any fmt ppf _ = pf ppf fmt
 let using f pp ppf v = pp ppf (f v)
 let const pp_v v ppf _ = pp_v ppf v
-let unit fmt ppf () = pf ppf fmt
 let fmt fmt ppf = pf ppf fmt
 
 (* Separators *)
@@ -567,7 +566,7 @@ let styled style pp_v ppf v = match style_renderer ppf with
       pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev; curr := prev
     with e -> curr := prev; raise e
 
-let styled_unit style fmt = styled style (unit fmt)
+let styled_unit style fmt = styled style (any fmt)
 
 (* Converting with string converters. *)
 
@@ -580,6 +579,7 @@ let strf = str
 let kstrf = kstr
 let strf_like = str_like
 let always = any
+let unit = any
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers
