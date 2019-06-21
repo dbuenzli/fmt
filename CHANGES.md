@@ -16,6 +16,7 @@
   you were using it (backward compatible with earlier versions of `Fmt`).
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
 * Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
+* Deprecate `Fmt.using`in favor `Fmt.pam`.
 * Remove `Fmt.{prefix,suffix}` (specializes Fmt.( ++ )).
 * No longer subvert the `Format` tag system to do dirty things.
   Thanks to David Kaloper Meršinjak for the work.
