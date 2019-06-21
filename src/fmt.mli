@@ -256,11 +256,6 @@ val char : char t
 val string : string t
 (** [string] is {!Format.pp_print_string}. *)
 
-val elided_string : max:int -> string t
-(** [elided_string ~max] formats a string using at most [max]
-    characters, eliding it if it is too long with three consecutive
-    dots which do count towards [max]. *)
-
 val buffer : Buffer.t t
 (** [buffer] formats a {!Buffer.t} value's current contents. *)
 
@@ -519,6 +514,11 @@ val text : string t
 val lines : string t
 (** [lines] formats lines by replacing newlines (['\n']) in the string
     with calls to {!Format.pp_force_newline}. *)
+
+val truncated : max:int -> string t
+(** [truncated ~max] formats a string using at most [max]
+    characters. If the string doesn't fit, it is truncated and ended
+    with three consecutive dots which do count towards [max]. *)
 
 val text_loc : ((int * int) * (int * int)) t
 (** [text_loc] formats a line-column text range according to

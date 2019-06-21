@@ -3,7 +3,7 @@
   Thanks to David Kaloper Meršinjak for the design and implementation..
 * Add `Fmt.si_size` to format integer magnitudes using SI prefixes.
 * Add `Fmt.uint64_ns_span`
-* Add `Fmt.elided_string` to elide your long strings.
+* Add `Fmt.truncated` to truncate your long strings.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.[Dump.]{field,record}` for records (#9).
 * Add `Fmt.concat` to apply a list of formatters to a value.
