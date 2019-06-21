@@ -413,6 +413,98 @@ let bi_byte_size ppf s =
   in
   _pp_byte_size 1024 "i" ppf s
 
+(* XXX From 4.08 on use Int64.unsigned_*
+
+    See Hacker's Delight for the implementation of these unsigned_* funs *)
+
+let unsigned_compare x0 x1 = Int64.(compare (sub x0 min_int) (sub x1 min_int))
+let unsigned_div n d = match d < Int64.zero with
+| true -> if unsigned_compare n d < 0 then Int64.zero else Int64.one
+| false ->
+    let q = Int64.(shift_left (div (shift_right_logical n 1) d) 1) in
+    let r = Int64.(sub n (mul q d)) in
+    if unsigned_compare r d >= 0 then Int64.succ q else q
+
+let unsigned_rem n d = Int64.(sub n (mul (unsigned_div n d) d))
+
+let us_span   =                  1_000L
+let ms_span   =              1_000_000L
+let sec_span  =          1_000_000_000L
+let min_span  =         60_000_000_000L
+let hour_span =       3600_000_000_000L
+let day_span  =     86_400_000_000_000L
+let year_span = 31_557_600_000_000_000L
+
+let rec pp_si_span unit_str si_unit si_higher_unit ppf span =
+  let geq x y = unsigned_compare x y >= 0 in
+  let m = unsigned_div span si_unit in
+  let n = unsigned_rem span si_unit in
+  match m with
+  | m when geq m 100L -> (* No fractional digit *)
+      let m_up = if Int64.equal n 0L then m else Int64.succ m in
+      let span' = Int64.mul m_up si_unit in
+      if geq span' si_higher_unit then uint64_ns_span ppf span' else
+      pf ppf "%Ld%s" m_up unit_str
+  | m when geq m 10L -> (* One fractional digit w.o. trailing zero *)
+      let f_factor = unsigned_div si_unit 10L in
+      let f_m = unsigned_div n f_factor in
+      let f_n = unsigned_rem n f_factor in
+      let f_m_up = if Int64.equal f_n 0L then f_m else Int64.succ f_m in
+      begin match f_m_up with
+      | 0L -> pf ppf "%Ld%s" m unit_str
+      | f when geq f 10L ->
+          uint64_ns_span ppf Int64.(add (mul m si_unit) (mul f f_factor))
+      | f -> pf ppf "%Ld.%Ld%s" m f unit_str
+      end
+  | m -> (* Two or zero fractional digits w.o. trailing zero *)
+      let f_factor = unsigned_div si_unit 100L in
+      let f_m = unsigned_div n f_factor in
+      let f_n = unsigned_rem n f_factor in
+      let f_m_up = if Int64.equal f_n 0L then f_m else Int64.succ f_m in
+      match f_m_up with
+      | 0L -> pf ppf "%Ld%s" m unit_str
+      | f when geq f 100L ->
+          uint64_ns_span ppf Int64.(add (mul m si_unit) (mul f f_factor))
+      | f when Int64.equal (Int64.rem f 10L) 0L ->
+          pf ppf "%Ld.%Ld%s" m (Int64.div f 10L) unit_str
+      | f ->
+          pf ppf "%Ld.%02Ld%s" m f unit_str
+
+and pp_non_si unit_str unit unit_lo_str unit_lo unit_lo_size ppf span =
+  let geq x y = unsigned_compare x y >= 0 in
+  let m = unsigned_div span unit in
+  let n = unsigned_rem span unit in
+  if Int64.equal n 0L then pf ppf "%Ld%s" m unit_str else
+  let f_m = unsigned_div n unit_lo in
+  let f_n = unsigned_rem n unit_lo in
+  let f_m_up = if Int64.equal f_n 0L then f_m else Int64.succ f_m in
+  match f_m_up with
+  | f when geq f unit_lo_size ->
+      uint64_ns_span ppf Int64.(add (mul m unit) (mul f unit_lo))
+  | f ->
+      pf ppf "%Ld%s%Ld%s" m unit_str f unit_lo_str
+
+and uint64_ns_span ppf span =
+  let geq x y = unsigned_compare x y >= 0 in
+  let lt x y = unsigned_compare x y = -1 in
+  match span with
+  | s when lt s us_span -> pf ppf "%Ldns" s
+  | s when lt s ms_span -> pp_si_span "us" us_span ms_span ppf s
+  | s when lt s sec_span -> pp_si_span "ms" ms_span sec_span ppf s
+  | s when lt s min_span -> pp_si_span "s" sec_span min_span ppf s
+  | s when lt s hour_span -> pp_non_si "min" min_span "s" sec_span 60L ppf s
+  | s when lt s day_span -> pp_non_si "h" hour_span "min" min_span 60L ppf s
+  | s when lt s year_span -> pp_non_si "d" day_span "h" hour_span 24L ppf s
+  | s ->
+      let m = unsigned_div s year_span in
+      let n = unsigned_rem s year_span in
+      if Int64.equal n 0L then pf ppf "%Lda" m else
+      let f_m = unsigned_div n day_span in
+      let f_n = unsigned_rem n day_span in
+      let f_m_up = if Int64.equal f_n 0L then f_m else Int64.succ f_m in
+      match f_m_up with
+      | f when geq f 366L -> pf ppf "%Lda" (Int64.succ m)
+      | f -> pf ppf "%Lda%Ldd" m f
 
 (* Binary formatting *)
 

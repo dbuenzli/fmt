@@ -1,18 +1,18 @@
 
-
-* Add support for hex dumping, see `Fmt.hex` and friends.
-  Thanks to David Kaloper Meršinjak for the work.
+* Add `Fmt.hex` and friends. Support for hex dumping.
+  Thanks to David Kaloper Meršinjak for the design and implementation..
 * Add `Fmt.si_size` to format integer magnitudes using SI prefixes.
+* Add `Fmt.uint64_ns_span`
 * Add `Fmt.elided_string` to elide your long strings.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.concat` to apply a list of formatters to a value.
 * Add `Fmt.{semi,dot,sps}`, separators.
 * Add `Fmt.{error,error_msg}` to format `result` values.
 * Add `Fmt.failwith_notrace`.
+* Add `Fmt.( ++ )`, alias for `Fmt.append`.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
 * Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if 
   you were using it (backward compatible with earlier versions of `Fmt`).
-* Add `Fmt.( ++ )`, alias for `Fmt.append`.
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
 * Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
 * Remove `Fmt.{prefix,suffix}` (specializes Fmt.( ++ )).
@@ -30,7 +30,6 @@ v0.8.6 2019-04-01 La Forclaz (VS)
 * Require at least OCaml 4.03 (drops dependency on `result` and `uchar`
   compatibility packages).
 
-
 v0.8.5 2017-12-27 La Forclaz (VS)
 ---------------------------------
 
@@ -44,7 +43,6 @@ v0.8.4 2017-07-08 Zagreb
 ------------------------
 
 * Add `Fmt.{invalid_arg,failwith}`. Thanks to Hezekiah M. Carty for the patch.
-
 
 v0.8.3 2017-04-13 La Forclaz (VS)
 ---------------------------------
@@ -81,7 +79,6 @@ v0.7.1 2015-12-03 Cambridge (UK)
 
 * Add optional cmdliner support. See the `Fmt_cli` module provided
   by the package `fmt.cli`.
-
 
 v0.7.0 2015-09-17 Cambridge (UK)
 --------------------------------

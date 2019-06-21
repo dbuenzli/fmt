@@ -450,6 +450,17 @@ val bi_byte_size : int t
     using {{:https://en.wikipedia.org/wiki/Binary_prefix}binary prefixes}
     up to pebi bytes (2{^15}). *)
 
+val uint64_ns_span : int64 t
+(** [uint64_ns_span] formats an {e unsigned} nanosecond time span
+    according to its magnitude using
+    {{:http://www.bipm.org/en/publications/si-brochure/chapter3.html}SI
+    prefixes} on seconds and
+    {{:http://www.bipm.org/en/publications/si-brochure/table6.html}accepted
+    non-SI units}. Years are counted in Julian years (365.25 SI-accepted days)
+    as {{:http://www.iau.org/publications/proceedings_rules/units/}defined}
+    by the International Astronomical Union (IAU). Only US-ASCII characters
+    are used ([us] is used for [µs]). *)
+
 (** {1:binary Binary data} *)
 
 type 'a vec = int * (int -> 'a)
