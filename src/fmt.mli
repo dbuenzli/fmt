@@ -204,6 +204,11 @@ val char : char t
 val string : string t
 (** [string] is {!Format.pp_print_string}. *)
 
+val elided_string : max:int -> string t
+(** [elided_string ~max] formats a string using at most [max]
+    characters, eliding it if it is too long with three consecutive
+    dots which do count towards [max]. *)
+
 val buffer : Buffer.t t
 (** [buffer] formats a {!Buffer.t} value's current contents. *)
 

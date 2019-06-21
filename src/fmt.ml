@@ -84,6 +84,12 @@ let uint64 ppf v = pf ppf "%Lu" v
 let unativeint ppf v = pf ppf "%nu" v
 let char = Format.pp_print_char
 let string = Format.pp_print_string
+let elided_string ~max ppf s = match String.length s <= max with
+| true -> Format.pp_print_string ppf s
+| false ->
+    for i = 0 to max - 4 do Format.pp_print_char ppf s.[i] done;
+    Format.pp_print_string ppf "..."
+
 let buffer ppf b = string ppf (Buffer.contents b)
 let exn ppf e = string ppf (Printexc.to_string e)
 let exn_backtrace ppf (e, bt) =
