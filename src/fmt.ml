@@ -71,6 +71,36 @@ let append pp_v0 pp_v1 ppf v = pp_v0 ppf v; pp_v1 ppf v
 let ( ++ ) = append
 let concat ?sep pps ppf v = iter ?sep List.iter (fun ppf pp -> pp ppf v) ppf pps
 
+(* Boxes *)
+
+let box ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_box ppf indent; pp_v ppf v; pp_close_box ppf ())
+
+let hbox pp_v ppf v =
+  Format.(pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
+
+let vbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_vbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+
+let hvbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+
+let hovbox ?(indent = 0) pp_v ppf v =
+  Format.(pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
+
+(* Brackets *)
+
+let surround s1 s2 pp_v ppf v =
+  Format.(pp_print_string ppf s1; pp_v ppf v; pp_print_string ppf s2)
+
+let parens pp_v = box ~indent:1 (surround "(" ")" pp_v)
+let brackets pp_v = box ~indent:1 (surround "[" "]" pp_v)
+let oxford_brackets pp_v = box ~indent:2 (surround "[|" "|]" pp_v)
+let braces pp_v = box ~indent:1 (surround "{" "}" pp_v)
+let quote ?(mark = "\"") pp_v =
+  let pp_mark ppf _ = Format.pp_print_as ppf 1 mark in
+  box ~indent:1 (pp_mark ++ pp_v ++ pp_mark)
+
 (* Stdlib types formatters *)
 
 let bool = Format.pp_print_bool
@@ -143,34 +173,6 @@ let hashtbl ?sep pp_binding = iter_bindings ?sep Hashtbl.iter pp_binding
 let queue ?sep pp_elt = iter Queue.iter pp_elt
 let stack ?sep pp_elt = iter Stack.iter pp_elt
 
-(* Boxes *)
-
-let box ?(indent = 0) pp_v ppf v =
-  Format.(pp_open_box ppf indent; pp_v ppf v; pp_close_box ppf ())
-
-let hbox pp_v ppf v =
-  Format.(pp_open_hbox ppf (); pp_v ppf v; pp_close_box ppf ())
-
-let vbox ?(indent = 0) pp_v ppf v =
-  Format.(pp_open_vbox ppf indent; pp_v ppf v; pp_close_box ppf ())
-
-let hvbox ?(indent = 0) pp_v ppf v =
-  Format.(pp_open_hvbox ppf indent; pp_v ppf v; pp_close_box ppf ())
-
-let hovbox ?(indent = 0) pp_v ppf v =
-  Format.(pp_open_hovbox ppf indent; pp_v ppf v; pp_close_box ppf ())
-
-(* Brackets *)
-
-let surround s1 s2 pp_v ppf v = string ppf s1; pp_v ppf v; string ppf s2
-let parens pp_v = box ~indent:1 (surround "(" ")" pp_v)
-let brackets pp_v = box ~indent:1 (surround "[" "]" pp_v)
-let oxford_brackets pp_v = box ~indent:2 (surround "[|" "|]" pp_v)
-let braces pp_v = box ~indent:1 (surround "{" "}" pp_v)
-let quote ?(mark = "\"") pp_v =
-  let pp_mark ppf _ = Format.pp_print_as ppf 1 mark in
-  box ~indent:1 (pp_mark ++ pp_v ++ pp_mark)
-
 (* Stdlib type dumpers *)
 
 module Dump = struct
@@ -234,117 +236,6 @@ module Dump = struct
   let record pps =
     box ~indent:2 (surround "{ " " }" @@ vbox (concat ~sep:(any ";@,") pps))
 end
-
-(* Text and lines *)
-
-let is_nl c = c = '\n'
-let is_nl_or_sp c = is_nl c || c = ' '
-let is_white = function ' ' | '\t' .. '\r'  -> true | _ -> false
-let not_white c = not (is_white c)
-let not_white_or_nl c = is_nl c || not_white c
-
-let rec stop_at sat ~start ~max s =
-  if start > max then start else
-  if sat s.[start] then start else
-  stop_at sat ~start:(start + 1) ~max s
-
-let sub s start stop ~max =
-  if start = stop then "" else
-  if start = 0 && stop > max then s else
-  String.sub s start (stop - start)
-
-let words ppf s =
-  let max = String.length s - 1 in
-  let rec loop start s = match stop_at is_white ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
-  | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
-      match stop_at not_white ~start:stop ~max s with
-      | stop when stop > max -> ()
-      | stop -> Format.pp_print_space ppf (); loop stop s
-  in
-  let start = stop_at not_white ~start:0 ~max s in
-  if start > max then () else loop start s
-
-let paragraphs ppf s =
-  let max = String.length s - 1 in
-  let rec loop start s = match stop_at is_white ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
-  | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
-      match stop_at not_white_or_nl ~start:stop ~max s with
-      | stop when stop > max -> ()
-      | stop ->
-          if s.[stop] <> '\n'
-          then (Format.pp_print_space ppf (); loop stop s) else
-          match stop_at not_white_or_nl ~start:(stop + 1) ~max s with
-          | stop when stop > max -> ()
-          | stop ->
-              if s.[stop] <> '\n'
-              then (Format.pp_print_space ppf (); loop stop s) else
-              match stop_at not_white ~start:(stop + 1) ~max s with
-              | stop when stop > max -> ()
-              | stop ->
-                  Format.pp_force_newline ppf ();
-                  Format.pp_force_newline ppf ();
-                  loop stop s
-  in
-  let start = stop_at not_white ~start:0 ~max s in
-  if start > max then () else loop start s
-
-let text ppf s =
-  let max = String.length s - 1 in
-  let rec loop start s = match stop_at is_nl_or_sp ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
-  | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
-      begin match s.[stop] with
-      | ' ' -> Format.pp_print_space ppf ()
-      | '\n' -> Format.pp_force_newline ppf ()
-      | _ -> assert false
-      end;
-      loop (stop + 1) s
-  in
-  loop 0 s
-
-let lines ppf s =
-  let max = String.length s - 1 in
-  let rec loop start s = match stop_at is_nl ~start ~max s with
-  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
-  | stop ->
-      Format.pp_print_string ppf (sub s start stop ~max);
-      Format.pp_force_newline ppf ();
-      loop (stop + 1) s
-  in
-  loop 0 s
-
-let text_loc ppf ((l0, c0), (l1, c1)) =
-  if (l0 : int) == (l1 : int) && (c0 : int) == (c1 : int)
-  then pf ppf "%d.%d" l0 c0
-  else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
-
-(* HCI fragments *)
-
-let one_of ?(empty = nop) pp_v ppf = function
-| [] -> empty ppf ()
-| [v] -> pp_v ppf v
-| [v0; v1] -> pf ppf "@[either %a or@ %a@]" pp_v v0 pp_v v1
-| _ :: _ as vs ->
-    let rec loop ppf = function
-    | [v] -> pf ppf "or@ %a" pp_v v
-    | v :: vs -> pf ppf "%a,@ " pp_v v; loop ppf vs
-    | [] -> assert false
-    in
-    pf ppf "@[one@ of@ %a@]" loop vs
-
-let did_you_mean
-    ?(pre = any "Unknown") ?(post = nop) ~kind pp_v ppf (v, hints)
-  =
-  match hints with
-  | [] -> pf ppf "@[%a %s %a%a.@]" pre () kind pp_v v post ()
-  | hints ->
-      pf ppf "@[%a %s %a%a.@ Did you mean %a ?@]"
-        pre () kind pp_v v post () (one_of pp_v) hints
 
 (* Magnitudes *)
 
@@ -451,7 +342,7 @@ let bi_byte_size ppf s =
 
 (* XXX From 4.08 on use Int64.unsigned_*
 
-    See Hacker's Delight for the implementation of these unsigned_* funs *)
+   See Hacker's Delight for the implementation of these unsigned_* funs *)
 
 let unsigned_compare x0 x1 = Int64.(compare (sub x0 min_int) (sub x1 min_int))
 let unsigned_div n d = match d < Int64.zero with
@@ -595,6 +486,117 @@ let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
 
 let hex ?(w = 16) () =
   addresses ~w ((octets ~w () |> box) ++ sps 2 ++ (ascii ~w () |> box))
+
+(* Text and lines *)
+
+let is_nl c = c = '\n'
+let is_nl_or_sp c = is_nl c || c = ' '
+let is_white = function ' ' | '\t' .. '\r'  -> true | _ -> false
+let not_white c = not (is_white c)
+let not_white_or_nl c = is_nl c || not_white c
+
+let rec stop_at sat ~start ~max s =
+  if start > max then start else
+  if sat s.[start] then start else
+  stop_at sat ~start:(start + 1) ~max s
+
+let sub s start stop ~max =
+  if start = stop then "" else
+  if start = 0 && stop > max then s else
+  String.sub s start (stop - start)
+
+let words ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_white ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      match stop_at not_white ~start:stop ~max s with
+      | stop when stop > max -> ()
+      | stop -> Format.pp_print_space ppf (); loop stop s
+  in
+  let start = stop_at not_white ~start:0 ~max s in
+  if start > max then () else loop start s
+
+let paragraphs ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_white ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      match stop_at not_white_or_nl ~start:stop ~max s with
+      | stop when stop > max -> ()
+      | stop ->
+          if s.[stop] <> '\n'
+          then (Format.pp_print_space ppf (); loop stop s) else
+          match stop_at not_white_or_nl ~start:(stop + 1) ~max s with
+          | stop when stop > max -> ()
+          | stop ->
+              if s.[stop] <> '\n'
+              then (Format.pp_print_space ppf (); loop stop s) else
+              match stop_at not_white ~start:(stop + 1) ~max s with
+              | stop when stop > max -> ()
+              | stop ->
+                  Format.pp_force_newline ppf ();
+                  Format.pp_force_newline ppf ();
+                  loop stop s
+  in
+  let start = stop_at not_white ~start:0 ~max s in
+  if start > max then () else loop start s
+
+let text ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_nl_or_sp ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      begin match s.[stop] with
+      | ' ' -> Format.pp_print_space ppf ()
+      | '\n' -> Format.pp_force_newline ppf ()
+      | _ -> assert false
+      end;
+      loop (stop + 1) s
+  in
+  loop 0 s
+
+let lines ppf s =
+  let max = String.length s - 1 in
+  let rec loop start s = match stop_at is_nl ~start ~max s with
+  | stop when stop > max -> Format.pp_print_string ppf (sub s start stop ~max)
+  | stop ->
+      Format.pp_print_string ppf (sub s start stop ~max);
+      Format.pp_force_newline ppf ();
+      loop (stop + 1) s
+  in
+  loop 0 s
+
+let text_loc ppf ((l0, c0), (l1, c1)) =
+  if (l0 : int) == (l1 : int) && (c0 : int) == (c1 : int)
+  then pf ppf "%d.%d" l0 c0
+  else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
+
+(* HCI fragments *)
+
+let one_of ?(empty = nop) pp_v ppf = function
+| [] -> empty ppf ()
+| [v] -> pp_v ppf v
+| [v0; v1] -> pf ppf "@[either %a or@ %a@]" pp_v v0 pp_v v1
+| _ :: _ as vs ->
+    let rec loop ppf = function
+    | [v] -> pf ppf "or@ %a" pp_v v
+    | v :: vs -> pf ppf "%a,@ " pp_v v; loop ppf vs
+    | [] -> assert false
+    in
+    pf ppf "@[one@ of@ %a@]" loop vs
+
+let did_you_mean
+    ?(pre = any "Unknown") ?(post = nop) ~kind pp_v ppf (v, hints)
+  =
+  match hints with
+  | [] -> pf ppf "@[%a %s %a%a.@]" pre () kind pp_v v post ()
+  | hints ->
+      pf ppf "@[%a %s %a%a.@ Did you mean %a ?@]"
+        pre () kind pp_v v post () (one_of pp_v) hints
 
 (* Conditional UTF-8 and styled formatting. *)
 

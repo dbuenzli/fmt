@@ -145,6 +145,58 @@ val iter_bindings : ?sep:unit t -> (('a -> 'b -> unit) -> 'c -> unit) ->
     [iter] over a value using [pp_binding]. Iterations are separated
     by [sep] (defaults to {!cut}). *)
 
+(** {1:boxes Boxes} *)
+
+val box : ?indent:int -> 'a t -> 'a t
+(** [box ~indent pp ppf] wraps [pp] in a pretty-printing box. The box tries to
+    print as much as possible on every line, while emphasizing the box structure
+    (see {!Format.pp_open_box}). Break hints that lead to a new line add
+    [indent] to the current indentation (defaults to [0]). *)
+
+val hbox : 'a t -> 'a t
+(** [hbox] is like {!box} but is a horizontal box: the line is not split
+    in this box (but may be in sub-boxes). See {!Format.pp_open_hbox}. *)
+
+val vbox : ?indent:int -> 'a t -> 'a t
+(** [vbox] is like {!box} but is a vertical box: every break hint leads
+    to a new line which adds [indent] to the current indentation
+    (defaults to [0]). See {!Format.pp_open_vbox}. *)
+
+val hvbox : ?indent:int -> 'a t -> 'a t
+(** [hvbox] is like {!hbox} if it fits on a single line, or like {!vbox}
+    otherwise. See {!Format.pp_open_hvbox}. *)
+
+val hovbox : ?indent:int -> 'a t -> 'a t
+(** [hovbox] is a condensed {!box}. See {!Format.pp_open_hovbox}. *)
+
+(** {1:bracks Brackets} *)
+
+val parens : 'a t -> 'a t
+(** [parens pp_v ppf] is [pf "@[<1>(%a)@]" pp_v]. *)
+
+val brackets : 'a t -> 'a t
+(** [brackets pp_v ppf] is [pf "@[<1>[%a]@]" pp_v]. *)
+
+val braces : 'a t -> 'a t
+(** [braces pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
+
+val quote : ?mark:string -> 'a t -> 'a t
+(** [quote ~mark pp_v ppf] is [pf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v mark],
+    [mark] defaults to ["\""], it is always counted as spanning as single
+    column (this allows for UTF-8 encoded marks). *)
+
+(** {1:records Records} *)
+
+val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
+(** [field ~label l prj pp_v] pretty prints a named field using [label]
+    (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
+    for the field value. *)
+
+val record : ?sep:unit t -> 'a t list -> 'a t
+(** [record ~sep fields] pretty-prints a value using the concatenation of
+    [fields], separated by [sep] (defaults to [cut]) and framed in a vertical
+    box. *)
+
 (** {1:stdlib Stdlib types}
 
     Formatters for structures give full control to the client over the
@@ -361,103 +413,6 @@ module Dump : sig
       [pp_name]. *)
 end
 
-(** {1:boxes Boxes} *)
-
-val box : ?indent:int -> 'a t -> 'a t
-(** [box ~indent pp ppf] wraps [pp] in a pretty-printing box. The box tries to
-    print as much as possible on every line, while emphasizing the box structure
-    (see {!Format.pp_open_box}). Break hints that lead to a new line add
-    [indent] to the current indentation (defaults to [0]). *)
-
-val hbox : 'a t -> 'a t
-(** [hbox] is like {!box} but is a horizontal box: the line is not split
-    in this box (but may be in sub-boxes). See {!Format.pp_open_hbox}. *)
-
-val vbox : ?indent:int -> 'a t -> 'a t
-(** [vbox] is like {!box} but is a vertical box: every break hint leads
-    to a new line which adds [indent] to the current indentation
-    (defaults to [0]). See {!Format.pp_open_vbox}. *)
-
-val hvbox : ?indent:int -> 'a t -> 'a t
-(** [hvbox] is like {!hbox} if it fits on a single line, or like {!vbox}
-    otherwise. See {!Format.pp_open_hvbox}. *)
-
-val hovbox : ?indent:int -> 'a t -> 'a t
-(** [hovbox] is a condensed {!box}. See {!Format.pp_open_hovbox}. *)
-
-(** {1:bracks Brackets} *)
-
-val parens : 'a t -> 'a t
-(** [parens pp_v ppf] is [pf "@[<1>(%a)@]" pp_v]. *)
-
-val brackets : 'a t -> 'a t
-(** [brackets pp_v ppf] is [pf "@[<1>[%a]@]" pp_v]. *)
-
-val braces : 'a t -> 'a t
-(** [braces pp_v ppf] is [pf "@[<1>{%a}@]" pp_v]. *)
-
-val quote : ?mark:string -> 'a t -> 'a t
-(** [quote ~mark pp_v ppf] is [pf "@[<1>@<1>%s%a@<1>%s@]" mark pp_v mark],
-    [mark] defaults to ["\""], it is always counted as spanning as single
-    column (this allows for UTF-8 encoded marks). *)
-
-(** {1:text Words, paragraphs, text and lines}
-
-    {b Note.} These functions only work on US-ASCII strings and/or
-    with newlines (['\n']). If you are dealing with UTF-8 strings or
-    different kinds of line endings you should use the pretty-printers
-    from {!Uuseg_string}.
-
-    {b White space.} White space is one of the following US-ASCII
-    characters: space [' '] ([0x20]), tab ['\t'] ([0x09]), newline
-    ['\n'] ([0x0A]), vertical tab ([0x0B]), form feed ([0x0C]),
-    carriage return ['\r'] ([0x0D]). *)
-
-val words : string t
-(** [words] formats words by suppressing initial and trailing
-    white space and replacing consecutive white space with
-    a single {!Format.pp_print_space}. *)
-
-val paragraphs : string t
-(** [paragraphs] formats paragraphs by suppressing initial and trailing
-    spaces and newlines, replacing blank lines (a line made only
-    of white space) by a two {!Format.pp_force_newline} and remaining
-    consecutive white space with a single {!Format.pp_print_space}. *)
-
-val text : string t
-(** [text] formats text by respectively replacing spaces and newlines in
-    the string with {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
-
-val lines : string t
-(** [lines] formats lines by replacing newlines (['\n']) in the string
-    with calls to {!Format.pp_force_newline}. *)
-
-val text_loc : ((int * int) * (int * int)) t
-(** [text_loc] formats a line-column text range according to
-    {{:http://www.gnu.org/prep/standards/standards.html#Errors}
-    GNU conventions}. *)
-
-(** {1:hci HCI fragments} *)
-
-val one_of : ?empty:unit t -> 'a t -> 'a list t
-(** [one_of ~empty pp_v ppf l] formats according to the length of [l]
-    {ul
-    {- [0], formats {!empty} (defaults to {!nop}).}
-    {- [1], formats the element with [pp_v].}
-    {- [2], formats ["either %a or %a"] with the list elements}
-    {- [n], formats ["one of %a, ... or %a"] with the list elements}} *)
-
-val did_you_mean :
-  ?pre:unit t -> ?post:unit t -> kind:string -> 'a t -> ('a * 'a list) t
-(** [did_you_mean ~pre kind ~post pp_v] formats a faulty value [v] of
-    kind [kind] and a list of [hints] that [v] could have been
-    mistaken for.
-
-    [pre] defaults to [unit "Unknown"], [post] to {!nop} they surround
-    the faulty value before the "did you mean" part as follows ["%a %s
-    %a%a." pre () kind pp_v v post ()]. If [hints] is empty no "did
-    you mean" part is printed. *)
-
 (** {1:mgs Magnitudes} *)
 
 val si_size : scale:int -> string -> int t
@@ -534,6 +489,63 @@ val hex : ?w:int -> unit -> char vec t
     matching the output of {e xxd} and forcing line breaks after every
     [w] characters (defaults to 16). *)
 
+(** {1:text Words, paragraphs, text and lines}
+
+    {b Note.} These functions only work on US-ASCII strings and/or
+    with newlines (['\n']). If you are dealing with UTF-8 strings or
+    different kinds of line endings you should use the pretty-printers
+    from {!Uuseg_string}.
+
+    {b White space.} White space is one of the following US-ASCII
+    characters: space [' '] ([0x20]), tab ['\t'] ([0x09]), newline
+    ['\n'] ([0x0A]), vertical tab ([0x0B]), form feed ([0x0C]),
+    carriage return ['\r'] ([0x0D]). *)
+
+val words : string t
+(** [words] formats words by suppressing initial and trailing
+    white space and replacing consecutive white space with
+    a single {!Format.pp_print_space}. *)
+
+val paragraphs : string t
+(** [paragraphs] formats paragraphs by suppressing initial and trailing
+    spaces and newlines, replacing blank lines (a line made only
+    of white space) by a two {!Format.pp_force_newline} and remaining
+    consecutive white space with a single {!Format.pp_print_space}. *)
+
+val text : string t
+(** [text] formats text by respectively replacing spaces and newlines in
+    the string with {!Format.pp_print_space} and {!Format.pp_force_newline}. *)
+
+val lines : string t
+(** [lines] formats lines by replacing newlines (['\n']) in the string
+    with calls to {!Format.pp_force_newline}. *)
+
+val text_loc : ((int * int) * (int * int)) t
+(** [text_loc] formats a line-column text range according to
+    {{:http://www.gnu.org/prep/standards/standards.html#Errors}
+    GNU conventions}. *)
+
+(** {1:hci HCI fragments} *)
+
+val one_of : ?empty:unit t -> 'a t -> 'a list t
+(** [one_of ~empty pp_v ppf l] formats according to the length of [l]
+    {ul
+    {- [0], formats {!empty} (defaults to {!nop}).}
+    {- [1], formats the element with [pp_v].}
+    {- [2], formats ["either %a or %a"] with the list elements}
+    {- [n], formats ["one of %a, ... or %a"] with the list elements}} *)
+
+val did_you_mean :
+  ?pre:unit t -> ?post:unit t -> kind:string -> 'a t -> ('a * 'a list) t
+(** [did_you_mean ~pre kind ~post pp_v] formats a faulty value [v] of
+    kind [kind] and a list of [hints] that [v] could have been
+    mistaken for.
+
+    [pre] defaults to [unit "Unknown"], [post] to {!nop} they surround
+    the faulty value before the "did you mean" part as follows ["%a %s
+    %a%a." pre () kind pp_v v post ()]. If [hints] is empty no "did
+    you mean" part is printed. *)
+
 (** {1:utf8_cond Conditional UTF-8 formatting}
 
     {b Note.} Since {!Format} is not UTF-8 aware using UTF-8 output
@@ -605,18 +617,6 @@ val set_style_renderer : Format.formatter -> style_renderer -> unit
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: its
     renderer is always [`None]. *)
 
-(** {1:records Records} *)
-
-val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
-(** [field ~label l prj pp_v] pretty prints a named field using [label]
-    (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
-    for the field value. *)
-
-val record : ?sep:unit t -> 'a t list -> 'a t
-(** [record ~sep fields] pretty-prints a value using the concatenation of
-    [fields], separated by [sep] (defaults to [cut]) and framed in a vertical
-    box. *)
-
 (** {1:stringconverters Converting with string value converters} *)
 
 val of_to_string : ('a -> string) -> 'a t
@@ -650,14 +650,14 @@ val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
     {ul
     {- [pp_ty] for a pretty printer that provides full control to the
        client and does not wrap the formatted value in an enclosing
-       box. See {{!polytypes}these examples}.}
+       box. See {{!stdlib}these examples}.}
     {- [pp_dump_ty] for a pretty printer that provides little control
        over the pretty-printing process, wraps the rendering in an
        enclosing box and tries as much as possible to respect the
        OCaml syntax. These pretty-printers should make it easy to
        inspect and understand values of the given type, they are
        mainly used for quick printf debugging and/or toplevel interaction.
-       See {{!Dump.polytypes} these examples}.}}
+       See {{!Dump.stdlib} these examples}.}}
 
     If you are in a situation where making a difference between [dump_ty]
     and [pp_ty] doesn't make sense then use [pp_ty].
