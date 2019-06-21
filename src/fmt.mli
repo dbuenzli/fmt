@@ -123,7 +123,7 @@ val semi : 'a t
 (** [semi] is {!Fmt.any}[ ";@ "]. *)
 
 val dot : 'a t
-(** [dot] is {!Fmt.any}[ ";@ "]. *)
+(** [dot] is {!Fmt.any}[ ".@ "]. *)
 
 (** {1:seq Sequencing} *)
 
