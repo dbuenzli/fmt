@@ -723,6 +723,11 @@ let styled style pp_v ppf v = match style_renderer ppf with
 
 let styled_unit style fmt = styled style (any fmt)
 
+(* Field *)
+
+let field ?(style = `Yellow) f pp_v ppf v =
+  pf ppf "@[<hov 1>%a:@ @[%a@]@]" (styled style string) f pp_v v
+
 (* Converting with string converters. *)
 
 let of_to_string f ppf v = string ppf (f v)

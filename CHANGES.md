@@ -5,6 +5,7 @@
 * Add `Fmt.uint64_ns_span`
 * Add `Fmt.elided_string` to elide your long strings.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
+* Add `Fmt.field`, for named fields (e.g. records #9).
 * Add `Fmt.concat` to apply a list of formatters to a value.
 * Add `Fmt.{semi,dot,sps}`, separators.
 * Add `Fmt.{error,error_msg}` to format `result` values.

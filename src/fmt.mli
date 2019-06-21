@@ -590,6 +590,13 @@ val set_style_renderer : Format.formatter -> style_renderer -> unit
     @raise Invalid_argument if [ppf] is {!Format.str_formatter}: its
     renderer is always [`None]. *)
 
+(** {1:fields Fields} *)
+
+val field : ?style:style -> string -> 'a t -> 'a t
+(** [field ~style l pp_v] pretty prints a named field using
+    [l] styled with [style] (default to [`Yellow]) for the label
+    and [pp_v] for the field value. *)
+
 (** {1:stringconverters Converting with string value converters} *)
 
 val of_to_string : ('a -> string) -> 'a t
