@@ -45,7 +45,7 @@ let fmt fmt ppf = pf ppf fmt
 
 let cut ppf _ = Format.pp_print_cut ppf ()
 let sp ppf _ = Format.pp_print_space ppf ()
-let nsp n ppf _ = Format.pp_print_break ppf n 0
+let sps n ppf _ = Format.pp_print_break ppf n 0
 let comma ppf _ = Format.pp_print_string ppf ","; sp ppf ()
 let semi ppf _ = Format.pp_print_string ppf ";"; sp ppf ()
 let dot ppf _ = Format.pp_print_string ppf "."; sp ppf ()
@@ -412,13 +412,13 @@ let ascii ?(w = 0) ?(subst = const char '.') () ppf (n, _ as v) =
     if '\x20' <= c && c < '\x7f' then char ppf c else subst ppf ()
   in
   vec pp_char ppf v;
-  if n < w then nsp (w - n) ppf ()
+  if n < w then sps (w - n) ppf ()
 
 let octets ?(w = 0) ?(sep = sp) () ppf (n, _ as v) =
   let pp_sep ppf i = if i > 0 && i mod 2 = 0 then sep ppf () in
   let pp_char ppf (i, c) = pp_sep ppf i; pf ppf "%02x" (Char.code c) in
   vec ~sep:nop pp_char ppf v;
-  for i = n to w - 1 do pp_sep ppf i; nsp 2 ppf () done
+  for i = n to w - 1 do pp_sep ppf i; sps 2 ppf () done
 
 let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
   let addr = match addr with
@@ -429,7 +429,7 @@ let addresses ?addr ?(w = 16) pp_vec ppf (n, _ as v) =
   vbox (vec pp_sub) ppf (sub_vecs w v)
 
 let hex ?(w = 16) () =
-  addresses ~w ((octets ~w () |> box) ++ nsp 2 ++ (ascii ~w () |> box))
+  addresses ~w ((octets ~w () |> box) ++ sps 2 ++ (ascii ~w () |> box))
 
 (* Conditional UTF-8 and styled formatting. *)
 

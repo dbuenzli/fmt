@@ -113,9 +113,8 @@ val cut : 'a t
 val sp : 'a t
 (** [sp] has the effect of {!Format.pp_print_space}. *)
 
-val nsp : int -> 'a t
-(** [nsp nspaces] has the effect of {!Format.pp_print_break}
-    with [offset] [0]. *)
+val sps : int -> 'a t
+(** [sps n] has the effect of {!Format.pp_print_break}[ n 0]. *)
 
 val comma : 'a t
 (** [comma] is {!Fmt.any}[ ",@ "]. *)

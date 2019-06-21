@@ -1,7 +1,7 @@
 
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.concat` to apply a list of formatters to a value.
-* Add `Fmt.{semi,dot,nsp}`, separators.
+* Add `Fmt.{semi,dot,sps}`, separators.
 * Add `Fmt.{error,error_msg}` to format `result` values.
 * Add `Fmt.failwith_notrace`.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
