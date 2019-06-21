@@ -592,10 +592,15 @@ val set_style_renderer : Format.formatter -> style_renderer -> unit
 
 (** {1:fields Fields} *)
 
-val field : ?style:style -> string -> 'a t -> 'a t
-(** [field ~style l pp_v] pretty prints a named field using
-    [l] styled with [style] (default to [`Yellow]) for the label
-    and [pp_v] for the field value. *)
+val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
+(** [field ~label l prj pp_v] pretty prints a named field using [label]
+    (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
+    for the field value. *)
+
+val record : ?sep:unit t -> 'a t list -> 'a t
+(** [record ~sep fields] pretty-prints a value using the concatenation of
+    [fields], separated by [sep] (defaults to [cut]) and framed in a vertical
+    box. *)
 
 (** {1:stringconverters Converting with string value converters} *)
 

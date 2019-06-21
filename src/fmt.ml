@@ -725,8 +725,10 @@ let styled_unit style fmt = styled style (any fmt)
 
 (* Field *)
 
-let field ?(style = `Yellow) f pp_v ppf v =
-  pf ppf "@[<hov 1>%a:@ @[%a@]@]" (styled style string) f pp_v v
+let field ?(label = styled `Yellow string) l prj pp_v ppf v =
+  pf ppf "@[<1>%a:@ %a@]" label l pp_v (prj v)
+
+let record ?(sep = cut) pps = vbox (concat ~sep pps)
 
 (* Converting with string converters. *)
 
