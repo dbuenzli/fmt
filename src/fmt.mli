@@ -422,6 +422,27 @@ val text_loc : ((int * int) * (int * int)) t
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 
+(** {1:hci HCI fragments} *)
+
+val one_of : ?empty:unit t -> 'a t -> 'a list t
+(** [one_of ~empty pp_v ppf l] formats according to the length of [l]
+    {ul
+    {- [0], formats {!empty} (defaults to {!nop}).}
+    {- [1], formats the element with [pp_v].}
+    {- [2], formats ["either %a or %a"] with the list elements}
+    {- [n], formats ["one of %a, ... or %a"] with the list elements}} *)
+
+val did_you_mean :
+  ?pre:unit t -> ?post:unit t -> kind:string -> 'a t -> ('a * 'a list) t
+(** [did_you_mean ~pre kind ~post pp_v] formats a faulty value [v] of
+    kind [kind] and a list of [hints] that [v] could have been
+    mistaken for.
+
+    [pre] defaults to [unit "Unknown"], [post] to {!nop} they surround
+    the faulty value before the "did you mean" part as follows ["%a %s
+    %a%a." pre () kind pp_v v post ()]. If [hints] is empty no "did
+    you mean" part is printed. *)
+
 (** {1:mgs Magnitudes} *)
 
 val si_size : scale:int -> string -> int t

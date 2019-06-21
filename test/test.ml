@@ -293,7 +293,6 @@ let test_uint64_ns_span () =
   assert (span "0u63115200_000_000_001" = "2a1d");
   ()
 
-
 let tests () =
   test_dump_uchar ();
   test_utf_8 ();

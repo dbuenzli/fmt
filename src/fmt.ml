@@ -310,6 +310,29 @@ let text_loc ppf ((l0, c0), (l1, c1)) =
   then pf ppf "%d.%d" l0 c0
   else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 
+(* HCI fragments *)
+
+let one_of ?(empty = nop) pp_v ppf = function
+| [] -> empty ppf ()
+| [v] -> pp_v ppf v
+| [v0; v1] -> pf ppf "@[either %a or@ %a@]" pp_v v0 pp_v v1
+| _ :: _ as vs ->
+    let rec loop ppf = function
+    | [v] -> pf ppf "or@ %a" pp_v v
+    | v :: vs -> pf ppf "%a,@ " pp_v v; loop ppf vs
+    | [] -> assert false
+    in
+    pf ppf "@[one@ of@ %a@]" loop vs
+
+let did_you_mean
+    ?(pre = any "Unknown") ?(post = nop) ~kind pp_v ppf (v, hints)
+  =
+  match hints with
+  | [] -> pf ppf "@[%a %s %a%a.@]" pre () kind pp_v v post ()
+  | hints ->
+      pf ppf "@[%a %s %a%a.@ Did you mean %a ?@]"
+        pre () kind pp_v v post () (one_of pp_v) hints
+
 (* Magnitudes *)
 
 let ilog10 x =
