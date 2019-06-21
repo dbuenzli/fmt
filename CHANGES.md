@@ -2,6 +2,7 @@
 
 * Add support for hex dumping, see `Fmt.hex` and friends.
   Thanks to David Kaloper Meršinjak for the work.
+* Add `Fmt.si_size` to format integer magnitudes using SI prefixes.
 * Add `Fmt.elided_string` to elide your long strings.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.concat` to apply a list of formatters to a value.

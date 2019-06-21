@@ -61,11 +61,91 @@ let test_kstr_str_like_partial_app () =
   ()
 
 
+let test_byte_size () =
+  let size s = Fmt.str "%a" Fmt.byte_size s in
+  assert (size 0 = "0B");
+  assert (size 999 = "999B");
+  assert (size 1000 = "1kB");
+  assert (size 1001 = "1.01kB");
+  assert (size 1010 = "1.01kB");
+  assert (size 1011 = "1.02kB");
+  assert (size 1020 = "1.02kB");
+  assert (size 1100 = "1.1kB");
+  assert (size 1101 = "1.11kB");
+  assert (size 1109 = "1.11kB");
+  assert (size 1111 = "1.12kB");
+  assert (size 1119 = "1.12kB");
+  assert (size 1120 = "1.12kB");
+  assert (size 1121 = "1.13kB");
+  assert (size 9990 = "9.99kB");
+  assert (size 9991 = "10kB");
+  assert (size 9999 = "10kB");
+  assert (size 10_000 = "10kB");
+  assert (size 10_001 = "10.1kB");
+  assert (size 10_002 = "10.1kB");
+  assert (size 10_099 = "10.1kB");
+  assert (size 10_100 = "10.1kB");
+  assert (size 10_100 = "10.1kB");
+  assert (size 10_101 = "10.2kB");
+  assert (size 10_199 = "10.2kB");
+  assert (size 10_199 = "10.2kB");
+  assert (size 10_200 = "10.2kB");
+  assert (size 10_201 = "10.3kB");
+  assert (size 99_901 = "100kB");
+  assert (size 99_999 = "100kB");
+  assert (size 100_000 = "100kB");
+  assert (size 100_001 = "101kB");
+  assert (size 100_999 = "101kB");
+  assert (size 101_000 = "101kB");
+  assert (size 101_001 = "102kB");
+  assert (size 999_000 = "999kB");
+  assert (size 999_001 = "1MB");
+  assert (size 999_999 = "1MB");
+  assert (size 1_000_000 = "1MB");
+  assert (size 1_000_001 = "1.01MB");
+  assert (size 1_009_999 = "1.01MB");
+  assert (size 1_010_000 = "1.01MB");
+  assert (size 1_010_001 = "1.02MB");
+  assert (size 1_019_999 = "1.02MB");
+  assert (size 1_020_000 = "1.02MB");
+  assert (size 1_020_001 = "1.03MB");
+  assert (size 1_990_000 = "1.99MB");
+  assert (size 1_990_001 = "2MB");
+  assert (size 1_999_999 = "2MB");
+  assert (size 2_000_000 = "2MB");
+  assert (size 9_990_000 = "9.99MB");
+  assert (size 9_990_001 = "10MB");
+  assert (size 9_990_999 = "10MB");
+  assert (size 10_000_000 = "10MB");
+  assert (size 10_000_001 = "10.1MB");
+  assert (size 10_099_999 = "10.1MB");
+  assert (size 10_100_000 = "10.1MB");
+  assert (size 10_900_001 = "11MB");
+  assert (size 10_999_999 = "11MB");
+  assert (size 11_000_000 = "11MB");
+  assert (size 11_000_001 = "11.1MB");
+  assert (size 99_900_000 = "99.9MB");
+  assert (size 99_900_001 = "100MB");
+  assert (size 99_999_999 = "100MB");
+  assert (size 100_000_000 = "100MB");
+  assert (size 100_000_001 = "101MB");
+  assert (size 100_999_999 = "101MB");
+  assert (size 101_000_000 = "101MB");
+  assert (size 101_000_000 = "101MB");
+  assert (size 999_000_000 = "999MB");
+  assert (size 999_000_001 = "1GB");
+  assert (size 999_999_999 = "1GB");
+  assert (size 1_000_000_000 = "1GB");
+  assert (size 1_000_000_001 = "1.01GB");
+  assert (size 1_000_000_001 = "1.01GB");
+  ()
+
 let tests () =
   test_dump_uchar ();
   test_utf_8 ();
   test_style_renderer ();
   test_kstr_str_like_partial_app ();
+  test_byte_size ();
   Printf.printf "Done.\n";
   ()
 

@@ -310,50 +310,109 @@ let text_loc ppf ((l0, c0), (l1, c1)) =
   then pf ppf "%d.%d" l0 c0
   else pf ppf "%d.%d-%d.%d" l0 c0 l1 c1
 
-(* Byte sizes *)
+(* Magnitudes *)
 
-let _pp_byte_size k i ppf s =
-  let pp_frac = float_dfrac 1 in
-  let div_round_up m n = (m + n - 1) / n in
-  let float = float_of_int in
-  if s < k then pf ppf "%dB" s else
-  let m = k * k in
-  if s < m then begin
-    let kstr = if i = "" then "k" (* SI *) else "K" (* IEC *) in
-    let sk = s / k in
-    if sk < 10
-    then pf ppf "%a%s%sB" pp_frac (float s /. float k) kstr i
-    else pf ppf "%d%s%sB" (div_round_up s k) kstr i
-  end else
-  let g = k * m in
-  if s < g then begin
-    let sm = s / m in
-    if sm < 10
-    then pf ppf "%aM%sB" pp_frac (float s /. float m) i
-    else pf ppf "%dM%sB" (div_round_up s m) i
-  end else
-  let t = k * g in
-  if s < t then begin
-    let sg = s / g in
-    if sg < 10
-    then pf ppf "%aG%sB" pp_frac (float s /. float g) i
-    else pf ppf "%dG%sB" (div_round_up s g) i
-  end else
-  let p = k * t in
-  if s < p then begin
-    let st = s / t in
-    if st < 10
-    then pf ppf "%aT%sB" pp_frac (float s /. float t) i
-    else pf ppf "%dT%sB" (div_round_up s t) i
-  end else begin
-    let sp = s / p in
-    if sp < 10
-    then pf ppf "%aP%sB" pp_frac (float s /. float p) i
-    else pf ppf "%dP%sB" (div_round_up s p) i
-  end
+let ilog10 x =
+  let rec loop p x = if x = 0 then p else loop (p + 1) (x / 10) in
+  loop (-1) x
 
-let byte_size ppf s = _pp_byte_size 1000 "" ppf s
-let bi_byte_size ppf s = _pp_byte_size 1024 "i" ppf s
+let ipow10 n =
+  let rec loop acc n = if n = 0 then acc else loop (acc * 10) (n - 1) in
+  loop 1 n
+
+let si_symb_max = 16
+let si_symb =
+  [| "y"; "z"; "a"; "f"; "p"; "n"; "u"; "m"; ""; "k"; "M"; "G"; "T"; "P";
+     "E"; "Z"; "Y"|]
+
+let rec pp_at_factor ~scale u symb factor ppf s =
+  let m = s / factor in
+  let n = s mod factor in
+  match m with
+  | m when m >= 100 -> (* No fractional digit *)
+      let m_up = if n > 0 then m + 1 else m in
+      if m_up >= 1000 then si_size ~scale u ppf (m_up * factor) else
+      pf ppf "%d%s%s" m_up symb u
+  | m when m >= 10 -> (* One fractional digit w.o. trailing 0 *)
+      let f_factor = factor / 10 in
+      let f_m = n / f_factor in
+      let f_n = n mod f_factor in
+      let f_m_up = if f_n > 0 then f_m + 1 else f_m in
+      begin match f_m_up with
+      | 0 -> pf ppf "%d%s%s" m symb u
+      | f when f >= 10 -> si_size ~scale u ppf (m * factor + f * f_factor)
+      | f -> pf ppf "%d.%d%s%s" m f symb u
+      end
+  | m -> (* Two or zero fractional digits w.o. trailing 0 *)
+      let f_factor = factor / 100 in
+      let f_m = n / f_factor in
+      let f_n = n mod f_factor in
+      let f_m_up = if f_n > 0 then f_m + 1 else f_m in
+      match f_m_up with
+      | 0 -> pf ppf "%d%s%s" m symb u
+      | f when f >= 100 -> si_size ~scale u ppf (m * factor + f * f_factor)
+      | f when f mod 10 = 0 -> pf ppf "%d.%d%s%s" m (f / 10) symb u
+      | f -> pf ppf "%d.%02d%s%s" m f symb u
+
+and si_size ~scale u ppf s = match scale < -8 || scale > 8 with
+| true -> invalid_arg "~scale is %d, must be in [-8;8]" scale
+| false ->
+    let pow_div_3 = if s = 0 then 0 else (ilog10 s / 3) in
+    let symb = (scale + 8) + pow_div_3 in
+    let symb, factor = match symb > si_symb_max with
+    | true -> si_symb_max, ipow10 ((8 - scale) * 3)
+    | false -> symb, ipow10 (pow_div_3 * 3)
+    in
+    if factor = 1
+    then pf ppf "%d%s%s" s si_symb.(symb) u
+    else pp_at_factor ~scale u si_symb.(symb) factor ppf s
+
+let byte_size ppf s = si_size ~scale:0 "B" ppf s
+
+let bi_byte_size ppf s =
+  (* XXX we should get rid of this. *)
+  let _pp_byte_size k i ppf s =
+    let pp_frac = float_dfrac 1 in
+    let div_round_up m n = (m + n - 1) / n in
+    let float = float_of_int in
+    if s < k then pf ppf "%dB" s else
+    let m = k * k in
+    if s < m then begin
+      let kstr = if i = "" then "k" (* SI *) else "K" (* IEC *) in
+      let sk = s / k in
+      if sk < 10
+      then pf ppf "%a%s%sB" pp_frac (float s /. float k) kstr i
+      else pf ppf "%d%s%sB" (div_round_up s k) kstr i
+    end else
+    let g = k * m in
+    if s < g then begin
+      let sm = s / m in
+      if sm < 10
+      then pf ppf "%aM%sB" pp_frac (float s /. float m) i
+      else pf ppf "%dM%sB" (div_round_up s m) i
+    end else
+    let t = k * g in
+    if s < t then begin
+      let sg = s / g in
+      if sg < 10
+      then pf ppf "%aG%sB" pp_frac (float s /. float g) i
+      else pf ppf "%dG%sB" (div_round_up s g) i
+    end else
+    let p = k * t in
+    if s < p then begin
+      let st = s / t in
+      if st < 10
+      then pf ppf "%aT%sB" pp_frac (float s /. float t) i
+      else pf ppf "%dT%sB" (div_round_up s t) i
+    end else begin
+      let sp = s / p in
+      if sp < 10
+      then pf ppf "%aP%sB" pp_frac (float s /. float p) i
+      else pf ppf "%dP%sB" (div_round_up s p) i
+    end
+  in
+  _pp_byte_size 1024 "i" ppf s
+
 
 (* Binary formatting *)
 

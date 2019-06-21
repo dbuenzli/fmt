@@ -422,12 +422,28 @@ val text_loc : ((int * int) * (int * int)) t
     {{:http://www.gnu.org/prep/standards/standards.html#Errors}
     GNU conventions}. *)
 
-(** {1 Byte sizes} *)
+(** {1:mgs Magnitudes} *)
+
+val si_size : scale:int -> string -> int t
+(** [si_size ~scale unit] formats a non negative integer
+    representing unit [unit] at scale 10{^scale * 3}, depending on
+    its magnitude, using power of 3
+    {{:https://www.bipm.org/en/publications/si-brochure/chapter3.html}
+    SI prefixes} (i.e. all of them except deca, hector, deci and
+    centi). Only US-ASCII characters are used, [µ] (10{^-6}) is
+    written using [u].
+
+    [scale] indicates the scale 10{^scale * 3} an integer
+    represents, for example [-1] for m[unit] (10{^-3}), [0] for
+    [unit] (10{^0}), [1] for [kunit] (10{^3}); it must be in the
+    range \[[-8];[8]\] or [Invalid_argument] is raised.
+
+    Except at the maximal yotta scale always tries to show three
+    digits of data with trailing fractional zeros omited. Rounds
+    towards positive infinity (over approximates).  *)
 
 val byte_size : int t
-(** [byte_size] formats a byte size according to its magnitude
-    using {{:http://www.bipm.org/en/publications/si-brochure/chapter3.html}
-    SI prefixes} up to peta bytes (10{^15}). *)
+(** [byte_size] is [si_size ~scale:0 "B"]. *)
 
 val bi_byte_size : int t
 (** [bi_byte_size] formats a byte size according to its magnitude
