@@ -569,7 +569,7 @@ val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
     {- [pp_ty] for a pretty printer that provides full control to the
        client and does not wrap the formatted value in an enclosing
        box. See {{!polytypes}these examples}.}
-    {- [dump_ty] for a pretty printer that provides little control
+    {- [pp_dump_ty] for a pretty printer that provides little control
        over the pretty-printing process, wraps the rendering in an
        enclosing box and tries as much as possible to respect the
        OCaml syntax. These pretty-printers should make it easy to
@@ -582,7 +582,7 @@ val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
 
     For a type [ty] that is the main type of the module (the "[M.t]"
     convention) drop the suffix, that is simply use [M.pp] and
-    [M.dump]. *)
+    [M.pp_dump]. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers
