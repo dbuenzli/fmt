@@ -187,10 +187,11 @@ val quote : ?mark:string -> 'a t -> 'a t
 val id : 'a -> 'a
 (** [id] is {!Fun.id}. *)
 
-val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
-(** [field ~label l prj pp_v] pretty prints a named field using [label]
-    (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
-    for the field value. *)
+val field :
+  ?label:string t -> ?sep:unit t -> string -> ('b -> 'a) -> 'a t -> 'b t
+(** [field ~label ~sep l prj pp_v] pretty prints a labelled field value as
+    [pf "@[<1>%a%a%a@]" label l sep () (using prj pp_v)]. [label] defaults
+    to [styled `Yellow string] and [sep] to [any ":@ "]. *)
 
 val record : ?sep:unit t -> 'a t list -> 'a t
 (** [record ~sep fields] pretty-prints a value using the concatenation of
