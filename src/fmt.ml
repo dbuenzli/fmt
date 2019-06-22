@@ -739,6 +739,7 @@ let styled_unit style fmt = styled style (any fmt)
 
 (* Records *)
 
+external id : 'a -> 'a = "%identity"
 let field ?(label = styled `Yellow string) l prj pp_v ppf v =
   pf ppf "@[<1>%a:@ %a@]" label l pp_v (prj v)
 

@@ -184,6 +184,9 @@ val quote : ?mark:string -> 'a t -> 'a t
 
 (** {1:records Records} *)
 
+val id : 'a -> 'a
+(** [id] is {!Fun.id}. *)
+
 val field : ?label:string t -> string -> ('b -> 'a) -> 'a t -> 'b t
 (** [field ~label l prj pp_v] pretty prints a named field using [label]
     (defaults to [styled `Yellow string]) for the label, and [using prj pp_v]
