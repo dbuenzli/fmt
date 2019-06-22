@@ -36,11 +36,11 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 (** [epr] is [pf stderr]. *)
 
 val str : ('a, Format.formatter, unit, string) format4 -> 'a
-(** [strf] is {!Format.asprintf}.
+(** [str] is {!Format.asprintf}.
 
     {b Note.} When using [strf] {!utf_8} and {!style_renderer} are
     always respectively set to [true] and [`None]. See also
-    {!strf_like}. *)
+    {!str_like}. *)
 
 val kpf : (Format.formatter -> 'a) -> Format.formatter ->
   ('b, Format.formatter, unit, 'a) Stdlib.format4 -> 'b
@@ -631,10 +631,10 @@ val to_to_string : 'a t -> 'a -> string
 val strf : ('a, Format.formatter, unit, string) format4 -> 'a
 (** @deprecated use {!str} instead. *)
 
-val kstr : (string -> 'a) -> ('b, Format.formatter, unit, 'a) format4 -> 'b
+val kstrf : (string -> 'a) -> ('b, Format.formatter, unit, 'a) format4 -> 'b
 (** @deprecated use {!kstr} instead. *)
 
-val str_like :
+val strf_like :
   Format.formatter -> ('a, Format.formatter, unit, string) format4 -> 'a
 (** @deprecated use {!str_like} instead. *)
 
