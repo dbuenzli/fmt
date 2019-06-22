@@ -757,6 +757,8 @@ let kstrf = kstr
 let strf_like = str_like
 let always = any
 let unit = any
+let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
+let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers
