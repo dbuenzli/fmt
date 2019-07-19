@@ -645,10 +645,10 @@ val unit : (unit, Format.formatter, unit) Stdlib.format -> unit t
 (** @deprecated use {!any}. *)
 
 val prefix : unit t -> 'a t -> 'a t
-(** @deprecated use {!( ++ }}. *)
+(** @deprecated use {!( ++ )}. *)
 
 val suffix : unit t -> 'a t -> 'a t
-(** @deprecated use {!( ++ }}. *)
+(** @deprecated use {!( ++ )}. *)
 
 (** {1:nameconv Naming conventions}
 

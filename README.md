@@ -14,7 +14,6 @@ Fmt is distributed under the ISC license.
 [cmdliner]: http://erratique.ch/software/cmdliner
 
 Home page: http://erratique.ch/software/fmt  
-Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
 
 ## Installation
 
