@@ -572,30 +572,27 @@ val set_utf_8 : Format.formatter -> bool -> unit
 
 (** {1:styled Styled formatting} *)
 
-type colour =
-  [ `Black | `Red | `Green | `Yellow | `Blue | `Magenta | `Cyan | `White ]
-(** The type for colours. *)
+type color =
+  [ `Black | `Blue | `Cyan | `Green | `Magenta | `Red | `White | `Yellow ]
+(** The type for colors. *)
 
 type style =
-  [ `Bold | `Italic | `Underline | `Reverse
-  | colour | `Hi of colour
-  | `Bg of [ colour | `Hi of colour ]
-  | `None ]
+  [ `None |  `Bold | `Faint | `Italic | `Underline | `Reverse
+  | `Fg of [ color | `Hi of color ]
+  | `Bg of [ color | `Hi of color ]
+  | color (** deprecated *) ]
 (** The type for styles:
     {ul
-    {- [`None] resets the styling;}
-    {- [`Bold], [`Italic], [`Underline] and [`Reverse] are display attributes;}
-    {- [#colour] is the foreground colour;}
-    {- [`Hi #colour] is the high-intensity foreground colour;}
-    {- [`Bg #colour] is the background colour; and}
-    {- [`Bg (`Hi #colour)] is the high-intensity background colour.}} *)
+    {- [`None] resets the styling.}
+    {- [`Bold], [`Faint], [`Italic], [`Underline] and [`Reverse] are
+       display attributes.}
+    {- [`Fg _] is the foreground color or high-intensity color on [`Hi _].}
+    {- [`Bg _] is the foreground color or high-intensity color on [`Hi _].}
+    {- [#color] is the foreground colour, {b deprecated} use [`Fg
+       #color] instead.}} *)
 
 val styled : style -> 'a t -> 'a t
 (** [styled s pp] formats like [pp] but styled with [s]. *)
-
-val styled_unit :
-  style -> (unit, Format.formatter, unit) Stdlib.format -> unit t
-(** [styled_unit s fmt] is [style s (unit fmt)]. *)
 
 (** {2 Style rendering control} *)
 
@@ -649,6 +646,10 @@ val prefix : unit t -> 'a t -> 'a t
 
 val suffix : unit t -> 'a t -> 'a t
 (** @deprecated use {!( ++ )}. *)
+
+val styled_unit :
+  style -> (unit, Format.formatter, unit) Stdlib.format -> unit t
+(** @deprecated, use [styled s (any fmt)] instead *)
 
 (** {1:nameconv Naming conventions}
 

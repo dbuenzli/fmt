@@ -669,27 +669,29 @@ let if_utf_8 pp_u pp = fun ppf v -> (if utf_8 ppf then pp_u else pp) ppf v
 
 (* Styled formatting *)
 
-type colour =
-  [ `Black | `Red | `Green | `Yellow | `Blue | `Magenta | `Cyan | `White ]
+type color =
+  [ `Black | `Blue | `Cyan | `Green | `Magenta | `Red | `White | `Yellow ]
 
 type style =
-  [ `Bold | `Italic | `Underline | `Reverse
-  | colour | `Hi of colour | `Bg of [ colour | `Hi of colour ]
-  | `None ]
+  [ `None |  `Bold | `Faint | `Italic | `Underline | `Reverse
+  | `Fg of [ color | `Hi of color ]
+  | `Bg of [ color | `Hi of color ]
+  | color (** deprecated *) ]
 
 let ansi_style_code = function
 | `Bold -> "1"
+| `Faint -> "2"
 | `Italic -> "3"
 | `Underline -> "4"
 | `Reverse -> "7"
-| `Black -> "30"
-| `Red -> "31"
-| `Green -> "32"
-| `Yellow -> "33"
-| `Blue -> "34"
-| `Magenta -> "35"
-| `Cyan -> "36"
-| `White -> "37"
+| `Fg `Black -> "30"
+| `Fg `Red -> "31"
+| `Fg `Green -> "32"
+| `Fg `Yellow -> "33"
+| `Fg `Blue -> "34"
+| `Fg `Magenta -> "35"
+| `Fg `Cyan -> "36"
+| `Fg `White -> "37"
 | `Bg `Black -> "40"
 | `Bg `Red -> "41"
 | `Bg `Green -> "42"
@@ -698,14 +700,14 @@ let ansi_style_code = function
 | `Bg `Magenta -> "45"
 | `Bg `Cyan -> "46"
 | `Bg `White -> "47"
-| `Hi `Black -> "90"
-| `Hi `Red -> "91"
-| `Hi `Green -> "92"
-| `Hi `Yellow -> "93"
-| `Hi `Blue -> "94"
-| `Hi `Magenta -> "95"
-| `Hi `Cyan -> "96"
-| `Hi `White -> "97"
+| `Fg (`Hi `Black) -> "90"
+| `Fg (`Hi `Red) -> "91"
+| `Fg (`Hi `Green) -> "92"
+| `Fg (`Hi `Yellow) -> "93"
+| `Fg (`Hi `Blue) -> "94"
+| `Fg (`Hi `Magenta) -> "95"
+| `Fg (`Hi `Cyan) -> "96"
+| `Fg (`Hi `White) -> "97"
 | `Bg (`Hi `Black) -> "100"
 | `Bg (`Hi `Red) -> "101"
 | `Bg (`Hi `Green) -> "102"
@@ -715,6 +717,15 @@ let ansi_style_code = function
 | `Bg (`Hi `Cyan) -> "106"
 | `Bg (`Hi `White) -> "107"
 | `None -> "0"
+(* deprecated *)
+| `Black -> "30"
+| `Red -> "31"
+| `Green -> "32"
+| `Yellow -> "33"
+| `Blue -> "34"
+| `Magenta -> "35"
+| `Cyan -> "36"
+| `White -> "37"
 
 let pp_sgr ppf style =
   Format.pp_print_as ppf 0 "\027[";
@@ -728,19 +739,18 @@ let styled style pp_v ppf v = match style_renderer ppf with
 | `Ansi_tty ->
     let curr = match get curr_style ppf with
     | None -> let s = ref "0" in set curr_style s ppf; s
-    | Some s -> s in
+    | Some s -> s
+    in
     let prev = !curr and here = ansi_style_code style in
     curr := (match style with `None -> here | _ -> prev ^ ";" ^ here);
-    try
-      pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev; curr := prev
-    with e -> curr := prev; raise e
-
-let styled_unit style fmt = styled style (any fmt)
+    try pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev; curr := prev with
+    | e -> curr := prev; raise e
 
 (* Records *)
 
 external id : 'a -> 'a = "%identity"
-let field ?(label = styled `Yellow string) ?(sep = any ":@ ") l prj pp_v ppf v =
+let label = styled (`Fg `Yellow) string
+let field ?(label = label) ?(sep = any ":@ ") l prj pp_v ppf v =
   pf ppf "@[<1>%a%a%a@]" label l sep () pp_v (prj v)
 
 let record ?(sep = cut) pps = vbox (concat ~sep pps)
@@ -759,6 +769,7 @@ let always = any
 let unit = any
 let prefix pp_p pp_v ppf v = pp_p ppf (); pp_v ppf v
 let suffix pp_s pp_v ppf v = pp_v ppf v; pp_s ppf ()
+let styled_unit style fmt = styled style (any fmt)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2014 The fmt programmers

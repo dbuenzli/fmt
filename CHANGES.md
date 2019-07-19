@@ -2,7 +2,7 @@
 * Add `Fmt.hex` and friends. Support for hex dumping.
   Thanks to David Kaloper Meršinjak for the design and implementation..
 * Add `Fmt.si_size` to format integer magnitudes using SI prefixes.
-* Add `Fmt.uint64_ns_span`
+* Add `Fmt.uint64_ns_span` to format time spans.
 * Add `Fmt.truncated` to truncate your long strings.
 * Add `Fmt.flush`, has the effect of `Format.pp_print_flush`.
 * Add `Fmt.[Dump.]{field,record}` for records (#9).
@@ -12,12 +12,14 @@
 * Add `Fmt.failwith_notrace`.
 * Add `Fmt.( ++ )`, alias for `Fmt.append`.
 * Add `Fmt.Dump.string`.
+* Add more ANSI tty formatting styles and make them composable.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
 * Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if 
   you were using it (backward compatible with earlier versions of `Fmt`).
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
 * Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
 * Deprecate `Fmt.{prefix,suffix}` (specializes Fmt.( ++ )).
+* Deprecate `Fmt.styled_unit`.
 * No longer subvert the `Format` tag system to do dirty things.
   Thanks to David Kaloper Meršinjak for the work.
 
