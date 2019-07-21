@@ -1,3 +1,5 @@
+v0.8.7 2019-07-21 Zagreb
+------------------------
 
 * Add `Fmt.hex` and friends. Support for hex dumping.
   Thanks to David Kaloper Meršinjak for the design and implementation..
