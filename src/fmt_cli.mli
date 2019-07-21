@@ -4,9 +4,7 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** {!Cmdliner} support for [Fmt].
-
-    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
+(** {!Cmdliner} support for [Fmt]. *)
 
 (** {1 Option for setting the style renderer} *)
 

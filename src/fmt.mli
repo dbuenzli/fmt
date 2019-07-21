@@ -12,9 +12,7 @@
     {ul
     {- The {!Format} module documentation.}
     {- The required reading {!Format} module
-       {{:https://ocaml.org/learn/tutorials/format.html}tutorial}.}}
-
-    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
+       {{:https://ocaml.org/learn/tutorials/format.html}tutorial}.}} *)
 
 (** {1:stdos Standard outputs} *)
 

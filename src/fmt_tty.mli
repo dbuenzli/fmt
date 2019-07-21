@@ -14,9 +14,7 @@
        used otherwise.}
     {- {!Fmt.set_utf_8}. [true] is used if one of the following
        environment variables has ["UTF-8"] as a case insensitive
-       substring: [LANG], [LC_ALL], [LC_CTYPE].}}
-
-    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
+       substring: [LANG], [LC_ALL], [LC_CTYPE].}} *)
 
 (** {1:tty_setup TTY setup} *)
 
