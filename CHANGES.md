@@ -1,6 +1,7 @@
 v0.8.7 2019-07-21 Zagreb
 ------------------------
 
+* Require OCaml 4.05.
 * Add `Fmt.hex` and friends. Support for hex dumping.
   Thanks to David Kaloper Meršinjak for the design and implementation..
 * Add `Fmt.si_size` to format integer magnitudes using SI prefixes.
