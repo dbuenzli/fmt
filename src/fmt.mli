@@ -72,7 +72,7 @@ val error : ('b, Format.formatter , unit, ('a, string) result) format4 -> 'b
 (** [error fmt ...] is [kstr (fun s -> Error s) fmt ...] *)
 
 val error_msg :
-  ('b, Format.formatter , unit, ('a, [`Msg of string]) result) format4 -> 'b
+  ('b, Format.formatter , unit, ('a, [> `Msg of string]) result) format4 -> 'b
 (** [error_msg fmt ...] is [kstr (fun s -> Error (`Msg s)) fmt ...] *)
 
 (** {1 Formatters} *)

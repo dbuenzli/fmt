@@ -1,3 +1,8 @@
+
+* Open the result of `Fmt.error_msg` to make it easier
+  to compose with other errors. Thanks to Thomas Leonard 
+  for the patch.
+
 v0.8.8 2019-08-01 Zagreb
 ------------------------
 
