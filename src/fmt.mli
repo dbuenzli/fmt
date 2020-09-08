@@ -36,7 +36,7 @@ val epr : ('a, Format.formatter, unit) format -> 'a
 val str : ('a, Format.formatter, unit, string) format4 -> 'a
 (** [str] is {!Format.asprintf}.
 
-    {b Note.} When using [strf] {!utf_8} and {!style_renderer} are
+    {b Note.} When using [str], {!utf_8} and {!style_renderer} are
     always respectively set to [true] and [`None]. See also
     {!str_like}. *)
 
