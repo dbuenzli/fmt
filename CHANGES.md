@@ -1,4 +1,5 @@
-
+* Fix `Dump.{iter_bindings,hashtbl}` which since 0.8.7 no longer 
+  prints seperators. Thanks to Edwin Török for the patch.
 * Open the result of `Fmt.error_msg` to make it easier
   to compose with other errors. Thanks to Thomas Leonard 
   for the patch.
