@@ -1,3 +1,6 @@
+v0.8.9 2020-09-23 Zagreb
+------------------------
+
 * Fix `Dump.{iter_bindings,hashtbl}` which since 0.8.7 no longer 
   prints seperators. Thanks to Edwin Török for the patch.
 * Open the result of `Fmt.error_msg` to make it easier
