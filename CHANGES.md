@@ -1,8 +1,9 @@
 
 
-
 * Require OCaml >= 4.08. This drops the dependency on the 
   `stdlib-shims` and `seq` packages.
+* Add the `[@@ocaml.deprecated]` annotation to deprecated 
+  functions. Thanks to Antonin Décimo for the patch.
 
 v0.8.9 2020-09-23 Zagreb
 ------------------------
