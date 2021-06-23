@@ -170,7 +170,7 @@ let stack ?sep pp_elt = iter Stack.iter pp_elt
 
 module Dump = struct
 
-  (* Stlib types *)
+  (* Stdlib types *)
 
   let sig_names =
     Sys.[ sigabrt, "SIGABRT"; sigalrm, "SIGALRM"; sigfpe, "SIGFPE";
