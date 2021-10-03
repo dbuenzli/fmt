@@ -1,4 +1,4 @@
-PKG cmdliner result
+PKG b0.kit cmdliner
 S src
 S test
 B _build/**
