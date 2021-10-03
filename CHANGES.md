@@ -1,3 +1,9 @@
+
+
+
+* Require OCaml >= 4.08. This drops the dependency on the 
+  `stdlib-shims` and `seq` packages.
+
 v0.8.9 2020-09-23 Zagreb
 ------------------------
 
