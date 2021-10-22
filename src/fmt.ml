@@ -757,11 +757,11 @@ let styled style pp_v ppf v = match style_renderer ppf with
     let finally () = set curr_style prev ppf in
     set curr_style curr ppf;
     Fun.protect ~finally @@ fun () ->
-    pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev;
+    pp_sgr ppf here; pp_v ppf v; pp_sgr ppf prev
 
 (* Records *)
 
-external id : 'a -> 'a = "%identity"
+let id = Fun.id
 let label = styled (`Fg `Yellow) string
 let field ?(label = label) ?(sep = any ":@ ") l prj pp_v ppf v =
   pf ppf "@[<1>%a%a%a@]" label l sep () pp_v (prj v)
