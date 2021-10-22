@@ -1,5 +1,6 @@
 
 
+* Add alert messages to deprecation annotations (#47).
 * The solution using ephemerons introduced in v0.8.7 for attaching
   custom data to formatters has unreliable performance characteristics
   in some usage scenarios. Namely use of `Fmt.styled` with
