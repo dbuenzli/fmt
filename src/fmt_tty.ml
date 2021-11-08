@@ -46,7 +46,7 @@ let setup ?style_renderer ?utf_8 oc =
   | Some b -> b
   | None ->
       let has_utf_8 var =
-        try is_infix "UTF-8" (String.uppercase_ascii (Sys.getenv var))
+        try is_infix ~affix:"UTF-8" (String.uppercase_ascii (Sys.getenv var))
         with Not_found -> false
       in
       has_utf_8 "LANG" || has_utf_8 "LC_ALL" || has_utf_8 "LC_CTYPE"
