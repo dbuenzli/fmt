@@ -7,7 +7,7 @@
 
 (** {1 Option for setting the style renderer} *)
 
-val style_renderer : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
+val style_renderer : ?env:Cmdliner.Cmd.Env.info -> ?docs:string -> unit ->
   Fmt.style_renderer option Cmdliner.Term.t
 (** [style_renderer ?env ?docs ()] is a {!Cmdliner} option [--color] that can
     be directly used with the optional arguments of
