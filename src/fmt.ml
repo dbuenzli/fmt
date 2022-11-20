@@ -37,6 +37,7 @@ let nop fmt ppf = ()
 let any fmt ppf _ = pf ppf fmt
 let using f pp ppf v = pp ppf (f v)
 let const pp_v v ppf _ = pp_v ppf v
+let if' bool pp = if bool then pp else nop
 let fmt fmt ppf = pf ppf fmt
 
 (* Separators *)

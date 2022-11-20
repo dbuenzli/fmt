@@ -95,6 +95,9 @@ val using : ('a -> 'b) -> 'b t -> 'a t
 val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
 
+val if' : bool -> 'a t -> 'a t
+(** [if' bool pp] is [pp] if [bool] is [true] and {!nop} otherwise. *)
+
 val fmt : ('a, Format.formatter, unit) Stdlib.format -> Format.formatter -> 'a
 (** [fmt fmt ppf] is [pf ppf fmt]. If [fmt] is used with a single
     non-constant formatting directive, generates a value of type
