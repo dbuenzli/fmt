@@ -1,5 +1,4 @@
-
-
+* Add `Fmt.colon`, `Fmt.dot`, `Fmt.slash`
 * Add `Fmt.if'`, thanks to Rizo for the suggestion and patch.
 
 v0.9.0 2021-10-22 Zagreb
@@ -10,30 +9,30 @@ v0.9.0 2021-10-22 Zagreb
   custom data to formatters has unreliable performance characteristics
   in some usage scenarios. Namely use of `Fmt.styled` with
   `Fmt.[k]str` heavy code as those rely on `Format.{k,a}sprintf` which
-  allocate one formatter per call. 
-  
+  allocate one formatter per call.
+
   Hence we subvert again the `Format` tag system to do dirty
   things. However since as of 4.08 tags became an extensible sum type
   we can keep our dirty things entirely internal.
 
   Thanks to Thomas Leonard for reporting and David Kaloper Meršinjak
   for further investigations (#52).
-  
+
 v0.8.10 2021-10-04 Zagreb
 -------------------------
 
-* Require OCaml >= 4.08. This drops the dependency on the 
+* Require OCaml >= 4.08. This drops the dependency on the
   `stdlib-shims` and `seq` packages.
-* Add the `[@@ocaml.deprecated]` annotation to deprecated 
+* Add the `[@@ocaml.deprecated]` annotation to deprecated
   functions. Thanks to Antonin Décimo for the patch.
 
 v0.8.9 2020-09-23 Zagreb
 ------------------------
 
-* Fix `Dump.{iter_bindings,hashtbl}` which since 0.8.7 no longer 
+* Fix `Dump.{iter_bindings,hashtbl}` which since 0.8.7 no longer
   prints seperators. Thanks to Edwin Török for the patch.
 * Open the result of `Fmt.error_msg` to make it easier
-  to compose with other errors. Thanks to Thomas Leonard 
+  to compose with other errors. Thanks to Thomas Leonard
   for the patch.
 
 v0.8.8 2019-08-01 Zagreb
@@ -60,7 +59,7 @@ v0.8.7 2019-07-21 Zagreb
 * Add `Fmt.Dump.string`.
 * Add more ANSI tty formatting styles and make them composable.
 * Change `Fmt.{const,comma,cut,sp}`, generalize signature.
-* Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if 
+* Change `Fmt.append`, incompatible signature. Use `Fmt.(pair ~sep:nop)` if
   you were using it (backward compatible with earlier versions of `Fmt`).
 * Deprecate `Fmt.{strf,kstrf,strf_like}` in favor of `Fmt.{str,kstr,str_like}`.
 * Deprecate `Fmt.{always,unit}` in favor of `Fmt.any`.
