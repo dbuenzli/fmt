@@ -588,8 +588,8 @@ type style =
     {- [`Bold], [`Faint], [`Italic], [`Underline] and [`Reverse] are
        display attributes.}
     {- [`Fg _] is the foreground color or high-intensity color on [`Hi _].}
-    {- [`Bg _] is the foreground color or high-intensity color on [`Hi _].}
-    {- [#color] is the foreground colour, {b deprecated} use [`Fg
+    {- [`Bg _] is the background color or high-intensity color on [`Hi _].}
+    {- [#color] is the foreground color, {b deprecated} use [`Fg
        #color] instead.}} *)
 
 val styled : style -> 'a t -> 'a t
