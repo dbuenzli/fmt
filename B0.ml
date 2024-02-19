@@ -64,19 +64,19 @@ let default =
     |> B0_meta.(add description_tags)
       ["string"; "format"; "pretty-print"; "org:erratique"]
     |> B0_meta.tag B0_opam.tag
-    |> B0_meta.add B0_opam.depopts ["base-unix", ""; "cmdliner", ""]
-    |> B0_meta.add B0_opam.conflicts
+    |> B0_meta.add B0_opam.Meta.depopts ["base-unix", ""; "cmdliner", ""]
+    |> B0_meta.add B0_opam.Meta.conflicts
       [ "cmdliner", {|< "0.9.8"|}]
-    |> B0_meta.add B0_opam.depends
+    |> B0_meta.add B0_opam.Meta.depends
       [ "ocaml", {|>= "4.08.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
         "topkg", {|build & >= "1.0.3"|};
       ]
-    |> B0_meta.add B0_opam.build
+    |> B0_meta.add B0_opam.Meta.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
           "--with-base-unix" "%{base-unix:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"]]|}
   in
-  B0_pack.make "default" ~doc:"fmt package" ~meta ~locked:true @@
+  B0_pack.v "default" ~doc:"fmt package" ~meta ~locked:true @@
   B0_unit.list ()
