@@ -20,7 +20,7 @@ val style_renderer : ?env:Cmdliner.Cmd.Env.info -> ?docs:string -> unit ->
     {{!Fmt_tty.tty_setup}TTY setup} takes over the automatic setup:
     {ul
     {- [--color=never], the value is [Some `None], forces no styling.}
-    {- [--color=always], the value is [Some `Ansi], forces ANSI styling.}
+    {- [--color=always], the value is [Some `Ansi_tty], forces ANSI styling.}
     {- [--color=auto] or absent, the value is [None], automatic setup
        takes place.}}
 
