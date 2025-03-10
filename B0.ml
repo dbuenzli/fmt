@@ -15,38 +15,26 @@ let fmt_top = B0_ocaml.libname "fmt.top"
 (* Libraries *)
 
 let fmt_lib =
-  let srcs = Fpath.[`File (v "src/fmt.mli"); `File (v "src/fmt.ml")] in
-  let requires = [] in
-  B0_ocaml.lib fmt ~doc:"The fmt library" ~srcs ~requires
+  B0_ocaml.lib fmt ~srcs:[`Dir ~/"src"]
 
 let fmt_cli =
-  let srcs = Fpath.[`File (v "src/fmt_cli.mli"); `File (v "src/fmt_cli.ml")]in
-  let requires = [cmdliner; fmt] in
-  B0_ocaml.lib fmt_cli ~doc:"The fmt.cli library" ~srcs ~requires
+  B0_ocaml.lib fmt_cli ~srcs:[`Dir ~/"src/cli"] ~requires:[cmdliner; fmt]
 
 let fmt_tty =
-  let srcs = Fpath.[`File (v "src/fmt_tty.mli"); `File (v "src/fmt_tty.ml")]in
-  let requires = [unix; fmt] in
-  B0_ocaml.lib fmt_tty ~doc:"The fmt.tty library" ~srcs ~requires
+  B0_ocaml.lib fmt_tty ~srcs:[`Dir ~/"src/tty"] ~requires:[unix; fmt]
 
 let fmt_top =
-  let srcs = Fpath.[`File (v "src/fmt_top.ml")] in
   let requires = [compiler_libs_toplevel] in
-  B0_ocaml.lib fmt_top ~doc:"The fmt.top library" ~srcs ~requires
+  let srcs = [`Dir ~/"src/top"; `X ~/"src/top/fmt_tty_top_init.ml"] in
+  B0_ocaml.lib fmt_top ~srcs ~requires
 
 (* Tests *)
 
-let test =
-  let srcs = Fpath.[`File (v "test/test.ml")] in
-  let meta = B0_meta.(empty |> tag test) in
-  let requires = [ fmt ] in
-  B0_ocaml.exe "test" ~doc:"Test suite" ~srcs ~meta ~requires
+let test ?(requires = []) = B0_ocaml.test ~requires:(fmt :: requires)
 
-let styled_test_bug =
-  let srcs = Fpath.[`File (v "test/styled_perf_bug.ml")] in
-  let meta = B0_meta.(empty |> tag test) in
-  let requires = [unix; fmt] in
-  B0_ocaml.exe "styled_perf_bug" ~srcs ~meta ~requires
+let test_fmt = test ~/"test/test_fmt.ml"
+let styled_perf_bug =
+  test ~/"test/styled_perf_bug.ml" ~requires:[unix] ~run:false
 
 (* Packs *)
 

@@ -2,10 +2,14 @@
 
 Fmt exposes combinators to devise {!Format} pretty-printing functions.
 
-{1:api API}
+{1:library_fmt Library [fmt]}
 
-{!modules:
-Fmt
-Fmt_tty
-Fmt_cli
-}
+{!modules: Fmt}
+
+{1:library_tty Library [fmt.tty]}
+
+{!modules: Fmt_tty}
+
+{1:library_tty Library [fmt.cli]}
+
+{!modules: Fmt_cli}
