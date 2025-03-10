@@ -1,4 +1,7 @@
+v0.10.0 2025-03-10 La Forclaz (VS)
+----------------------------------
 
+* Handle `cmdliner` deprecations.
 * Install each library in its own directory.
 * Add `Fmt.if'`, thanks to Rizo for the suggestion and patch.
 
