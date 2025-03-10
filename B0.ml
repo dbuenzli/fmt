@@ -53,27 +53,27 @@ let styled_test_bug =
 let default =
   let meta =
     B0_meta.empty
-    |> B0_meta.(add authors) ["The fmt programmers"]
-    |> B0_meta.(add maintainers)
+    |> ~~ B0_meta.authors ["The fmt programmers"]
+    |> ~~ B0_meta.maintainers
        ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
-    |> B0_meta.(add homepage) "https://erratique.ch/software/fmt"
-    |> B0_meta.(add online_doc) "https://erratique.ch/software/fmt/doc/"
-    |> B0_meta.(add licenses) ["ISC"]
-    |> B0_meta.(add repo) "git+https://erratique.ch/repos/fmt.git"
-    |> B0_meta.(add issues) "https://github.com/dbuenzli/fmt/issues"
-    |> B0_meta.(add description_tags)
+    |> ~~ B0_meta.homepage "https://erratique.ch/software/fmt"
+    |> ~~ B0_meta.online_doc "https://erratique.ch/software/fmt/doc/"
+    |> ~~ B0_meta.licenses ["ISC"]
+    |> ~~ B0_meta.repo "git+https://erratique.ch/repos/fmt.git"
+    |> ~~ B0_meta.issues "https://github.com/dbuenzli/fmt/issues"
+    |> ~~ B0_meta.description_tags
       ["string"; "format"; "pretty-print"; "org:erratique"]
     |> B0_meta.tag B0_opam.tag
-    |> B0_meta.add B0_opam.depopts ["base-unix", ""; "cmdliner", ""]
-    |> B0_meta.add B0_opam.conflicts
-      [ "cmdliner", {|< "0.9.8"|}]
-    |> B0_meta.add B0_opam.depends
+    |> ~~ B0_opam.depopts ["base-unix", ""; "cmdliner", ""]
+    |> ~~ B0_opam.conflicts
+      [ "cmdliner", {|< "1.3.0"|}]
+    |> ~~ B0_opam.depends
       [ "ocaml", {|>= "4.08.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
         "topkg", {|build & >= "1.0.3"|};
       ]
-    |> B0_meta.add B0_opam.build
+    |> ~~ B0_opam.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
           "--with-base-unix" "%{base-unix:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"]]|}
