@@ -1,3 +1,7 @@
+
+
+* Export `fmt` from `fmt.tty` and `fmt.cli` libraries.
+
 v0.10.0 2025-03-10 La Forclaz (VS)
 ----------------------------------
 

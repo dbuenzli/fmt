@@ -18,15 +18,16 @@ let fmt_lib =
   B0_ocaml.lib fmt ~srcs:[`Dir ~/"src"]
 
 let fmt_cli =
-  B0_ocaml.lib fmt_cli ~srcs:[`Dir ~/"src/cli"] ~requires:[cmdliner; fmt]
+  let srcs = [`Dir ~/"src/cli"] in
+  B0_ocaml.lib fmt_cli ~srcs ~requires:[cmdliner; fmt] ~exports:[fmt]
 
 let fmt_tty =
-  B0_ocaml.lib fmt_tty ~srcs:[`Dir ~/"src/tty"] ~requires:[unix; fmt]
+  let srcs = [`Dir ~/"src/tty"] in
+  B0_ocaml.lib fmt_tty ~srcs ~requires:[unix; fmt] ~exports:[fmt]
 
 let fmt_top =
-  let requires = [compiler_libs_toplevel] in
   let srcs = [`Dir ~/"src/top"; `X ~/"src/top/fmt_tty_top_init.ml"] in
-  B0_ocaml.lib fmt_top ~srcs ~requires
+  B0_ocaml.lib fmt_top ~srcs ~requires:[compiler_libs_toplevel]
 
 (* Tests *)
 
