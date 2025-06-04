@@ -1,5 +1,7 @@
 
 
+* Add `Fmt.{cardinal,ordinal}` to format english 
+  plurals. Thanks to Brian Ward for suggesting (#64).
 * Export `fmt` from `fmt.tty` and `fmt.cli` libraries.
 
 v0.10.0 2025-03-10 La Forclaz (VS)

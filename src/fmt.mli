@@ -548,6 +548,30 @@ val did_you_mean :
     %a%a." pre () kind pp_v v post ()]. If [hints] is empty no "did
     you mean" part is printed. *)
 
+val cardinal : ?zero:int t -> one:int t -> ?other:int t -> unit -> int t
+(** [cardinal ?zero ~one ?other ()] formats an integer by selecting a
+    formatter according to the cardinal english plural form of its absolute
+    value [n]:
+    {ul
+    {- [zero], if [n = 0]. Defaults to [other] (as per
+    {{:https://www.unicode.org/cldr/charts/47/supplemental/language_plural_rules.html#en}english rules}).}
+    {- [one], if [n = 1].}
+    {- [other], otherwise. Defaults to [one] followed by a ['s'] character.}} *)
+
+val ordinal :
+  ?zero:int t -> ?one:int t -> ?two:int t -> ?three:int t -> ?other:int t ->
+  unit -> int t
+(** [ordinal ?zero ?one ?two ?three ?other ()] formats an integer by selecting a
+    formatter according to the ordinal english plural form of its absolute
+    value [n]:
+    {ul
+    {- [zero], if [n = 0]. Defaults to [other] (as per
+    {{:https://www.unicode.org/cldr/charts/47/supplemental/language_plural_rules.html#en}english rules}).}
+    {- [one], if [n mod 10 = 1 && n mod 100 <> 11]. Defaults to ["%dst"].}
+    {- [two], if [n mod 10 = 2 && n mod 100 <> 12]. Defaults to ["%dnd"].}
+    {- [three], if [n mod 10 = 3 && n mod 100 <> 13]. Defaults to ["%drd"].}
+    {- [other] otherwise. Defaults to ["%dth"].}} *)
+
 (** {1:utf8_cond Conditional UTF-8 formatting}
 
     {b Note.} Since {!Format} is not UTF-8 aware using UTF-8 output

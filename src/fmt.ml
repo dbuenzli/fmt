@@ -598,6 +598,32 @@ let did_you_mean
       pf ppf "@[%a %s %a%a.@ Did you mean %a ?@]"
         pre () kind pp_v v post () (one_of pp_v) hints
 
+let cardinal ?zero ~one ?other () =
+  let other = match other with
+  | Some other -> other
+  | None -> fun ppf i -> one ppf i; char ppf 's'
+  in
+  let zero = Option.value ~default:other zero in
+  fun ppf i -> match Int.abs i with
+  | 0 -> zero ppf 0 | 1 -> one ppf 1 | n -> other ppf i
+
+let ordinal =
+  let one ppf i = int ppf i; string ppf "st" in
+  let two ppf i = int ppf i; string ppf "nd" in
+  let three ppf i = int ppf i; string ppf "rd" in
+  let other ppf i = int ppf i; string ppf "th" in
+  fun ?zero ?(one = one) ?(two = two) ?(three = three) ?(other = other) () ->
+    let zero = Option.value ~default:other zero in
+    fun ppf i ->
+      if i = 0 then zero ppf i else
+      let n = Int.abs i in
+      let mod10 = n mod 10 in
+      let mod100 = n mod 100 in
+      if mod10 = 1 && mod100 <> 11 then one ppf i else
+      if mod10 = 2 && mod100 <> 12 then two ppf i else
+      if mod10 = 3 && mod100 <> 13 then three ppf i else
+      other ppf i
+
 (* Conditional UTF-8 and styled formatting. *)
 
 module Imap = Map.Make (Int)

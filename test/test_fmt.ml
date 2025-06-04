@@ -54,6 +54,43 @@ let test_kstr_str_like_partial_app =
   assertf (test_kstrf "%s");
   ()
 
+let test_cardinal =
+  Test.test "Fmt.cardinal" @@ fun () ->
+  let item = Fmt.cardinal ~one:(fun ppf n -> Fmt.pf ppf "%d item" n) () in
+  let item n = Fmt.str "%a" item n in
+  let children =
+    let zero = Fmt.any "are no children" in
+    let one = Fmt.any "is a child" in
+    let other = Fmt.any "are children" in
+    Fmt.cardinal ~zero ~one ~other ()
+  in
+  let children n = Fmt.str "There %a." children n in
+  Snap.string (item 0) @@ __POS_OF__ "0 items";
+  Snap.string (item 1) @@ __POS_OF__ "1 item";
+  Snap.string (item 3) @@ __POS_OF__ "3 items";
+  Snap.string (children 0) @@ __POS_OF__ "There are no children.";
+  Snap.string (children 1) @@ __POS_OF__ "There is a child.";
+  Snap.string (children 67) @@ __POS_OF__ "There are children.";
+  ()
+
+let test_ordinal =
+  Test.test "Fmt.ordinal" @@ fun () ->
+  let ord = Fmt.ordinal () in
+  let ord n = Fmt.str "%a" ord n in
+  Snap.string (ord 0) @@ __POS_OF__ "0th";
+  Snap.string (ord 1) @@ __POS_OF__ "1st";
+  Snap.string (ord 2) @@ __POS_OF__ "2nd";
+  Snap.string (ord 3) @@ __POS_OF__ "3rd";
+  Snap.string (ord 4) @@ __POS_OF__ "4th";
+  Snap.string (ord 11) @@ __POS_OF__ "11th";
+  Snap.string (ord 12) @@ __POS_OF__ "12th";
+  Snap.string (ord 21) @@ __POS_OF__ "21st";
+  Snap.string (ord 22) @@ __POS_OF__ "22nd";
+  Snap.string (ord 66) @@ __POS_OF__ "66th";
+  Snap.string (ord 101) @@ __POS_OF__ "101st";
+  Snap.string (ord 111) @@ __POS_OF__ "111th";
+  ()
+
 let test_byte_size =
   Test.test "Fmt.byte_size" @@ fun () ->
   let size = str Fmt.byte_size in
@@ -287,7 +324,6 @@ let test_uint64_ns_span =
   snap (span "0u63115200_000_000_000") @@ __POS_OF__ "2a";
   snap (span "0u63115200_000_000_001") @@ __POS_OF__ "2a1d";
   ()
-
 
 let main () = Test.main @@ fun () -> Test.autorun ()
 let () = if !Sys.interactive then () else exit (main ())
