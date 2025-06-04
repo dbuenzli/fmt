@@ -3,6 +3,7 @@ open Result.Syntax
 
 (* OCaml library names *)
 
+let b0_std = B0_ocaml.libname "b0.std"
 let compiler_libs_toplevel = B0_ocaml.libname "compiler-libs.toplevel"
 let cmdliner = B0_ocaml.libname "cmdliner"
 let unix = B0_ocaml.libname "unix"
@@ -33,7 +34,7 @@ let fmt_top =
 
 let test ?(requires = []) = B0_ocaml.test ~requires:(fmt :: requires)
 
-let test_fmt = test ~/"test/test_fmt.ml"
+let test_fmt = test ~/"test/test_fmt.ml" ~requires:[b0_std]
 let styled_perf_bug =
   test ~/"test/styled_perf_bug.ml" ~requires:[unix] ~run:false
 
