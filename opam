@@ -7,13 +7,13 @@ Fmt exposes combinators to devise `Format` pretty-printing functions.
 Fmt depends only on the OCaml standard library. The optional `Fmt_tty`
 library that allows to setup formatters for terminal color output
 depends on the Unix library. The optional `Fmt_cli` library that
-provides command line support for Fmt depends on [`Cmdliner`][cmdliner].
+provides command line support for Fmt depends on [`cmdliner`].
 
 Fmt is distributed under the ISC license.
 
-[cmdliner]: http://erratique.ch/software/cmdliner
+Home page: <http://erratique.ch/software/fmt>
 
-Home page: http://erratique.ch/software/fmt"""
+[`cmdliner`]: http://erratique.ch/software/cmdliner"""
 maintainer: "Daniel Bünzli <daniel.buenzl i@erratique.ch>"
 authors: "The fmt programmers"
 license: "ISC"
@@ -25,7 +25,7 @@ depends: [
   "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
-  "topkg" {build & >= "1.0.3"}
+  "topkg" {build & >= "1.1.0"}
 ]
 depopts: ["base-unix" "cmdliner"]
 conflicts: [
