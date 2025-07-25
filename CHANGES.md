@@ -1,4 +1,5 @@
-
+v0.11.0 2025-07-25 Zagreb
+-------------------------
 
 * Add `Fmt.{cardinal,ordinal}` to format english 
   plurals. Thanks to Brian Ward for suggesting (#64).
