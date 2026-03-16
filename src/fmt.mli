@@ -90,7 +90,7 @@ val any : (unit, Format.formatter, unit) Stdlib.format -> 'a t
 (** [any fmt ppf v] formats any value with the constant format [fmt]. *)
 
 val using : ('a -> 'b) -> 'b t -> 'a t
-(** [using f pp ppf v] ppf ppf [(f v)]. *)
+(** [using f pp ppf v] is [pp ppf (f v)]. *)
 
 val const : 'a t -> 'a -> 'b t
 (** [const pp_v v] always formats [v] using [pp_v]. *)
