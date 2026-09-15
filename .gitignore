@@ -6,3 +6,6 @@ tmp
 \.\#*
 \#*#
 *.install
+src/tty/isatty.ml
+src/tty/_tags
+pkg/META

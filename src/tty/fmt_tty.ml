@@ -37,9 +37,7 @@ let setup ?style_renderer ?utf_8 oc =
         with
         Not_found -> true
       in
-      let isatty = try Unix.(isatty (descr_of_out_channel oc)) with
-      | Unix.Unix_error _ -> false
-      in
+      let isatty = Isatty.isatty oc in
       if not dumb && isatty then `Ansi_tty else `None
   in
   let utf_8 = match utf_8 with
