@@ -646,7 +646,7 @@ val of_to_string : ('a -> string) -> 'a t
 (** [of_to_string f ppf v] is [string ppf (f v)]. *)
 
 val to_to_string : 'a t -> 'a -> string
-(** [to_to_string pp_v v] is [strf "%a" pp_v v]. *)
+(** [to_to_string pp_v v] is [str "%a" pp_v v]. *)
 
 (** {1:deprecated Deprecated} *)
 
